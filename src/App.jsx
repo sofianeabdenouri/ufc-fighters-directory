@@ -13,24 +13,33 @@ function App() {
         sortBy: '',
     });
 
-    // Fetch fighters and remove duplicates before setting the state
+    // Fetch fighters and process the data
     useEffect(() => {
-        fetch('http://127.0.0.1:5000/fighters')
+        fetch('https://mmafightcardsapi.adaptable.app/')
             .then(response => response.json())
-            .then(data => {
-                // Clean up country names
-                const cleanedFighters = data.map(fighter => ({
-                    ...fighter,
-                    country: fighter.country ? fighter.country.trim() : 'Unknown'
-                }));
+            .then(responseData => {
+                console.log('API Response:', responseData); // Debugging: Log the API response
+                
+                const data = responseData.data; // Access the nested 'data' array
 
-                // Remove duplicates by using a Set on fighter names
-                const uniqueFighters = Array.from(new Set(cleanedFighters.map(fighter => fighter.name)))
-                    .map(name => cleanedFighters.find(fighter => fighter.name === name));
+                const extractedFighters = [];
+
+                // Process the data array to extract fighters
+                data.forEach(event => {
+                    event.fights.forEach(fight => {
+                        extractedFighters.push(fight.fighterA);
+                        extractedFighters.push(fight.fighterB);
+                    });
+                });
+
+                // Remove duplicates
+                const uniqueFighters = Array.from(new Set(extractedFighters.map(fighter => fighter.name)))
+                    .map(name => extractedFighters.find(fighter => fighter.name === name));
 
                 setFighters(uniqueFighters);
-                setFilteredFighters(uniqueFighters);  // Initially, show all fighters
-            });
+                setFilteredFighters(uniqueFighters); // Initially, show all fighters
+            })
+            .catch(error => console.error('Error fetching data:', error));
     }, []);
 
     // Handle the search and filters
@@ -96,7 +105,7 @@ function App() {
             <div className="filters">
                 <select name="country" value={filters.country} onChange={handleFilterChange}>
                     <option value="">All Countries</option>
-                    {[...new Set(fighters.map(fighter => fighter.country).filter(country => country !== 'Unknown'))].map((country) => (
+                    {[...new Set(fighters.map(fighter => fighter.country))].map((country) => (
                         <option key={country} value={country}>
                             {country}
                         </option>
@@ -127,7 +136,7 @@ function App() {
 
             <div className="fighter-list">
                 {filteredFighters.map(fighter => (
-                    <FighterCard key={fighter.fighter_id} fighter={fighter} />
+                    <FighterCard key={fighter.name} fighter={fighter} />
                 ))}
             </div>
         </div>

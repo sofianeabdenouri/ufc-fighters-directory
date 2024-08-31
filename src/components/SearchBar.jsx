@@ -1,16 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 function SearchBar({ fighters, setFilteredFighters }) {
     const [searchTerm, setSearchTerm] = useState('');
 
-    const handleSearch = () => {
-        console.log('Search term:', searchTerm);  // Debugging
-        const filtered = fighters.filter(fighter =>
-            fighter.name.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-        console.log('Filtered fighters:', filtered);  // Debugging
-        setFilteredFighters(filtered);
-    };
+    useEffect(() => {
+        const delayDebounceFn = setTimeout(() => {
+            const filtered = fighters.filter(fighter =>
+                fighter.name.toLowerCase().includes(searchTerm.trim().toLowerCase())
+            );
+            setFilteredFighters(filtered);
+        }, 300); // Debounce time in ms
+
+        return () => clearTimeout(delayDebounceFn);
+    }, [searchTerm, fighters, setFilteredFighters]);
 
     return (
         <div>
@@ -20,7 +22,6 @@ function SearchBar({ fighters, setFilteredFighters }) {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search fighters"
             />
-            <button onClick={handleSearch}>Search</button>
         </div>
     );
 }
