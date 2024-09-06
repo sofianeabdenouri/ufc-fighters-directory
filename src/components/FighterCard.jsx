@@ -1,36 +1,52 @@
 import React from 'react';
 
-function FighterCard({ fighter }) {
-  const { name, picture, country } = fighter;
+const FighterCard = ({ fighter }) => {
+    const {
+        FirstName,
+        LastName,
+        Nickname,
+        WeightClass,
+        Wins,
+        Losses,
+        Draws,
+        TechnicalKnockouts,
+        TechnicalKnockoutLosses,
+        Submissions,
+        SubmissionLosses,
+        Nocontests
+    } = fighter;
 
-  // The image URL comes directly from the API now
-  const imagePath = picture || '/src/assets/fighter_images/default_image.png';
+    // Helper function for singular/plural formatting and 0 case
+    const formatLabel = (count, singular, plural) => {
+        if (count === 0) return singular; // No 's' for zero
+        return count === 1 ? singular : plural;
+    };
 
-  return (
-    <div className="fighter-card">
-      <h2>{name}</h2>
-      <p>{fighter.weight_class || 'Unknown Weight Class'}</p>
-      {country && (
-        <img src={country} alt="Country Flag" style={{ width: '30px', marginBottom: '10px' }} />
-      )}
-      <div className="record">
-        <span className="wins">{fighter.record.split(' - ')[0]}</span>
-        <span className="separator">-</span>
-        <span className="losses">{fighter.record.split(' - ')[1]}</span>
-        <span className="separator">-</span>
-        <span className="draws">{fighter.record.split(' - ')[2]}</span>
-      </div>
-      <img
-        className="fighter-image"
-        src={imagePath}
-        alt={name}
-        onError={(e) => {
-          e.target.onerror = null;
-          e.target.src = '/src/assets/fighter_images/default_image.png'; // Fallback image
-        }}
-      />
-    </div>
-  );
-}
+    return (
+        <div className="fighter-card">
+            {Nickname && <p className="nickname">"{Nickname}"</p>} {/* Display nickname if it exists */}
+            <h2>{FirstName} {LastName}</h2>
+            <p>{WeightClass}</p>
+            
+            <div className="fighter-stats">
+                <div className="wins">
+                    <p>{Wins}</p>
+                    <p>{TechnicalKnockouts} {formatLabel(TechnicalKnockouts, 'KO', 'KOs')}</p>
+                    <p>{Submissions} {formatLabel(Submissions, 'SUB', 'SUBs')}</p>
+                </div>
+                <div className="losses">
+                    <p>{Losses}</p>
+                    <p>{TechnicalKnockoutLosses} {formatLabel(TechnicalKnockoutLosses, 'KO', 'KOs')}</p>
+                    <p>{SubmissionLosses} {formatLabel(SubmissionLosses, 'SUB', 'SUBs')}</p>
+                </div>
+                <div className="draws">
+                    <p>{Draws}</p>
+                    <p>{formatLabel(Draws, 'Draw', 'Draws')}</p> {/* Apply singular/plural formatting logic for Draws */}
+                    <p>{Nocontests} {formatLabel(Nocontests, 'NC', 'NCs')}</p> {/* Apply same logic for NCs */}
+                </div>
+            </div>
+        </div>
+    );
+};
 
 export default FighterCard;

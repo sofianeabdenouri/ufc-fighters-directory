@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import FighterCard from './components/FighterCard';
-import '../styles.css'; // Ensure your styles file is correctly imported
+import './App.css'; // Ensure your styles file is correctly imported
 
 function App() {
     const [fighters, setFighters] = useState([]);
@@ -15,26 +15,15 @@ function App() {
 
     // Fetch fighters and process the data
     useEffect(() => {
-        fetch('https://mmafightcardsapi.adaptable.app/')
+        fetch(`https://api.sportsdata.io/v3/mma/scores/json/FightersBasic?key=${import.meta.env.VITE_API_KEY}`)
             .then(response => response.json())
-            .then(responseData => {
-                console.log('API Response:', responseData); // Debugging: Log the API response
-                
-                const data = responseData.data; // Access the nested 'data' array
+            .then(data => {
+                // Filter out fighters with no fights or records
+                const fightersWithRecords = data.filter(fighter => fighter.Wins || fighter.Losses || fighter.Draws);
 
-                const extractedFighters = [];
-
-                // Process the data array to extract fighters
-                data.forEach(event => {
-                    event.fights.forEach(fight => {
-                        extractedFighters.push(fight.fighterA);
-                        extractedFighters.push(fight.fighterB);
-                    });
-                });
-
-                // Remove duplicates
-                const uniqueFighters = Array.from(new Set(extractedFighters.map(fighter => fighter.name)))
-                    .map(name => extractedFighters.find(fighter => fighter.name === name));
+                // Remove duplicates by unique Fighter ID
+                const uniqueFighters = Array.from(new Set(fightersWithRecords.map(fighter => fighter.FighterId)))
+                    .map(id => fightersWithRecords.find(fighter => fighter.FighterId === id));
 
                 setFighters(uniqueFighters);
                 setFilteredFighters(uniqueFighters); // Initially, show all fighters
@@ -49,32 +38,33 @@ function App() {
         // Apply search term
         if (searchTerm) {
             results = results.filter(fighter =>
-                fighter.name.toLowerCase().includes(searchTerm.toLowerCase())
+                fighter.FirstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                fighter.LastName.toLowerCase().includes(searchTerm.toLowerCase())
             );
         }
 
         // Apply filters
         if (filters.country) {
-            results = results.filter(fighter => fighter.country === filters.country);
+            results = results.filter(fighter => fighter.Nationality === filters.country);
         }
 
         if (filters.weightClass) {
-            results = results.filter(fighter => fighter.weight_class === filters.weightClass);
+            results = results.filter(fighter => fighter.WeightClass === filters.weightClass);
         }
 
         if (filters.sex) {
-            results = results.filter(fighter => fighter.sex === filters.sex);
+            results = results.filter(fighter => fighter.Gender === filters.sex);
         }
 
         // Apply sorting
         if (filters.sortBy === 'alphabetical') {
-            results.sort((a, b) => a.name.localeCompare(b.name));
+            results.sort((a, b) => a.FirstName.localeCompare(b.FirstName));
         } else if (filters.sortBy === 'wins') {
-            results.sort((a, b) => b.wins - a.wins);
+            results.sort((a, b) => b.Wins - a.Wins);
         } else if (filters.sortBy === 'losses') {
-            results.sort((a, b) => b.losses - a.losses);
+            results.sort((a, b) => b.Losses - a.Losses);
         } else if (filters.sortBy === 'draws') {
-            results.sort((a, b) => b.draws - a.draws);
+            results.sort((a, b) => b.Draws - a.Draws);
         }
 
         setFilteredFighters(results);
@@ -105,7 +95,7 @@ function App() {
             <div className="filters">
                 <select name="country" value={filters.country} onChange={handleFilterChange}>
                     <option value="">All Countries</option>
-                    {[...new Set(fighters.map(fighter => fighter.country))].map((country) => (
+                    {[...new Set(fighters.map(fighter => fighter.Nationality))].map((country) => (
                         <option key={country} value={country}>
                             {country}
                         </option>
@@ -114,7 +104,7 @@ function App() {
 
                 <select name="weightClass" value={filters.weightClass} onChange={handleFilterChange}>
                     <option value="">All Weight Classes</option>
-                    {[...new Set(fighters.map(fighter => fighter.weight_class))].map((weightClass) => (
+                    {[...new Set(fighters.map(fighter => fighter.WeightClass))].map((weightClass) => (
                         <option key={weightClass} value={weightClass}>{weightClass}</option>
                     ))}
                 </select>
@@ -136,7 +126,7 @@ function App() {
 
             <div className="fighter-list">
                 {filteredFighters.map(fighter => (
-                    <FighterCard key={fighter.name} fighter={fighter} />
+                    <FighterCard key={fighter.FighterId} fighter={fighter} />
                 ))}
             </div>
         </div>
