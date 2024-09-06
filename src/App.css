@@ -1,68 +1,55 @@
-/* General styles */
-body {
-  background-color: #1b1b1b;
-  color: #f4f4f4;
-  font-family: 'Arial', sans-serif;
-  margin: 0;
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-}
-
-/* Container to center everything */
-.app {
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
-h1 {
-  font-size: 3rem;
-  margin-bottom: 20px;
-}
-
-.fighter-list {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin-top: 20px;
-}
-
-/* Fighter Card Styles */
 .fighter-card {
-  background-color: #2b2b2b;
-  border-radius: 10px;
-  padding: 20px;
-  margin: 10px;
-  width: 200px;
-  text-align: center;
-  color: white;
-}
-
-/* Search Bar Styles */
-input[type="text"] {
-  padding: 10px;
-  font-size: 1rem;
-  border-radius: 5px;
   border: 1px solid #ccc;
-  margin-right: 10px;
-  width: 250px;
-}
-
-button {
-  padding: 10px 15px;
-  font-size: 1rem;
-  background-color: #4caf50;
+  padding: 10px;
+  margin: 10px;
+  width: 300px;
+  text-align: center;
+  background-color: #2b2b2b;
   color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
+  border-radius: 10px;
 }
 
-button:hover {
-  background-color: #45a049;
+/* Nickname styling */
+.nickname {
+  font-size: 14px;
+  color: #9f9f9f;
+  margin-bottom: 5px;
+}
+
+.fighter-card h2 {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.fighter-card p {
+  margin: 5px 0;
+}
+
+/* Fighter stats layout */
+.fighter-stats {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 15px;
+}
+
+.fighter-stats div {
+  text-align: center;
+}
+
+.fighter-stats div p {
+  margin: 0;
+  font-size: 16px;
+}
+
+/* Colors for wins, losses, and draws */
+.wins p:first-child {
+  color: #3dff3d; /* Green color for wins */
+}
+
+.losses p:first-child {
+  color: #ff6767; /* Red color for losses */
+}
+
+.draws p:first-child {
+  color: #a4c1ff; /* Blue color for draws */
 }
