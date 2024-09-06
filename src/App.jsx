@@ -1,45 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import FighterCard from './components/FighterCard';
-import FighterProfile from './pages/fighter-profile/FighterProfile';
-import Header from './header/Header';
-import './App.css';
-
-// Utility function to sanitize fighter names for use in image paths
-const sanitizeNameForImage = (firstName = '', lastName = '', nickname = '', isDuplicate = false) => {
-    const fullName = [firstName, lastName]
-        .filter(Boolean)
-        .join(' ')
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .toLowerCase()
-        .replace(/['-]/g, '')
-        .replace(/[^a-z0-9\s]/g, '')
-        .replace(/\s+/g, '_')
-        .trim();
-
-    if (isDuplicate && nickname) {
-        const sanitizedNickname = nickname
-            .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '')
-            .toLowerCase()
-            .replace(/['-]/g, '')
-            .replace(/[^a-z0-9\s]/g, '')
-            .replace(/\s+/g, '_')
-            .trim();
-            return `${fullName}_${sanitizedNickname}`;
-        }
-
-    return fullName;
-};
-
-
-
-
-// Utility function to remove accents from strings
-const removeAccents = (str) => {
-    return str.normalize('NFD').replace(/[\u0300-\u036f]/g, ''); // Removes accents from characters
-};
+import './App.css'; // Ensure your styles file is correctly imported
 
 function App() {
     const [fighters, setFighters] = useState([]);
@@ -51,245 +13,18 @@ function App() {
     const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
     const [favorites, setFavorites] = useState([]);
     useEffect(() => {
-        const fetchFavorites = async () => {
-            try {
-                const response = await fetch(`http://localhost:5000/favorites/user123`);
-                const data = await response.json();
-                setFavorites(data); // Initialize favorites from backend
-            } catch (error) {
-                console.error('Error fetching favorites:', error);
-            }
-        };
-    
-        fetchFavorites();
-    }, []);
-    
-    const [showScrollButton, setShowScrollButton] = useState(false); // For scroll-to-top button
-    const [currentPage, setCurrentPage] = useState(1);
-    const fightersPerPage = useRef(0); // Dynamically calculate fighters per page
-    const totalPages = Math.ceil(filteredFighters.length / fightersPerPage.current); // Total number of pages
-    const [showPageInput, setShowPageInput] = useState({ left: false, right: false });
-const [pageInputValue, setPageInputValue] = useState('');
-const [errorMessage, setErrorMessage] = useState('');
-
-const handleEllipsisClick = (side) => {
-    setShowPageInput((prev) => ({ ...prev, [side]: true }));
-    setErrorMessage('');
-};
-
-const handleKeyDown = (e) => {
-    const allowedKeys = ['Backspace', 'ArrowLeft', 'ArrowRight', 'Delete'];
-    if (!/^\d$/.test(e.key) && !allowedKeys.includes(e.key)) {
-        e.preventDefault();
-    }
-};
-useEffect(() => {
-    setShowPageInput(false); // Hide the ellipsis input on page change
-    setPageInputValue('');   // Clear the input value on page change
-}, [currentPage]);
-
-    const handlePageInputChange = (e) => {
-        setPageInputValue(e.target.value);
-        setErrorMessage(''); // Clear any previous error message
-    };
-    
-    const handlePageInputKeyPress = (e) => {
-        if (e.key === 'Enter') {
-            const page = parseInt(pageInputValue, 10);
-            if (page >= 1 && page <= totalPages) {
-                setCurrentPage(page);
-                setShowPageInput(false);
-                setPageInputValue(''); // Clear input value after navigation
-            } else {
-                setErrorMessage('Please enter a valid page number');
-            }
-        }
-    };
-    const handleFavoritesFilter = () => {
-    // Filter for favorite fighters first
-    let favoriteFighters = fighters.filter(fighter => favorites.includes(fighter.FighterId));
-    
-    // Apply selected weight class filters
-    if (selectedWeightClasses.length > 0) {
-        favoriteFighters = favoriteFighters.filter(fighter =>
-            selectedWeightClasses.includes(fighter.WeightClass || 'Unknown')
-        );
-    }
-
-    // Apply selected gender filters
-    if (selectedGenders.length > 0) {
-        favoriteFighters = favoriteFighters.filter(fighter => {
-            const gender = maleWeightClasses.includes(fighter.WeightClass) || !fighter.WeightClass ? 'Male' : 'Female';
-            return selectedGenders.includes(gender);
-        });
-    }
-    
-    // Apply current sorting option
-    favoriteFighters = handleSort(favoriteFighters);
-    
-    // Update state with sorted and filtered favorites
-    setFilteredFighters(favoriteFighters);
-    setCurrentPage(1); // Reset to page 1 after filtering
-};
-
-    
-const goToPage = (side) => {
-    const page = parseInt(pageInputValue, 10);
-    if (page >= 1 && page <= totalPages) {
-        setCurrentPage(page);
-        setShowPageInput({ left: false, right: false }); // Close both inputs
-        setErrorMessage('');
-        setPageInputValue('');
-    } else {
-        setErrorMessage('Invalid page number');
-    }
-};
-
-    
-    
-const getPaginationNumbers = () => {
-    const pages = [];
-    if (totalPages <= 7) {
-        for (let i = 1; i <= totalPages; i++) pages.push(i);
-    } else {
-        if (currentPage <= 4) {
-            for (let i = 1; i <= 5; i++) pages.push(i);
-            pages.push('rightEllipsis');
-            pages.push(totalPages);
-        } else if (currentPage >= totalPages - 3) {
-            pages.push(1);
-            pages.push('leftEllipsis');
-            for (let i = totalPages - 4; i <= totalPages; i++) pages.push(i);
-        } else {
-            pages.push(1);
-            pages.push('leftEllipsis');
-            for (let i = currentPage - 2; i <= currentPage + 2; i++) pages.push(i);
-            pages.push('rightEllipsis');
-            pages.push(totalPages);
-        }
-    }
-    return pages;
-};
-
-
-
-    
-// Dynamically set fighters per page to 5 fighters per row and 3 rows
-useEffect(() => {
-    const setFixedGrid = () => {
-        const fightersPerRow = 5; // Set fixed fighters per row
-        fightersPerPage.current = fightersPerRow * 3; // 5 fighters per row, 3 rows
-    };
-
-    setFixedGrid(); // Run on mount
-    window.addEventListener('resize', setFixedGrid);
-    return () => window.removeEventListener('resize', setFixedGrid);
-}, []);
-
-    
-    // Scroll restoration logic
-    useEffect(() => {
-        // Save scroll position before leaving the page
-        const saveScrollPosition = () => {
-            sessionStorage.setItem('scrollPosition', window.scrollY);
-        };
-
-        // Add event listener to save scroll position
-        window.addEventListener('beforeunload', saveScrollPosition);
-
-        // Restore scroll position when user revisits
-        const savedScrollPosition = sessionStorage.getItem('scrollPosition');
-        if (savedScrollPosition && window.location.pathname === "/") {
-            window.scrollTo(0, parseInt(savedScrollPosition, 10));
-        }
-
-        return () => {
-            // Cleanup: remove event listener
-            window.removeEventListener('beforeunload', saveScrollPosition);
-        };
-    }, []);
-
-    // Toggle scroll-to-top button based on scroll position
-    useEffect(() => {
-        const handleScroll = () => {
-            if (window.pageYOffset > 300) {
-                setShowScrollButton(true);
-            } else {
-                setShowScrollButton(false);
-            }
-        };
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
-
-    const handleScrollToTop = () => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
-
-    const handleAdvancedSearch = () => {
-        handleSearch(); // Trigger search when doing advanced search
-    };
-
-    const maleWeightClasses = [
-        "Flyweight", "Bantamweight", "Featherweight", "Lightweight", "Welterweight",
-        "Middleweight", "Light Heavyweight", "Heavyweight", "Catch Weight", "Open Weight", "Unknown"
-    ];
-
-    const femaleWeightClasses = [
-        "Women's Strawweight", "Women's Flyweight",
-        "Women's Bantamweight", "Women's Featherweight"
-    ];
-
-    const genders = ["Male", "Female"];
-    const fighterListRef = useRef(null);
-
-    const scrollToFighters = () => {
-        fighterListRef.current?.scrollIntoView({ behavior: 'smooth' });
-    };
-    useEffect(() => {
         fetch(`https://api.sportsdata.io/v3/mma/scores/json/FightersBasic?key=${import.meta.env.VITE_API_KEY}`)
-        .then((response) => response.json())
-            .then((data) => {
-                // Filter out fighters with no fights (Wins, Losses, or Draws must be > 0)
-                const fightersWithFights = data.filter((fighter) => {
-                    const totalFights = (fighter.Wins || 0) + (fighter.Losses || 0) + (fighter.Draws || 0);
-                    return totalFights > 0;
-                });
-    
-                // Group fighters by full name
-                const groupedFighters = fightersWithFights.reduce((acc, fighter) => {
-                    const fullName = `${fighter.FirstName} ${fighter.LastName}`.trim();
-                    if (!acc[fullName]) acc[fullName] = [];
-                    acc[fullName].push(fighter);
-                    return acc;
-                }, {});
-    
-                // Flatten groups while removing duplicates with identical records
-                const selectedFighters = Object.values(groupedFighters).flatMap((group) => {
-                    if (group.length === 1) return group; // No duplicates, keep the single fighter
-    
-                    // Deduplicate fighters with identical records
-                    const uniqueFighters = group.reduce((unique, currentFighter) => {
-                        const isDuplicate = unique.some((fighter) =>
-                            fighter.Wins === currentFighter.Wins &&
-                            fighter.Losses === currentFighter.Losses &&
-                            fighter.Draws === currentFighter.Draws &&
-                            fighter.Nickname === currentFighter.Nickname
-                        );
-                        if (!isDuplicate) unique.push(currentFighter);
-                        return unique;
-                    }, []);
-    
-                    // Mark duplicates
-                    return uniqueFighters.map((fighter) => ({
-                        ...fighter,
-                        isDuplicate: uniqueFighters.length > 1, // Mark as duplicate only if more than one remains
-                    }));
-                });
-    
-                // Update the state with filtered fighters
-                setFighters(selectedFighters);
-                setFilteredFighters(selectedFighters);
+            .then(response => response.json())
+            .then(data => {
+                // Filter out fighters with no fights or records
+                const fightersWithRecords = data.filter(fighter => fighter.Wins || fighter.Losses || fighter.Draws);
+
+                // Remove duplicates by unique Fighter ID
+                const uniqueFighters = Array.from(new Set(fightersWithRecords.map(fighter => fighter.FighterId)))
+                    .map(id => fightersWithRecords.find(fighter => fighter.FighterId === id));
+
+                setFighters(uniqueFighters);
+                setFilteredFighters(uniqueFighters); // Initially, show all fighters
             })
             .catch((error) => console.error('Error fetching data:', error));
     }, []);
@@ -346,101 +81,46 @@ useEffect(() => {
     
         if (selectedWeightClasses.length > 0) {
             results = results.filter(fighter =>
-                selectedWeightClasses.includes(fighter.WeightClass || 'Unknown')
+                fighter.FirstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                fighter.LastName.toLowerCase().includes(searchTerm.toLowerCase())
             );
         }
-    
-        if (selectedGenders.length > 0) {
-            results = results.filter(fighter => {
-                const gender = maleWeightClasses.includes(fighter.WeightClass) || !fighter.WeightClass ? 'Male' : 'Female';
-                return selectedGenders.includes(gender);
-            });
+
+        // Apply filters
+        if (filters.country) {
+            results = results.filter(fighter => fighter.Nationality === filters.country);
         }
-    
-        results = handleSort(results);
+
+        if (filters.weightClass) {
+            results = results.filter(fighter => fighter.WeightClass === filters.weightClass);
+        }
+
+        if (filters.sex) {
+            results = results.filter(fighter => fighter.Gender === filters.sex);
+        }
+
+        // Apply sorting
+        if (filters.sortBy === 'alphabetical') {
+            results.sort((a, b) => a.FirstName.localeCompare(b.FirstName));
+        } else if (filters.sortBy === 'wins') {
+            results.sort((a, b) => b.Wins - a.Wins);
+        } else if (filters.sortBy === 'losses') {
+            results.sort((a, b) => b.Losses - a.Losses);
+        } else if (filters.sortBy === 'draws') {
+            results.sort((a, b) => b.Draws - a.Draws);
+        }
+
         setFilteredFighters(results);
-        setCurrentPage(1); // Reset to page 1 after search
-    
-        // Reset the advanced filters
-        setSelectedWeightClasses([]);
-        setSelectedGenders([]);
-    };
-    
-    
-    
-
-    const handleKeyPress = (e) => {
-        if (e.key === 'Enter') {
-            handleSearch();
-        }
     };
 
-    const clearSearch = () => {
-        setSearchTerm('');
-        setFilteredFighters(fighters); // Reset to the full fighter list
+    // Update filters state when a filter is selected
+    const handleFilterChange = (e) => {
+        const { name, value } = e.target;
+        setFilters(prevFilters => ({
+            ...prevFilters,
+            [name]: value
+        }));
     };
-
-    const toggleWeightClass = (weightClass) => {
-        setSelectedWeightClasses(prev =>
-            prev.includes(weightClass)
-                ? prev.filter(wc => wc !== weightClass)
-                : [...prev, weightClass]
-        );
-    };
-
-    const toggleGender = (gender) => {
-        setSelectedGenders(prev =>
-            prev.includes(gender)
-                ? prev.filter(g => g !== gender)
-                : [...prev, gender]
-        );
-    };
-
-    const toggleAdvancedSearch = () => {
-        setShowAdvancedSearch(prev => !prev);
-    };
-
-    const isWeightClassDisabled = (weightClass) => {
-        if (selectedGenders.length === 2) {
-            return false;
-        }
-        if (selectedGenders.includes("Female") && !femaleWeightClasses.includes(weightClass)) {
-            return true;
-        }
-        if (selectedGenders.includes("Male") && !maleWeightClasses.includes(weightClass)) {
-            return true;
-        }
-        return false;
-    };
-
-    const toggleFavorite = async (fighterId) => {
-        try {
-            if (favorites.includes(fighterId)) {
-                // If already in favorites, remove it
-                await fetch(`http://localhost:5000/favorites/user123`, {
-                    method: 'DELETE',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ fighterId }),
-                });
-    
-                setFavorites((prevFavorites) =>
-                    prevFavorites.filter((id) => id !== fighterId)
-                );
-            } else {
-                // If not in favorites, add it
-                await fetch(`http://localhost:5000/favorites/user123`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ fighterId }),
-                });
-    
-                setFavorites((prevFavorites) => [...prevFavorites, fighterId]);
-            }
-        } catch (error) {
-            console.error('Error toggling favorite:', error);
-        }
-    };
-    
 
     return (
         <Router>
@@ -469,251 +149,44 @@ useEffect(() => {
         )}
     </div>
 
-    <select onChange={(e) => setSortBy(e.target.value)} value={sortBy}>
-        <option value="">No sorting</option>
-        <option value="alphabetical">Alphabetical</option>
-        <option value="mostWins">Most Wins</option>
-        <option value="mostLosses">Most Losses</option>
-        <option value="mostDraws">Most Draws</option>
-        <option value="mostKOs">Most Knockouts</option>
-        <option value="mostSubs">Most Submissions</option>
-    </select>
+            <div className="filters">
+                <select name="country" value={filters.country} onChange={handleFilterChange}>
+                    <option value="">All Countries</option>
+                    {[...new Set(fighters.map(fighter => fighter.Nationality))].map((country) => (
+                        <option key={country} value={country}>
+                            {country}
+                        </option>
+                    ))}
+                </select>
 
-    <button onClick={handleSearch}>Search</button>
+                <select name="weightClass" value={filters.weightClass} onChange={handleFilterChange}>
+                    <option value="">All Weight Classes</option>
+                    {[...new Set(fighters.map(fighter => fighter.WeightClass))].map((weightClass) => (
+                        <option key={weightClass} value={weightClass}>{weightClass}</option>
+                    ))}
+                </select>
 
-    <button
-        className="favorites-button"
-        onClick={handleFavoritesFilter} // New function for instant favorites filter
-    >
-        Favorites
-    </button>
+                <select name="sex" value={filters.sex} onChange={handleFilterChange}>
+                    <option value="">Both</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                </select>
 
-    <button onClick={toggleAdvancedSearch} style={{ marginLeft: '10px' }}>
-        {showAdvancedSearch ? 'Hide Advanced Search' : 'Advanced Search'}
-    </button>
-</div>
+                <select name="sortBy" value={filters.sortBy} onChange={handleFilterChange}>
+                    <option value="">Sort By</option>
+                    <option value="alphabetical">Alphabetical (A-Z)</option>
+                    <option value="wins">Most Wins</option>
+                    <option value="losses">Most Losses</option>
+                    <option value="draws">Most Draws</option>
+                </select>
+            </div>
 
-
-
-                            {showAdvancedSearch && (
-                                <div className="advanced-search-box fighter-card">
-                                    <div className="weight-class-container">
-                                        <div className="male-divisions">
-                                            <h3>Male Divisions</h3>
-                                            {maleWeightClasses.slice(0, 8).map(wc => (
-                                                <div key={wc}>
-                                                    <label>
-                                                        <input
-                                                            type="checkbox"
-                                                            onChange={() => toggleWeightClass(wc)}
-                                                            disabled={isWeightClassDisabled(wc)}
-                                                        /> {wc}
-                                                    </label>
-                                                </div>
-                                            ))}
-                                        </div>
-
-                                        <div className="female-divisions">
-                                            <h3>Female Divisions</h3>
-                                            {femaleWeightClasses.map(wc => (
-                                                <div key={wc}>
-                                                    <label>
-                                                        <input
-                                                            type="checkbox"
-                                                            onChange={() => toggleWeightClass(wc)}
-                                                            disabled={isWeightClassDisabled(wc)}
-                                                        /> {wc}
-                                                    </label>
-                                                </div>
-                                            ))}
-                                        </div>
-
-                                        <div className="other-divisions">
-                                            <h3>Other Divisions</h3>
-                                            {maleWeightClasses.slice(8).map(wc => (
-                                                <div key={wc}>
-                                                    <label>
-                                                        <input
-                                                            type="checkbox"
-                                                            onChange={() => toggleWeightClass(wc)}
-                                                            disabled={isWeightClassDisabled(wc)}
-                                                        /> {wc}
-                                                    </label>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-
-                                    
-                                </div>
-                            )}
-
-                            {/* Display number of results */}
-                            <div className="result-count">
-    {Math.min(fightersPerPage.current, filteredFighters.slice((currentPage - 1) * fightersPerPage.current, currentPage * fightersPerPage.current).length)} fighters shown — {filteredFighters.length} fighters found
-</div>
-
-
-  {/* PAGINATION LOGIC HERE */}
-  {(() => {
-                            const paginatedFighters = filteredFighters.slice(
-                                (currentPage - 1) * fightersPerPage.current,
-                                currentPage * fightersPerPage.current
-                            );
-
-                             return (
-                                <div className="fighter-list" ref={fighterListRef}>
-                                    
-                                    {paginatedFighters.length > 0 ? (
-                                        paginatedFighters.map((fighter) => (
-                                            <FighterCard
-                                                key={fighter.FighterId}
-                                                fighter={fighter}
-                                                isFavorite={favorites.includes(
-                                                    fighter.FighterId
-                                                )}
-                                                toggleFavorite={toggleFavorite}
-                                            />
-                                        ))
-                                    ) : (
-                                        <p>No fighters found</p>
-                                    )}
-                                </div>
-                                     );
-                                    })()}
-{/* Pagination Controls */}
-{totalPages > 1 && (
-    <div className="pagination">
-    <button
-        disabled={currentPage === 1}
-        onClick={() => setCurrentPage(1)}
-        className={currentPage === 1 ? 'disabled-button' : ''}
-    >
-        « First
-    </button>
-
-    <button
-        disabled={currentPage === 1}
-        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-        className={currentPage === 1 ? 'disabled-button' : ''}
-    >
-        ‹ Prev
-    </button>
-
-    {getPaginationNumbers().map((page, index) =>
-        page === 'leftEllipsis' ? (
-            showPageInput.left ? (
-                <div key={index} style={{ display: 'inline-block', textAlign: 'center' }}>
-                    {errorMessage && <div className="ellipses-error-message">{errorMessage}</div>}
-                    <input
-                        type="text"
-                        value={pageInputValue}
-                        onChange={(e) => setPageInputValue(e.target.value)}
-                        onKeyDown={(e) => {
-                            if (e.key === 'Enter') goToPage('left');
-                        }}
-                        placeholder="Go"
-                        className="ellipses-page-input"
-                        onBlur={() => setShowPageInput((prev) => ({ ...prev, left: false }))}
-                        autoFocus
-                    />
-                </div>
-            ) : (
-                <button
-                    key={index}
-                    onClick={() => handleEllipsisClick('left')}
-                    className="ellipsis-button"
-                >
-                    ...
-                </button>
-            )
-        ) : page === 'rightEllipsis' ? (
-            showPageInput.right ? (
-                <div key={index} style={{ display: 'inline-block', textAlign: 'center' }}>
-                    {errorMessage && <div className="ellipses-error-message">{errorMessage}</div>}
-                    <input
-                        type="text"
-                        value={pageInputValue}
-                        onChange={(e) => setPageInputValue(e.target.value)}
-                        onKeyDown={(e) => {
-                            if (e.key === 'Enter') goToPage('right');
-                        }}
-                        placeholder="Go"
-                        className="ellipses-page-input"
-                        onBlur={() => setShowPageInput((prev) => ({ ...prev, right: false }))}
-                        autoFocus
-                    />
-                </div>
-            ) : (
-                <button
-                    key={index}
-                    onClick={() => handleEllipsisClick('right')}
-                    className="ellipsis-button"
-                >
-                    ...
-                </button>
-            )
-        ) : (
-            <button
-                key={index}
-                className={page === currentPage ? 'active' : ''}
-                onClick={() => setCurrentPage(page)}
-            >
-                {page}
-            </button>
-        )
-    )}
-
-    <button
-        disabled={currentPage === totalPages}
-        onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-        className={currentPage === totalPages ? 'disabled-button' : ''}
-    >
-        Next ›
-    </button>
-
-    <button
-        disabled={currentPage === totalPages}
-        onClick={() => setCurrentPage(totalPages)}
-        className={currentPage === totalPages ? 'disabled-button' : ''}
-    >
-        Last »
-    </button>
-</div>
-
-)}
-
-
-
-                            {/* Scroll to top button */}
-                            {showScrollButton && (
-                                <button onClick={handleScrollToTop} className="scroll-to-top">
-                                    ↑
-                                </button>
-                            )}
-
-                            {/* Footer for fan project */}
-                            <footer className="footer">
-                                <p>
-                                    This is a fan-made project and is in no way affiliated with, authorized, or endorsed by the Ultimate Fighting Championship (UFC) or any of its partners, subsidiaries, or associated organizations.<br/> All UFC-related trademarks, names, and logos are the property of their respective owners. <br/> The information presented on this site is for entertainment and informational purposes only, and while every effort is made to ensure accuracy, it is not official or guaranteed to be up-to-date.
-                                </p>
-                            </footer>
-                        </div>
-                    }
-                />
-
-                {/* Adjusted Route to pass favorites and toggleFavorite to FighterProfile */}
-                <Route
-                    path="/fighter/:id"
-                    element={
-                        <FighterProfile 
-                            favorites={favorites}
-                            toggleFavorite={toggleFavorite}
-                        />
-                    }
-                />
-            </Routes>
-        </Router>
+            <div className="fighter-list">
+                {filteredFighters.map(fighter => (
+                    <FighterCard key={fighter.FighterId} fighter={fighter} />
+                ))}
+            </div>
+        </div>
     );
 }
 
