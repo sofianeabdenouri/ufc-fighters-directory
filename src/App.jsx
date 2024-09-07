@@ -1,82 +1,63 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import FighterCard from './components/FighterCard';
-import './App.css'; // Ensure your styles file is correctly imported
+import './App.css';
 
 function App() {
     const [fighters, setFighters] = useState([]);
-    const [filteredFighters, setFilteredFighters] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
-    const [filters, setFilters] = useState({
-        country: '',
-        weightClass: '',
-        sex: '',
-        sortBy: '',
-    });
 
     // Fetch fighters and process the data
     useEffect(() => {
         fetch(`https://api.sportsdata.io/v3/mma/scores/json/FightersBasic?key=${import.meta.env.VITE_API_KEY}`)
             .then(response => response.json())
             .then(data => {
-                // Filter out fighters with no fights or records
                 const fightersWithRecords = data.filter(fighter => fighter.Wins || fighter.Losses || fighter.Draws);
-
-                // Remove duplicates by unique Fighter ID
                 const uniqueFighters = Array.from(new Set(fightersWithRecords.map(fighter => fighter.FighterId)))
                     .map(id => fightersWithRecords.find(fighter => fighter.FighterId === id));
-
                 setFighters(uniqueFighters);
-                setFilteredFighters(uniqueFighters); // Initially, show all fighters
             })
             .catch(error => console.error('Error fetching data:', error));
     }, []);
 
-    // Handle the search and filters
-    const handleSearch = () => {
-        let results = [...fighters];
+    const fetchImage = async (fighterName) => {
+        try {
+            const apiKey = import.meta.env.VITE_GOOGLE_API_KEY; // Add your Google API Key
+            const searchEngineId = import.meta.env.VITE_GOOGLE_CSE_ID; // Add your Google Custom Search Engine ID
 
-        // Apply search term
-        if (searchTerm) {
-            results = results.filter(fighter =>
-                fighter.FirstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                fighter.LastName.toLowerCase().includes(searchTerm.toLowerCase())
-            );
+            const response = await axios.get(`https://www.googleapis.com/customsearch/v1`, {
+                params: {
+                    key: apiKey,
+                    cx: searchEngineId,
+                    q: fighterName + ' UFC',
+                    searchType: 'image',
+                    num: 1, // Get only one image per request
+                },
+            });
+
+            const imageUrl = response.data.items[0]?.link || '';
+            return imageUrl;
+        } catch (error) {
+            console.error('Error fetching image:', error);
+            return '';
         }
-
-        // Apply filters
-        if (filters.country) {
-            results = results.filter(fighter => fighter.Nationality === filters.country);
-        }
-
-        if (filters.weightClass) {
-            results = results.filter(fighter => fighter.WeightClass === filters.weightClass);
-        }
-
-        if (filters.sex) {
-            results = results.filter(fighter => fighter.Gender === filters.sex);
-        }
-
-        // Apply sorting
-        if (filters.sortBy === 'alphabetical') {
-            results.sort((a, b) => a.FirstName.localeCompare(b.FirstName));
-        } else if (filters.sortBy === 'wins') {
-            results.sort((a, b) => b.Wins - a.Wins);
-        } else if (filters.sortBy === 'losses') {
-            results.sort((a, b) => b.Losses - a.Losses);
-        } else if (filters.sortBy === 'draws') {
-            results.sort((a, b) => b.Draws - a.Draws);
-        }
-
-        setFilteredFighters(results);
     };
 
-    // Update filters state when a filter is selected
-    const handleFilterChange = (e) => {
-        const { name, value } = e.target;
-        setFilters(prevFilters => ({
-            ...prevFilters,
-            [name]: value
-        }));
+    const handleSearch = () => {
+        const results = fighters.filter(fighter =>
+            fighter.FirstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            fighter.LastName.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+
+        // Fetch images for the filtered fighters
+        Promise.all(
+            results.map(async (fighter) => {
+                const imageUrl = await fetchImage(fighter.FirstName + ' ' + fighter.LastName);
+                return { ...fighter, imageUrl };
+            })
+        ).then((fightersWithImages) => {
+            setFighters(fightersWithImages);
+        });
     };
 
     return (
@@ -92,40 +73,8 @@ function App() {
                 <button onClick={handleSearch}>Search</button>
             </div>
 
-            <div className="filters">
-                <select name="country" value={filters.country} onChange={handleFilterChange}>
-                    <option value="">All Countries</option>
-                    {[...new Set(fighters.map(fighter => fighter.Nationality))].map((country) => (
-                        <option key={country} value={country}>
-                            {country}
-                        </option>
-                    ))}
-                </select>
-
-                <select name="weightClass" value={filters.weightClass} onChange={handleFilterChange}>
-                    <option value="">All Weight Classes</option>
-                    {[...new Set(fighters.map(fighter => fighter.WeightClass))].map((weightClass) => (
-                        <option key={weightClass} value={weightClass}>{weightClass}</option>
-                    ))}
-                </select>
-
-                <select name="sex" value={filters.sex} onChange={handleFilterChange}>
-                    <option value="">Both</option>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                </select>
-
-                <select name="sortBy" value={filters.sortBy} onChange={handleFilterChange}>
-                    <option value="">Sort By</option>
-                    <option value="alphabetical">Alphabetical (A-Z)</option>
-                    <option value="wins">Most Wins</option>
-                    <option value="losses">Most Losses</option>
-                    <option value="draws">Most Draws</option>
-                </select>
-            </div>
-
             <div className="fighter-list">
-                {filteredFighters.map(fighter => (
+                {fighters.map(fighter => (
                     <FighterCard key={fighter.FighterId} fighter={fighter} />
                 ))}
             </div>
