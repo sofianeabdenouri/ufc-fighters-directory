@@ -16,6 +16,10 @@ const FighterCard = ({ fighter }) => {
         Nocontests
     } = fighter;
 
+    // Construct the image filename based on the fighter's first and last name
+    const imageName = `${FirstName}_${LastName}.png`;
+    const imageUrl = `/src/assets/images/${imageName}`; // Assuming your images are in this folder
+
     // Helper function for singular/plural formatting and 0 case
     const formatLabel = (count, singular, plural) => {
         if (count === 0) return singular; // No 's' for zero
@@ -24,25 +28,27 @@ const FighterCard = ({ fighter }) => {
 
     return (
         <div className="fighter-card">
-            {Nickname && <p className="nickname">"{Nickname}"</p>} {/* Display nickname if it exists */}
+            {Nickname && <p className="nickname">"{Nickname}"</p>}
             <h2>{FirstName} {LastName}</h2>
             <p>{WeightClass}</p>
-            
-            <div className="fighter-stats">
-                <div className="wins">
+
+            {/* Display the image */}
+            <div className="fighter-image">
+                <img src={imageUrl} alt={`${FirstName} ${LastName}`} onError={(e) => { e.target.src = '/src/assets/images/default.png'; }} />
+            </div>
+
+            <div className="fighter-stats-box">
+                <div className="fighter-stats wins">
                     <p>{Wins}</p>
-                    <p>{TechnicalKnockouts} {formatLabel(TechnicalKnockouts, 'KO', 'KOs')}</p>
-                    <p>{Submissions} {formatLabel(Submissions, 'SUB', 'SUBs')}</p>
+                    <p className="hover-content">{TechnicalKnockouts} KOs<br/>{Submissions} SUBs</p>
                 </div>
-                <div className="losses">
+                <div className="fighter-stats losses">
                     <p>{Losses}</p>
-                    <p>{TechnicalKnockoutLosses} {formatLabel(TechnicalKnockoutLosses, 'KO', 'KOs')}</p>
-                    <p>{SubmissionLosses} {formatLabel(SubmissionLosses, 'SUB', 'SUBs')}</p>
+                    <p className="hover-content">{TechnicalKnockoutLosses} KOs<br/>{SubmissionLosses} SUBs</p>
                 </div>
-                <div className="draws">
+                <div className="fighter-stats draws">
                     <p>{Draws}</p>
-                    <p>{formatLabel(Draws, 'Draw', 'Draws')}</p> {/* Apply singular/plural formatting logic for Draws */}
-                    <p>{Nocontests} {formatLabel(Nocontests, 'NC', 'NCs')}</p> {/* Apply same logic for NCs */}
+                    <p className="hover-content">{Nocontests} NC</p>
                 </div>
             </div>
         </div>

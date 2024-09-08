@@ -1,8 +1,43 @@
+/* Wrapper for the whole app to center content */
+.app {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Horizontally center */
+  justify-content: center; /* Vertically center */
+  min-height: 100vh; /* Full page height */
+  margin: 0 auto;
+}
+
+h1 {
+  text-align: center; /* Centering the title */
+  margin-bottom: 20px;
+}
+
+/* Container for the input field and button */
+.search-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+/* Style the input and button */
+.search-container input {
+  margin-right: 10px;
+}
+
+/* Fighter List Layout */
+.fighter-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Fighter Card CSS */
 .fighter-card {
   border: 1px solid #ccc;
   padding: 10px;
   margin: 10px;
-  width: 300px;
+  width: 280px; /* Adjusted width */
   text-align: center;
   background-color: #2b2b2b;
   color: white;
@@ -25,31 +60,130 @@
   margin: 5px 0;
 }
 
-/* Fighter stats layout */
-.fighter-stats {
-  display: flex;
-  justify-content: space-around;
-  margin-top: 15px;
+/* Fighter image styling */
+.fighter-image img {
+  width: 220px;
+  height: 143px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-bottom: 10px;
 }
 
-.fighter-stats div {
+/* Fighter stats layout */
+.fighter-stats-box {
+  display: flex;
+  justify-content: center; /* Center the boxes */
+  gap: 1px; /* 1px gap between each box */
+}
+
+/* Fighter stats box styles (Wins, Losses, Draws) */
+.fighter-stats {
+  padding: 0px;
+  color: white;
+  font-weight: bold;
+  text-align: center;
+  flex: 1;
+  font-size: 24px;
+  position: relative; /* For hover content positioning */
+}
+
+/* Wins background (green) with rounded left side */
+.fighter-stats.wins {
+  background-color: #1D8814;
+  border-top-left-radius: 5px; /* Rounded top-left corner */
+  border-bottom-left-radius: 5px; /* Rounded bottom-left corner */
+}
+
+/* Losses background (red) with no rounded corners */
+.fighter-stats.losses {
+  background-color: #C10101;
+}
+
+/* Draws background (blue) with rounded right side */
+.fighter-stats.draws {
+  background-color: #85AEFB;
+  border-top-right-radius: 5px; /* Rounded top-right corner */
+  border-bottom-right-radius: 5px; /* Rounded bottom-right corner */
+}
+
+/* KO and SUBs labels directly aligned under respective stats */
+.fighter-stats-labels {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 5px;
+}
+
+.wins-label, .losses-label, .draws-label {
   text-align: center;
 }
 
-.fighter-stats div p {
+.wins-label p {
+  color: #1D8814;
   margin: 0;
-  font-size: 16px;
+  font-size: 14px;
+  font-weight: 500;
 }
 
-/* Colors for wins, losses, and draws */
-.wins p:first-child {
-  color: #3dff3d; /* Green color for wins */
+.losses-label p {
+  color: #C10101;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
 }
 
-.losses p:first-child {
-  color: #ff6767; /* Red color for losses */
+.draws-label p {
+  color: #85AEFB;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
 }
 
-.draws p:first-child {
-  color: #a4c1ff; /* Blue color for draws */
+/* Hover content styling */
+.fighter-stats p.hover-content {
+  display: none; /* Hidden by default */
+  position: absolute;
+  bottom: 100%; /* Position above the stat box */
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.8);
+  padding: 5px;
+  border-radius: 5px;
+  font-size: 14px;
+  color: #fff;
+  white-space: nowrap;
+}
+
+/* Show hover content on hover */
+.fighter-stats:hover p.hover-content {
+  display: block;
+  z-index: 1;
+}
+
+/* Loading screen styling */
+.loading-screen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Full height of the viewport */
+  background-color: #2b2b2b;
+  color: white;
+}
+
+.loading-screen h2 {
+  font-size: 32px;
+  font-weight: bold;
+  animation: pulse 1.5s infinite;
+}
+
+/* Adding a simple pulse animation to the loading text */
+@keyframes pulse {
+  0% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.7;
+  }
 }

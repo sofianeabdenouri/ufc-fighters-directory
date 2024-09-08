@@ -6,6 +6,16 @@ import './App.css';
 function App() {
     const [fighters, setFighters] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
+    const [isLoading, setIsLoading] = useState(true); // State for loading screen
+
+    // Simulate a 3-second loading screen
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setIsLoading(false);
+        }, 3000); // 3000ms = 3 seconds
+
+        return () => clearTimeout(timer); // Clear timeout if component unmounts
+    }, []);
 
     // Fetch fighters and process the data
     useEffect(() => {
@@ -60,10 +70,19 @@ function App() {
         });
     };
 
+    // If loading, show loading screen
+    if (isLoading) {
+        return (
+            <div className="loading-screen">
+                <h2>Loading...</h2>
+            </div>
+        );
+    }
+
     return (
         <div className="app">
             <h1>UFC Fighters Directory</h1>
-            <div>
+            <div className="search-container">
                 <input
                     type="text"
                     value={searchTerm}
