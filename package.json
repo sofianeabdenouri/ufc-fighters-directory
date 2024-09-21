@@ -20,10 +20,13 @@
     "node-fetch": "^3.3.2",
     "puppeteer": "^23.3.0",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.26.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",
+    "@types/css-modules": "^1.0.5",
+    "@types/file-loader": "^5.0.4",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
@@ -32,7 +35,9 @@
     "eslint-plugin-react": "^7.35.0",
     "eslint-plugin-react-hooks": "^5.1.0-rc.0",
     "eslint-plugin-react-refresh": "^0.4.9",
+    "file-loader": "^6.2.0",
     "globals": "^15.9.0",
+    "typed-css-modules": "^0.9.1",
     "vite": "^5.4.1"
   }
 }

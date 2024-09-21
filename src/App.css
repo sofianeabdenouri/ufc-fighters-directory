@@ -28,21 +28,24 @@ h1 {
 /* Fighter List Layout */
 .fighter-list {
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  flex-wrap: wrap; /* Allow wrapping to the next row */
+  justify-content: center; /* Center the list horizontally */
+  gap: 20px; /* Add space between fighters */
 }
 
-/* Fighter Card CSS */
+/* Adjusting the Fighter Card to fit 5 per row */
 .fighter-card {
+  flex: 0 1 calc(20% - 40px); /* 20% of the width for 5 fighters per row, subtract margin */
+  margin: 10px;
   border: 1px solid #ccc;
   padding: 10px;
-  margin: 10px;
   width: 280px; /* Adjusted width */
   text-align: center;
   background-color: #2b2b2b;
   color: white;
   border-radius: 10px;
 }
+
 
 /* Nickname styling */
 .nickname {
@@ -83,7 +86,7 @@ h1 {
   font-weight: bold;
   text-align: center;
   flex: 1;
-  font-size: 24px;
+  font-size: 30px;
   position: relative; /* For hover content positioning */
 }
 
@@ -186,4 +189,44 @@ h1 {
   100% {
     opacity: 0.7;
   }
+}
+/* Updated App Styling for Filters */
+
+.app {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center horizontally */
+  justify-content: center; /* Center vertically */
+  min-height: 100vh;
+  margin: 0 auto;
+  width: 100%; /* Ensure full width */
+}
+
+.search-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+  gap: 10px; /* Add spacing between input, dropdown, and button */
+}
+
+select {
+  padding: 5px;
+  font-size: 16px;
+  border-radius: 5px;
+  background-color: #444;
+  color: white;
+  border: 1px solid #ccc;
+}
+
+button {
+  padding: 5px 10px;
+  font-size: 16px;
+  background-color: #444;
+  color: white;
+  border: 1px solid #ccc;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #555;
 }
