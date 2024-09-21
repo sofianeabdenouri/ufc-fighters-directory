@@ -1,21 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import FighterCard from './components/FighterCard';
+import Header from './header/Header'; // Correct import path
 import './App.css';
 
 function App() {
     const [fighters, setFighters] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
-    const [isLoading, setIsLoading] = useState(true); // State for loading screen
-
-    // Simulate a 3-second loading screen
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setIsLoading(false);
-        }, 3000); // 3000ms = 3 seconds
-
-        return () => clearTimeout(timer); // Clear timeout if component unmounts
-    }, []);
+    const [sortBy, setSortBy] = useState('alphabetical'); // New state for sorting
+    const [filteredFighters, setFilteredFighters] = useState([]); // To apply sorting and filters
 
     // Fetch fighters and process the data
     useEffect(() => {
@@ -26,9 +19,48 @@ function App() {
                 const uniqueFighters = Array.from(new Set(fightersWithRecords.map(fighter => fighter.FighterId)))
                     .map(id => fightersWithRecords.find(fighter => fighter.FighterId === id));
                 setFighters(uniqueFighters);
+                setFilteredFighters(uniqueFighters); // Set filteredFighters to be the same initially
             })
             .catch(error => console.error('Error fetching data:', error));
     }, []);
+
+    // Handle sorting logic based on sortBy state
+    const handleSort = () => {
+        let sortedFighters = [...fighters];
+
+        switch (sortBy) {
+            case 'alphabetical':
+                sortedFighters.sort((a, b) => a.LastName.localeCompare(b.LastName));
+                break;
+            case 'mostWins':
+                sortedFighters.sort((a, b) => b.Wins - a.Wins);
+                break;
+            case 'mostLosses':
+                sortedFighters.sort((a, b) => b.Losses - a.Losses);
+                break;
+            case 'mostDraws':
+                sortedFighters.sort((a, b) => b.Draws - a.Draws);
+                break;
+            case 'mostSubmissions':
+                sortedFighters.sort((a, b) => b.Submissions - a.Submissions);
+                break;
+            case 'mostKOs':
+                sortedFighters.sort((a, b) => b.TechnicalKnockouts - a.TechnicalKnockouts);
+                break;
+            case 'weightClass':
+                sortedFighters.sort((a, b) => a.WeightClass.localeCompare(b.WeightClass));
+                break;
+            case 'gender':
+                sortedFighters = sortedFighters.filter(fighter =>
+                    fighter.WeightClass.toLowerCase().includes("women's") ? 'Female' : 'Male'
+                );
+                break;
+            default:
+                break;
+        }
+
+        setFilteredFighters(sortedFighters); // Set sorted fighters to the state
+    };
 
     const fetchImage = async (fighterName) => {
         try {
@@ -66,22 +98,18 @@ function App() {
                 return { ...fighter, imageUrl };
             })
         ).then((fightersWithImages) => {
-            setFighters(fightersWithImages);
+            setFilteredFighters(fightersWithImages); // Set filtered fighters with images
         });
     };
 
-    // If loading, show loading screen
-    if (isLoading) {
-        return (
-            <div className="loading-screen">
-                <h2>Loading...</h2>
-            </div>
-        );
-    }
-
     return (
         <div className="app">
-            <h1>UFC Fighters Directory</h1>
+            {/* Render Header only once */}
+            <Header />
+
+            <h1 id="fighters">UFC Fighters Directory</h1>
+
+            {/* Search and Sort */}
             <div className="search-container">
                 <input
                     type="text"
@@ -90,10 +118,25 @@ function App() {
                     placeholder="Search fighters"
                 />
                 <button onClick={handleSearch}>Search</button>
+
+                {/* Sort Dropdown */}
+                <select onChange={(e) => setSortBy(e.target.value)} value={sortBy}>
+                    <option value="alphabetical">Sort by Alphabetical</option>
+                    <option value="mostWins">Sort by Most Wins</option>
+                    <option value="mostLosses">Sort by Most Losses</option>
+                    <option value="mostDraws">Sort by Most Draws</option>
+                    <option value="mostSubmissions">Sort by Most Submissions</option>
+                    <option value="mostKOs">Sort by Most KOs</option>
+                    <option value="weightClass">Sort by Weight Class</option>
+                    <option value="gender">Sort by Gender</option>
+                </select>
+
+                <button onClick={handleSort}>Sort</button>
             </div>
 
+            {/* Fighter List */}
             <div className="fighter-list">
-                {fighters.map(fighter => (
+                {filteredFighters.map(fighter => (
                     <FighterCard key={fighter.FighterId} fighter={fighter} />
                 ))}
             </div>
