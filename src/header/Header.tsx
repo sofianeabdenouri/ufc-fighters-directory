@@ -1,6 +1,6 @@
 import React from 'react';
 import classes from './Header.module.css';
-import imageSource from '../common/images/favicon.png';
+import imageSource from '../common/images/favicon.ico';
 import videoSource from '../common/videos/backgroundvideo.mp4';
 
 const Header: React.FC = () => {

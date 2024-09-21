@@ -20,12 +20,6 @@ const FighterCard = ({ fighter }) => {
     const imageName = `${FirstName}_${LastName}.png`;
     const imageUrl = `/src/common/images/${imageName}`; // Assuming your images are in this folder
 
-    // Helper function for singular/plural formatting and 0 case
-    const formatLabel = (count, singular, plural) => {
-        if (count === 0) return singular; // No 's' for zero
-        return count === 1 ? singular : plural;
-    };
-
     return (
         <div className="fighter-card">
             {Nickname && <p className="nickname">"{Nickname}"</p>}
@@ -51,6 +45,9 @@ const FighterCard = ({ fighter }) => {
                     <p className="hover-content">{Nocontests} NC</p>
                 </div>
             </div>
+
+            {/* Visit Profile Button */}
+            <button className="visit-profile-btn">Visit Profile</button>
         </div>
     );
 };
