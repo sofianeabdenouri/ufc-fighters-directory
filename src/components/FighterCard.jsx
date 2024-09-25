@@ -1,7 +1,9 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom'; // Import the hook for navigation
 
 const FighterCard = ({ fighter }) => {
     const {
+        FighterId,
         FirstName,
         LastName,
         Nickname,
@@ -15,6 +17,8 @@ const FighterCard = ({ fighter }) => {
         SubmissionLosses,
         Nocontests
     } = fighter;
+
+    const navigate = useNavigate(); // Get the navigate function
 
     // Construct the image filename based on the fighter's first and last name
     const imageName = `${FirstName}_${LastName}.png`;
@@ -47,7 +51,12 @@ const FighterCard = ({ fighter }) => {
             </div>
 
             {/* Visit Profile Button */}
-            <button className="visit-profile-btn">Visit Profile</button>
+            <button 
+                className="visit-profile-btn" 
+                onClick={() => navigate(`/fighter/${FighterId}`, { state: { fighter } })} // Pass the fighter data as state
+            >
+                Visit Profile
+            </button>
         </div>
     );
 };
