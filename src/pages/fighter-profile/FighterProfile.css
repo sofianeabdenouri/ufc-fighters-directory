@@ -1,0 +1,109 @@
+/* Container for the whole profile */
+.fighter-profile-container {
+    display: flex;
+    flex-direction: row; /* Place the image and the details side by side */
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 20px;
+    background: linear-gradient(to bottom, #202020, #1c1c1c);
+    border-radius: 20px;
+    color: white;
+    max-width: 1000px;
+    margin: 20px auto;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.8);
+    position: relative; /* Make the container relative for absolute positioning */
+}
+
+/* Fighter profile details section */
+.fighter-profile-details {
+    flex: 2;
+    margin-right: 20px;
+}
+
+.fighter-profile-details h1 {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #ffba08; /* Bright yellow for bold headers */
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.fighter-profile-details p {
+    font-size: 1.2rem;
+    line-height: 1.6;
+    border-bottom: 1px solid #ffba08;
+    padding-bottom: 8px;
+    margin-bottom: 15px;
+}
+
+.fighter-profile-details p:last-child {
+    border-bottom: none;
+}
+
+/* Back Button Styling */
+.fighter-profile-back-btn {
+    background-color: #ffba08;
+    color: #202020;
+    font-size: 1.2rem;
+    padding: 10px 30px;
+    border-radius: 10px;
+    border: none;
+    text-transform: uppercase;
+    font-weight: bold;
+    cursor: pointer;
+    position: absolute; /* Position it relative to the profile container */
+    bottom: 20px; /* Distance from the bottom of the container */
+    right: 20px; /* Distance from the right of the container */
+    transition: background-color 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+
+.fighter-profile-back-btn:hover {
+    background-color: #ffaa00;
+    color: #000;
+    transform: scale(1.05);
+}
+
+/* Fighter profile image section */
+.fighter-profile-image {
+    flex: 1;
+    text-align: center;
+}
+
+.fighter-profile-image img {
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 5px solid #ffba08;
+    transition: transform 0.3s ease-in-out;
+}
+
+.fighter-profile-image img:hover {
+    transform: scale(1.05);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .fighter-profile-container {
+        flex-direction: column;
+        align-items: center;
+        padding: 10px;
+    }
+
+    .fighter-profile-details {
+        text-align: center;
+        margin-right: 0;
+    }
+
+    .fighter-profile-image img {
+        width: 200px;
+        height: 200px;
+    }
+
+    /* Adjust button placement for smaller screens */
+    .fighter-profile-back-btn {
+        bottom: 10px;
+        right: 10px;
+    }
+}
