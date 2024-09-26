@@ -6,6 +6,7 @@
   justify-content: center; /* Vertically center */
   min-height: 100vh; /* Full page height */
   margin: 0 auto;
+  width: 100%; /* Ensure full width */
 }
 
 h1 {
@@ -18,11 +19,7 @@ h1 {
   display: flex;
   justify-content: center;
   margin-bottom: 20px;
-}
-
-/* Style the input and button */
-.search-container input {
-  margin-right: 10px;
+  gap: 10px; /* Add spacing between input, dropdown, and button */
 }
 
 /* Fighter List Layout */
@@ -35,17 +32,16 @@ h1 {
 
 /* Adjusting the Fighter Card to fit 5 per row */
 .fighter-card {
-  flex: 0 1 calc(20% - 40px); /* 20% of the width for 5 fighters per row, subtract margin */
+  flex: 0 1 calc(20% - 20px); /* Adjust to ensure 5 per row, reduce margin space */
   margin: 10px;
   border: 1px solid #ccc;
   padding: 10px;
-  width: 280px; /* Adjusted width */
+  width: 220px; /* Reduce width to make space for 5 fighters */
   text-align: center;
   background-color: #2b2b2b;
   color: white;
   border-radius: 10px;
 }
-
 
 /* Nickname styling */
 .nickname {
@@ -190,32 +186,51 @@ h1 {
     opacity: 0.7;
   }
 }
-/* Updated App Styling for Filters */
 
-.app {
+/* Advanced search box styling */
+.advanced-search-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start; /* Align items to the top */
+  padding: 20px;
+  border-radius: 10px;
+  background-color: #333; /* Box color */
+  margin-top: 20px;
+  max-width: 800px; /* Make it wider */
+  margin-left: auto;
+  margin-right: auto;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Styling for Gender and Weight Class */
+.advanced-search-box > div {
   display: flex;
   flex-direction: column;
-  align-items: center; /* Center horizontally */
-  justify-content: center; /* Center vertically */
-  min-height: 100vh;
-  margin: 0 auto;
-  width: 100%; /* Ensure full width */
+  text-align: left;
+  gap: 10px;
 }
 
-.search-container {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 20px;
-  gap: 10px; /* Add spacing between input, dropdown, and button */
+.advanced-search-box > div:first-child {
+  flex-basis: 30%; /* Width for the Gender column */
 }
 
-select {
-  padding: 5px;
-  font-size: 16px;
-  border-radius: 5px;
-  background-color: #444;
+.advanced-search-box > div:last-child {
+  flex-basis: 70%; /* Width for the Weight Class column */
+}
+
+.advanced-search-box h3 {
   color: white;
-  border: 1px solid #ccc;
+  margin-bottom: 10px;
+}
+
+.advanced-search-box label {
+  display: inline-block;
+  color: white;
+  margin-bottom: 8px;
+}
+
+.advanced-search-box input[type="checkbox"] {
+  margin-right: 5px;
 }
 
 button {
@@ -230,6 +245,7 @@ button {
 button:hover {
   background-color: #555;
 }
+
 .visit-profile-btn {
   background-color: #000;
   color: white;

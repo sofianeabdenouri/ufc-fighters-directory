@@ -10,6 +10,15 @@ function App() {
     const [searchTerm, setSearchTerm] = useState('');
     const [sortBy, setSortBy] = useState(''); // Initial state set to empty string
     const [filteredFighters, setFilteredFighters] = useState([]);
+    const [selectedWeightClasses, setSelectedWeightClasses] = useState([]); // For weight class filters
+    const [selectedGenders, setSelectedGenders] = useState([]); // For gender filters
+    const [showAdvancedSearch, setShowAdvancedSearch] = useState(false); // Control visibility of advanced search
+
+    const weightClasses = ["Flyweight", "Bantamweight", "Featherweight", "Lightweight", "Welterweight", "Middleweight", "Light Heavyweight", "Heavyweight"];
+    const femaleWeightClasses = weightClasses.map(wc => `Women's ${wc}`);
+    const allWeightClasses = [...weightClasses, ...femaleWeightClasses]; // Combining both male and female weight classes
+
+    const genders = ["Male", "Female"]; // Gender filters
 
     // Fetch fighters and process the data
     useEffect(() => {
@@ -45,16 +54,31 @@ function App() {
 
     // Handle sorting logic
     const handleSort = () => {
-        let sortedFighters = [...fighters];
+        let sortedFighters = [...filteredFighters];
         switch (sortBy) {
             case 'alphabetical':
-                sortedFighters.sort((a, b) => a.LastName.localeCompare(b.LastName));
+                sortedFighters.sort((a, b) => {
+                    const lastNameCompare = a.LastName?.toLowerCase().localeCompare(b.LastName?.toLowerCase());
+                    if (lastNameCompare === 0) {
+                        return a.FirstName?.toLowerCase().localeCompare(b.FirstName?.toLowerCase());
+                    }
+                    return lastNameCompare;
+                });
                 break;
             case 'mostWins':
                 sortedFighters.sort((a, b) => b.Wins - a.Wins);
                 break;
             case 'mostLosses':
                 sortedFighters.sort((a, b) => b.Losses - a.Losses);
+                break;
+            case 'mostDraws':
+                sortedFighters.sort((a, b) => b.Draws - a.Draws);
+                break;
+            case 'mostKOs':
+                sortedFighters.sort((a, b) => b.TechnicalKnockouts - a.TechnicalKnockouts); // Sort by most KOs
+                break;
+            case 'mostSubs':
+                sortedFighters.sort((a, b) => b.Submissions - a.Submissions); // Sort by most submissions
                 break;
             default:
                 break;
@@ -64,17 +88,32 @@ function App() {
 
     // Handle search functionality
     const handleSearch = () => {
-        if (searchTerm.trim() === '') {
-            setFilteredFighters(fighters); // If search term is empty, show all fighters
-        } else {
-            const results = fighters.filter(fighter => {
+        let results = fighters;
+
+        // If a search term exists, filter based on that
+        if (searchTerm.trim() !== '') {
+            results = fighters.filter(fighter => {
                 const fullName = `${fighter.FirstName || ''} ${fighter.LastName || ''}`.toLowerCase();
                 return fullName.includes(searchTerm.toLowerCase()) || 
                        (fighter.FirstName || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
                        (fighter.LastName || '').toLowerCase().includes(searchTerm.toLowerCase());
             });
-            setFilteredFighters(results);
         }
+
+        // Filter by weight classes if any are selected
+        if (selectedWeightClasses.length > 0) {
+            results = results.filter(fighter => selectedWeightClasses.includes(fighter.WeightClass));
+        }
+
+        // Filter by gender if any are selected
+        if (selectedGenders.length > 0) {
+            results = results.filter(fighter => {
+                const gender = fighter.WeightClass.toLowerCase().startsWith("women") ? "Female" : "Male";
+                return selectedGenders.includes(gender);
+            });
+        }
+
+        setFilteredFighters(results);
     };
 
     // Handle pressing the "Enter" key to trigger search
@@ -82,6 +121,39 @@ function App() {
         if (e.key === 'Enter') {
             handleSearch(); // Trigger search when Enter is pressed
         }
+    };
+
+    // Toggle weight class filters
+    const toggleWeightClass = (weightClass) => {
+        setSelectedWeightClasses(prev => 
+            prev.includes(weightClass) 
+            ? prev.filter(wc => wc !== weightClass) 
+            : [...prev, weightClass]
+        );
+    };
+
+    // Toggle gender filters
+    const toggleGender = (gender) => {
+        setSelectedGenders(prev => 
+            prev.includes(gender) 
+            ? prev.filter(g => g !== gender) 
+            : [...prev, gender]
+        );
+    };
+
+    // Toggle advanced search section visibility
+    const toggleAdvancedSearch = () => {
+        setShowAdvancedSearch(prev => !prev); // Toggle the state
+    };
+
+    // Determine which weight classes are selectable based on gender
+    const isWeightClassDisabled = (weightClass) => {
+        if (selectedGenders.length === 0) return false; // No gender selected, all weight classes are selectable
+
+        if (selectedGenders.includes("Female") && weightClass.startsWith("Women's")) return false;
+        if (selectedGenders.includes("Male") && !weightClass.startsWith("Women's")) return false;
+
+        return true; // Disable the weight class if it doesn't match the selected gender
     };
 
     return (
@@ -111,10 +183,52 @@ function App() {
                                     <option value="alphabetical">Alphabetical</option>
                                     <option value="mostWins">Most Wins</option>
                                     <option value="mostLosses">Most Losses</option>
+                                    <option value="mostDraws">Most Draws</option>
+                                    <option value="mostKOs">Most KOs</option>
+                                    <option value="mostSubs">Most Submissions</option>
                                 </select>
 
                                 <button onClick={handleSort}>Sort</button>
+
+                                {/* Advanced Search Toggle */}
+                                <button onClick={toggleAdvancedSearch} style={{ marginLeft: '10px' }}>
+                                    {showAdvancedSearch ? 'Hide Advanced Search' : 'Advanced Search'}
+                                </button>
                             </div>
+
+                            {/* Advanced Search Section */}
+                            {showAdvancedSearch && (
+                                <div className="advanced-search-box fighter-card"> {/* Horizontal rectangle with flexbox */}
+                                    
+                                    {/* Gender column */}
+                                    <div className="advanced-search-column">
+                                        <h3>Gender</h3>
+                                        {genders.map(gender => (
+                                            <label key={gender}>
+                                                <input 
+                                                    type="checkbox" 
+                                                    onChange={() => toggleGender(gender)} 
+                                                /> {gender}
+                                            </label>
+                                        ))}
+                                    </div>
+
+                                    {/* Weight class column */}
+                                    <div className="advanced-search-column">
+                                        <h3>Weight Class</h3>
+                                        {allWeightClasses.map(wc => (
+                                            <label key={wc} style={{ color: isWeightClassDisabled(wc) ? 'gray' : 'white' }}>
+                                                <input 
+                                                    type="checkbox" 
+                                                    onChange={() => toggleWeightClass(wc)} 
+                                                    disabled={isWeightClassDisabled(wc)} // Disable if it doesn't match gender filter
+                                                /> {wc}
+                                            </label>
+                                        ))}
+                                    </div>
+
+                                </div>
+                            )}
 
                             <div className="fighter-list">
                                 {filteredFighters.length > 0 ? (
