@@ -1,61 +1,99 @@
 import React, { useState, useEffect } from 'react';
+import FighterCard from './components/FighterCard'; // Adjust this import path
 
-const apiKey = '367273178ae34553a6df1f7b5b76089e';  // Your API key
+const apiKey = 'YOUR_API_KEY'; // Add your API key here
 const apiUrl = `https://api.sportsdata.io/v3/mma/scores/json/FightersBasic?key=${apiKey}`;
-
-function FighterCard({ fighter }) {
-    // Helper function for singular/plural formatting
-    const formatLabel = (count, singular, plural) => count === 1 ? singular : plural;
-
-    return (
-        <div className="fighter-card">
-            {fighter.Nickname && <p>"{fighter.Nickname}"</p>} {/* Display nickname if it exists */}
-            <h2>{fighter.FirstName} {fighter.LastName}</h2>
-            <p>{fighter.WeightClass}</p>
-
-            <div className="fighter-stats">
-                <div className="wins">
-                    <p>{fighter.Wins}</p>
-                    <p>{fighter.TechnicalKnockouts} {formatLabel(fighter.TechnicalKnockouts, 'KO', 'KOs')}</p>
-                    <p>{fighter.Submissions} {formatLabel(fighter.Submissions, 'SUB', 'SUBs')}</p>
-                </div>
-                <div className="losses">
-                    <p>{fighter.Losses}</p>
-                    <p>{fighter.TechnicalKnockoutLosses} {formatLabel(fighter.TechnicalKnockoutLosses, 'KO', 'KOs')}</p>
-                    <p>{fighter.SubmissionLosses} {formatLabel(fighter.SubmissionLosses, 'SUB', 'SUBs')}</p>
-                </div>
-                <div className="draws">
-                    <p>{fighter.Draws}</p>
-                    <p>{formatLabel(fighter.Draws, 'Draw', 'Draws')}</p>
-                    <p>{fighter.NoContests} {formatLabel(fighter.NoContests, 'NC', 'NCs')}</p>
-                </div>
-            </div>
-        </div>
-    );
-}
 
 function FighterList() {
     const [fighters, setFighters] = useState([]);
+    const [filteredFighters, setFilteredFighters] = useState([]);
+    const [searchTerm, setSearchTerm] = useState(''); // Search term state
+    const [sortBy, setSortBy] = useState('');
 
+    // Fetch data
     useEffect(() => {
         fetch(apiUrl)
             .then(response => response.json())
             .then(data => {
-                // Filter out fighters with no records and ensure no duplicates
-                const uniqueFighters = Array.from(new Set(data.map(f => f.FighterId)))
-                    .map(id => data.find(f => f.FighterId === id))
-                    .filter(fighter => fighter.Wins !== 0 || fighter.Losses !== 0 || fighter.Draws !== 0 || fighter.NoContests !== 0);
+                // Remove duplicates by keeping only 1 fighter with the same FirstName + LastName
+                const uniqueFighters = [];
+                const namesSet = new Set();
+
+                data.forEach(fighter => {
+                    const fullName = `${fighter.FirstName} ${fighter.LastName}`;
+                    if (!namesSet.has(fullName)) {
+                        namesSet.add(fullName);
+                        uniqueFighters.push(fighter);
+                    }
+                });
 
                 setFighters(uniqueFighters);
+                setFilteredFighters(uniqueFighters); // Initial set
             })
             .catch(error => console.error('Error fetching data:', error));
     }, []);
 
+    // Handle search input
+    const handleSearch = () => {
+        const term = searchTerm.trim().toLowerCase();
+
+        // Filter based on the search term
+        const filtered = fighters.filter(fighter => {
+            const fullName = `${fighter.FirstName} ${fighter.LastName}`.toLowerCase();
+            return fullName.includes(term);
+        });
+
+        setFilteredFighters(filtered); // Update filtered fighters
+    };
+
+    // Handle sort
+    const handleSort = (e) => {
+        const sortType = e.target.value;
+        setSortBy(sortType);
+
+        let sortedFighters = [...fighters];
+        switch (sortType) {
+            case 'alphabetical':
+                sortedFighters.sort((a, b) => a.LastName.localeCompare(b.LastName));
+                break;
+            case 'mostWins':
+                sortedFighters.sort((a, b) => b.Wins - a.Wins);
+                break;
+            case 'mostLosses':
+                sortedFighters.sort((a, b) => b.Losses - a.Losses);
+                break;
+            default:
+                break;
+        }
+
+        setFilteredFighters(sortedFighters); // Update filtered list after sorting
+    };
+
     return (
-        <div className="fighter-list">
-            {fighters.map(fighter => (
-                <FighterCard key={fighter.FighterId} fighter={fighter} />
-            ))}
+        <div>
+            {/* Search Bar */}
+            <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)} // Capture input
+                placeholder="Search fighters"
+            />
+            <button onClick={handleSearch}>Search</button> {/* Trigger search on button click */}
+
+            {/* Sort Dropdown */}
+            <select value={sortBy} onChange={handleSort}>
+                <option value="">Sort by</option>
+                <option value="alphabetical">Alphabetical</option>
+                <option value="mostWins">Most Wins</option>
+                <option value="mostLosses">Most Losses</option>
+            </select>
+
+            {/* Fighter List */}
+            <div className="fighter-list">
+                {filteredFighters.map(fighter => (
+                    <FighterCard key={fighter.FighterId} fighter={fighter} />
+                ))}
+            </div>
         </div>
     );
 }

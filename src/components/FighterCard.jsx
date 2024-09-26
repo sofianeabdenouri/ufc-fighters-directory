@@ -32,13 +32,17 @@ const FighterCard = ({ fighter }) => {
 
             {/* Display the image */}
             <div className="fighter-image">
-                <img src={imageUrl} alt={`${FirstName} ${LastName}`} onError={(e) => { e.target.src = '/src/common/images/default.png'; }} />
+                <img 
+                    src={imageUrl} 
+                    alt={`${FirstName} ${LastName}`} 
+                    onError={(e) => { e.target.src = '/src/common/images/default.png'; }} 
+                />
             </div>
 
             <div className="fighter-stats-box">
                 <div className="fighter-stats wins">
                     <p>{Wins}</p>
-                    <p className="hover-content" >{TechnicalKnockouts} KOs<br/>{Submissions} SUBs</p>
+                    <p className="hover-content">{TechnicalKnockouts} KOs<br/>{Submissions} SUBs</p>
                 </div>
                 <div className="fighter-stats losses">
                     <p>{Losses}</p>
