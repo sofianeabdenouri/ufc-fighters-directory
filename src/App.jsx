@@ -14,9 +14,15 @@ function App() {
     const [selectedGenders, setSelectedGenders] = useState([]); // For gender filters
     const [showAdvancedSearch, setShowAdvancedSearch] = useState(false); // Control visibility of advanced search
 
-    const weightClasses = ["Flyweight", "Bantamweight", "Featherweight", "Lightweight", "Welterweight", "Middleweight", "Light Heavyweight", "Heavyweight"];
-    const femaleWeightClasses = weightClasses.map(wc => `Women's ${wc}`);
-    const allWeightClasses = [...weightClasses, ...femaleWeightClasses]; // Combining both male and female weight classes
+    const maleWeightClasses = [
+        "Flyweight", "Bantamweight", "Featherweight", "Lightweight", "Welterweight", 
+        "Middleweight", "Light Heavyweight", "Heavyweight", "Catch Weight", "Open Weight", "Unknown"
+    ];
+
+    const femaleWeightClasses = [
+        "Women's Strawweight", "Women's Flyweight", 
+        "Women's Bantamweight", "Women's Featherweight"
+    ];
 
     const genders = ["Male", "Female"]; // Gender filters
 
@@ -102,13 +108,16 @@ function App() {
 
         // Filter by weight classes if any are selected
         if (selectedWeightClasses.length > 0) {
-            results = results.filter(fighter => selectedWeightClasses.includes(fighter.WeightClass));
+            results = results.filter(fighter => {
+                const fighterWeightClass = fighter.WeightClass || "Unknown"; // Assign "Unknown" to fighters with no weight class
+                return selectedWeightClasses.includes(fighterWeightClass);
+            });
         }
 
         // Filter by gender if any are selected
         if (selectedGenders.length > 0) {
             results = results.filter(fighter => {
-                const gender = fighter.WeightClass.toLowerCase().startsWith("women") ? "Female" : "Male";
+                const gender = maleWeightClasses.includes(fighter.WeightClass) || !fighter.WeightClass ? "Male" : "Female";
                 return selectedGenders.includes(gender);
             });
         }
@@ -146,16 +155,26 @@ function App() {
         setShowAdvancedSearch(prev => !prev); // Toggle the state
     };
 
-    // Determine which weight classes are selectable based on gender
     const isWeightClassDisabled = (weightClass) => {
-        if (selectedGenders.length === 0) return false; // No gender selected, all weight classes are selectable
-
-        if (selectedGenders.includes("Female") && weightClass.startsWith("Women's")) return false;
-        if (selectedGenders.includes("Male") && !weightClass.startsWith("Women's")) return false;
-
-        return true; // Disable the weight class if it doesn't match the selected gender
+        // If both genders are selected, none of the weight classes should be disabled
+        if (selectedGenders.length === 2) {
+            return false;
+        }
+    
+        // If "Female" is selected and the weight class is not a female one, disable it
+        if (selectedGenders.includes("Female") && !femaleWeightClasses.includes(weightClass)) {
+            return true;
+        }
+    
+        // If "Male" is selected and the weight class is not a male one, disable it
+        if (selectedGenders.includes("Male") && !maleWeightClasses.includes(weightClass)) {
+            return true;
+        }
+    
+        // Otherwise, keep everything enabled
+        return false;
     };
-
+    
     return (
         <Router>
             <Header />
@@ -198,35 +217,37 @@ function App() {
 
                             {/* Advanced Search Section */}
                             {showAdvancedSearch && (
-                                <div className="advanced-search-box fighter-card"> {/* Horizontal rectangle with flexbox */}
-                                    
-                                    {/* Gender column */}
-                                    <div className="advanced-search-column">
-                                        <h3>Gender</h3>
+                                <div className="advanced-search-box fighter-card"> {/* Match styling of fighter card */}
+                                    <h2>Advanced Search</h2>
+
+                                    <div>
+                                        <h3>Filter by Gender:</h3>
                                         {genders.map(gender => (
-                                            <label key={gender}>
-                                                <input 
-                                                    type="checkbox" 
-                                                    onChange={() => toggleGender(gender)} 
-                                                /> {gender}
-                                            </label>
+                                            <div key={gender}>
+                                                <label>
+                                                    <input 
+                                                        type="checkbox" 
+                                                        onChange={() => toggleGender(gender)} 
+                                                    /> {gender}
+                                                </label>
+                                            </div>
                                         ))}
                                     </div>
 
-                                    {/* Weight class column */}
-                                    <div className="advanced-search-column">
-                                        <h3>Weight Class</h3>
-                                        {allWeightClasses.map(wc => (
-                                            <label key={wc} style={{ color: isWeightClassDisabled(wc) ? 'gray' : 'white' }}>
-                                                <input 
-                                                    type="checkbox" 
-                                                    onChange={() => toggleWeightClass(wc)} 
-                                                    disabled={isWeightClassDisabled(wc)} // Disable if it doesn't match gender filter
-                                                /> {wc}
-                                            </label>
+                                    <div>
+                                        <h3>Filter by Weight Class:</h3>
+                                        {maleWeightClasses.concat(femaleWeightClasses).map(wc => (
+                                            <div key={wc}>
+                                                <label style={{ color: isWeightClassDisabled(wc) ? 'gray' : 'white' }}>
+                                                    <input 
+                                                        type="checkbox" 
+                                                        onChange={() => toggleWeightClass(wc)} 
+                                                        disabled={isWeightClassDisabled(wc)} 
+                                                    /> {wc}
+                                                </label>
+                                            </div>
                                         ))}
                                     </div>
-
                                 </div>
                             )}
 
