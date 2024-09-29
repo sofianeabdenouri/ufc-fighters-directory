@@ -15,7 +15,7 @@ const FighterCard = ({ fighter }) => {
         TechnicalKnockoutLosses,
         Submissions,
         SubmissionLosses,
-        Nocontests,
+        NoContests,
     } = fighter;
 
     const navigate = useNavigate();
@@ -60,7 +60,7 @@ const FighterCard = ({ fighter }) => {
                 </div>
                 <div className="fighter-stats draws">
                     <p>{Draws}</p>
-                    <p className="hover-content">{Nocontests} NC</p>
+                    <p className="hover-content">{NoContests} NC</p>
                 </div>
             </div>
 

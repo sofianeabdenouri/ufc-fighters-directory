@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react'; // Add useRef
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import FighterCard from './components/FighterCard'; 
-import FighterProfile from './pages/fighter-profile/FighterProfile'; 
+import FighterCard from './components/FighterCard';
+import FighterProfile from './pages/fighter-profile/FighterProfile';
 import Header from './header/Header';
 import './App.css';
 
@@ -25,9 +25,6 @@ function App() {
     ];
 
     const genders = ["Male", "Female"];
-
-    // Create a reference to the fighter list
-    const fighterListRef = useRef(null);
 
     // Fetch fighters and process the data
     useEffect(() => {
@@ -53,7 +50,7 @@ function App() {
             .catch(error => console.error('Error fetching data:', error));
     }, []);
 
-    // Handle the fighter list sorting
+    // Handle sorting logic
     const handleSort = () => {
         let sortedFighters = [...filteredFighters];
         switch (sortBy) {
@@ -87,44 +84,86 @@ function App() {
         setFilteredFighters(sortedFighters);
     };
 
-    // Handle search
+    // Handle search functionality
     const handleSearch = () => {
         let results = fighters;
+
+        // If a search term exists, filter based on that
         if (searchTerm.trim() !== '') {
             results = fighters.filter(fighter => {
                 const fullName = `${fighter.FirstName || ''} ${fighter.LastName || ''}`.toLowerCase();
-                return fullName.includes(searchTerm.toLowerCase());
+                return fullName.includes(searchTerm.toLowerCase()) || 
+                       (fighter.FirstName || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
+                       (fighter.LastName || '').toLowerCase().includes(searchTerm.toLowerCase());
             });
         }
+
+        // Filter by weight classes if any are selected
         if (selectedWeightClasses.length > 0) {
             results = results.filter(fighter => {
-                const fighterWeightClass = fighter.WeightClass || "Unknown";
+                const fighterWeightClass = fighter.WeightClass || "Unknown"; // Assign "Unknown" to fighters with no weight class
                 return selectedWeightClasses.includes(fighterWeightClass);
             });
         }
+
+        // Filter by gender if any are selected
         if (selectedGenders.length > 0) {
             results = results.filter(fighter => {
                 const gender = maleWeightClasses.includes(fighter.WeightClass) || !fighter.WeightClass ? "Male" : "Female";
                 return selectedGenders.includes(gender);
             });
         }
+
         setFilteredFighters(results);
     };
 
+    // Handle pressing the "Enter" key to trigger search
     const handleKeyPress = (e) => {
         if (e.key === 'Enter') {
-            handleSearch();
+            handleSearch(); // Trigger search when Enter is pressed
         }
     };
 
-    // Function to scroll to the fighter list
-    const scrollToFighters = () => {
-        fighterListRef.current.scrollIntoView({ behavior: 'smooth' });
+    // Toggle weight class filters
+    const toggleWeightClass = (weightClass) => {
+        setSelectedWeightClasses(prev => 
+            prev.includes(weightClass) 
+            ? prev.filter(wc => wc !== weightClass) 
+            : [...prev, weightClass]
+        );
+    };
+
+    // Toggle gender filters
+    const toggleGender = (gender) => {
+        setSelectedGenders(prev => 
+            prev.includes(gender) 
+            ? prev.filter(g => g !== gender) 
+            : [...prev, gender]
+        );
+    };
+
+    // Toggle advanced search section visibility
+    const toggleAdvancedSearch = () => {
+        setShowAdvancedSearch(prev => !prev); // Toggle the state
+    };
+
+    // Function to disable weight classes based on gender filter
+    const isWeightClassDisabled = (weightClass) => {
+        if (selectedGenders.length === 2) {
+            return false; // If both genders are selected, none of the weight classes should be disabled
+        }
+        if (selectedGenders.includes("Female") && !femaleWeightClasses.includes(weightClass)) {
+            return true; // Disable male weight classes if "Female" is selected
+        }
+        if (selectedGenders.includes("Male") && !maleWeightClasses.includes(weightClass)) {
+            return true; // Disable female weight classes if "Male" is selected
+        }
+        return false;
     };
 
     return (
         <Router>
-            <Header scrollToFighters={scrollToFighters} />
+            <Header />
 
             <Routes>
                 <Route
@@ -138,11 +177,12 @@ function App() {
                                     type="text"
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
-                                    onKeyDown={handleKeyPress}
+                                    onKeyDown={handleKeyPress} // Listen for Enter key press
                                     placeholder="Search fighters"
                                 />
                                 <button onClick={handleSearch}>Search</button>
 
+                                {/* Sort Dropdown */}
                                 <select onChange={(e) => setSortBy(e.target.value)} value={sortBy}>
                                     <option value="" disabled>Sort by</option>
                                     <option value="alphabetical">Alphabetical</option>
@@ -155,13 +195,15 @@ function App() {
 
                                 <button onClick={handleSort}>Sort</button>
 
-                                <button onClick={() => setShowAdvancedSearch(!showAdvancedSearch)} style={{ marginLeft: '10px' }}>
+                                {/* Advanced Search Toggle */}
+                                <button onClick={toggleAdvancedSearch} style={{ marginLeft: '10px' }}>
                                     {showAdvancedSearch ? 'Hide Advanced Search' : 'Advanced Search'}
                                 </button>
                             </div>
 
+                            {/* Advanced Search Section */}
                             {showAdvancedSearch && (
-                                <div className="advanced-search-box fighter-card">
+                                <div className="advanced-search-box fighter-card"> {/* Match styling of fighter card */}
                                     <h2>Advanced Search</h2>
 
                                     <div>
@@ -169,7 +211,10 @@ function App() {
                                         {genders.map(gender => (
                                             <div key={gender}>
                                                 <label>
-                                                    <input type="checkbox" onChange={() => toggleGender(gender)} /> {gender}
+                                                    <input 
+                                                        type="checkbox" 
+                                                        onChange={() => toggleGender(gender)} 
+                                                    /> {gender}
                                                 </label>
                                             </div>
                                         ))}
@@ -192,18 +237,20 @@ function App() {
                                 </div>
                             )}
 
-                            <div className="fighter-list" ref={fighterListRef}>
+                            <div className="fighter-list">
                                 {filteredFighters.length > 0 ? (
                                     filteredFighters.map(fighter => (
                                         <FighterCard key={fighter.FighterId} fighter={fighter} />
                                     ))
                                 ) : (
-                                    <p>No fighters found</p>
+                                    <p>No fighters found</p> // Display message if no search results
                                 )}
                             </div>
                         </div>
                     }
                 />
+
+                {/* Route for Fighter Profile */}
                 <Route path="/fighter/:id" element={<FighterProfile />} />
             </Routes>
         </Router>
