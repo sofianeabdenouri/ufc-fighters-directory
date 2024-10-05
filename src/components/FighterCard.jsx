@@ -36,7 +36,11 @@ const FighterCard = ({ fighter }) => {
 
     return (
         <div className="fighter-card">
-            {Nickname && <p className="nickname">"{Nickname}"</p>}
+{Nickname ? (
+    <p className="nickname">"{Nickname}"</p>
+) : (
+    <p className="nickname">&nbsp;</p> // Render a non-breaking space if no nickname
+)}
             <h2>{FirstName} {LastName}</h2>
             <p>{WeightClass}</p>
 
@@ -60,7 +64,7 @@ const FighterCard = ({ fighter }) => {
                 </div>
                 <div className="fighter-stats draws">
                     <p>{Draws}</p>
-                    <p className="hover-content">{NoContests} NC</p>
+                    <p className="hover-content">{NoContests} NCs</p>
                 </div>
             </div>
 
