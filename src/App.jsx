@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import FighterCard from './components/FighterCard';
 import FighterProfile from './pages/fighter-profile/FighterProfile';
@@ -25,6 +25,13 @@ function App() {
     ];
 
     const genders = ["Male", "Female"];
+
+    const fighterListRef = useRef(null); // Add useRef to refer to the fighter list
+
+    // Function to scroll to the fighter list
+    const scrollToFighters = () => {
+        fighterListRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
 
     // Fetch fighters and process the data
     useEffect(() => {
@@ -163,7 +170,7 @@ function App() {
 
     return (
         <Router>
-            <Header />
+            <Header scrollToFighters={scrollToFighters} /> {/* Pass scrollToFighters as a prop */}
 
             <Routes>
                 <Route
@@ -237,7 +244,7 @@ function App() {
                                 </div>
                             )}
 
-                            <div className="fighter-list">
+                            <div className="fighter-list" ref={fighterListRef}> {/* Attach the ref to the fighter list */}
                                 {filteredFighters.length > 0 ? (
                                     filteredFighters.map(fighter => (
                                         <FighterCard key={fighter.FighterId} fighter={fighter} />

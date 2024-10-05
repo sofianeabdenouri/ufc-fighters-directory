@@ -27,20 +27,24 @@ h1 {
   display: flex;
   flex-wrap: wrap; /* Allow wrapping to the next row */
   justify-content: center; /* Center the list horizontally */
-  gap: 20px; /* Add space between fighters */
+  gap: 10px; /* Add space between fighters */
 }
 
-/* Adjusting the Fighter Card to fit 5 per row */
+/* Adjusting the Fighter Card to fit 5 per row and make it thinner */
 .fighter-card {
-  flex: 0 1 calc(20% - 20px); /* Adjust to ensure 5 per row, reduce margin space */
-  margin: 10px;
+  flex: 0 1 calc(18% - 60px); /* Adjust width to make them thinner */
+  margin: 1px;
   border: 1px solid #ccc;
   padding: 10px;
-  width: 220px; /* Reduce width to make space for 5 fighters */
+  width: 180px; /* Decreased width */
+  height: 420px; /* Keep the height fixed for consistency */
   text-align: center;
   background-color: #2b2b2b;
   color: white;
   border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* Space between items inside the card */
 }
 
 /* Nickname styling */
@@ -48,12 +52,20 @@ h1 {
   font-size: 14px;
   color: #C0C0C0;
   margin-bottom: 5px;
+  white-space: nowrap; /* Prevent text from wrapping */
+  overflow: hidden; /* Hide overflow */
+  text-overflow: ellipsis; /* Add ellipsis if text is too long */
 }
 
+/* Fighter name styling */
 .fighter-card h2 {
   font-size: 24px;
   margin-bottom: 10px;
+  white-space: nowrap; /* Prevent text from wrapping */
+  overflow: hidden; /* Hide overflow */
+  text-overflow: ellipsis; /* Add ellipsis if the name is too long */
 }
+
 
 .fighter-card p {
   margin: 5px 0;
