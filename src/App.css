@@ -3,41 +3,49 @@
   display: flex;
   flex-direction: column;
   align-items: center; /* Horizontally center */
-  justify-content: center; /* Vertically center */
+  justify-content: flex-start; /* Start content at the top, not centered vertically */
   min-height: 100vh; /* Full page height */
   margin: 0 auto;
   width: 100%; /* Ensure full width */
+  padding-top: 20px; /* Add some padding so content is not pressed against the top */
 }
 
 h1 {
   text-align: center; /* Centering the title */
-  margin-bottom: 20px;
+  margin: 0; /* Remove extra margins */
+  padding: 20px 0; /* Add some padding to ensure proper spacing */
 }
 
 /* Container for the input field and button */
 .search-container {
   display: flex;
   justify-content: center;
-  margin-bottom: 20px;
+  margin: 0 0 20px 0; /* Ensure there is no top margin, just bottom */
   gap: 10px; /* Add spacing between input, dropdown, and button */
 }
 
-/* Fighter List Layout */
 .fighter-list {
   display: flex;
-  flex-wrap: wrap; /* Allow wrapping to the next row */
-  justify-content: center; /* Center the list horizontally */
-  gap: 10px; /* Add space between fighters */
+  flex-wrap: wrap;
+  justify-content: center; /* Ensure the list is centered */
+  align-items: center; /* Align items vertically in the center */
+  gap: 10px;
+  width: 100%;
+  margin-top: 0; /* Remove any top margin */
+  padding: 0; /* Ensure there's no extra padding */
 }
 
-/* Adjusting the Fighter Card to fit 5 per row and make it thinner */
+.fighter-list:empty {
+  justify-content: center; /* Keep the flexbox centered even when empty */
+}
+
 .fighter-card {
-  flex: 0 1 calc(18% - 60px); /* Adjust width to make them thinner */
+  flex: 0 1 420px; /* Fixed width */
   margin: 1px;
   border: 1px solid #ccc;
   padding: 10px;
-  width: 180px; /* Decreased width */
-  height: 420px; /* Keep the height fixed for consistency */
+  width: 180px; /* Fixed width */
+  height: 420px; /* Fixed height */
   text-align: center;
   background-color: #2b2b2b;
   color: white;
@@ -45,6 +53,14 @@ h1 {
   display: flex;
   flex-direction: column;
   justify-content: space-between; /* Space between items inside the card */
+  box-sizing: border-box; /* Ensure padding and borders don't affect size */
+  overflow: hidden; /* Ensure overflow content doesn't expand the card */
+}
+
+/* For a single card, center it and ensure it has enough width */
+.fighter-list:only-child .fighter-card {
+  flex: 0 1 300px; /* Set a wider width for a single result */
+  max-width: 300px;
 }
 
 /* Nickname styling */
@@ -65,7 +81,6 @@ h1 {
   overflow: hidden; /* Hide overflow */
   text-overflow: ellipsis; /* Add ellipsis if the name is too long */
 }
-
 
 .fighter-card p {
   margin: 5px 0;
@@ -202,47 +217,44 @@ h1 {
 /* Advanced search box styling */
 .advanced-search-box {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start; /* Align items to the top */
+  flex-direction: column;
   padding: 20px;
   border-radius: 10px;
   background-color: #333; /* Box color */
   margin-top: 20px;
-  max-width: 800px; /* Make it wider */
+  width: 800px; /* Fixed width */
+  height: auto;
   margin-left: auto;
   margin-right: auto;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  overflow-y: auto; /* Add scroll if content overflows */
 }
 
-/* Styling for Gender and Weight Class */
-.advanced-search-box > div {
-  display: flex;
-  flex-direction: column;
-  text-align: left;
-  gap: 10px;
+/* Adjusting the layout for Gender and Weight Class using grid */
+.weight-class-container {
+  display: grid; /* Use grid layout */
+  grid-template-columns: repeat(3, 1fr); /* Create 3 equal columns */
+  gap: 20px; /* Add spacing between the columns */
 }
 
-.advanced-search-box > div:first-child {
-  flex-basis: 30%; /* Width for the Gender column */
+/* Padding and spacing for each division section */
+.male-divisions, .female-divisions, .other-divisions {
+  padding: 10px; /* Add padding to each section */
+  background-color: #2b2b2b; /* Background to distinguish sections */
+  border-radius: 10px;
 }
 
-.advanced-search-box > div:last-child {
-  flex-basis: 70%; /* Width for the Weight Class column */
-}
-
-.advanced-search-box h3 {
-  color: white;
+/* Ensure h3 headers have some margin */
+h3 {
   margin-bottom: 10px;
-}
-
-.advanced-search-box label {
-  display: inline-block;
   color: white;
-  margin-bottom: 8px;
 }
 
-.advanced-search-box input[type="checkbox"] {
-  margin-right: 5px;
+/* Labels should be block elements and have margin */
+label {
+  display: block;
+  margin-bottom: 5px;
+  color: white;
 }
 
 button {
@@ -277,3 +289,24 @@ button:hover {
   background-color: #000000; /* Darker background on hover */
   color: white;
 }
+.advanced-search-button-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px; /* Space between the sections and button */
+}
+
+.advanced-search-button {
+  background-color: #0066cc; /* Different color to distinguish it */
+  color: white;
+  border: none;
+  padding: 12px 30px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.advanced-search-button:hover {
+  background-color: #005bb5; /* Slightly darker blue on hover */
+}
+
