@@ -5,6 +5,14 @@ import FighterProfile from './pages/fighter-profile/FighterProfile';
 import Header from './header/Header';
 import './App.css';
 
+// Utility function to sanitize fighter names for use in image paths
+const sanitizeNameForImage = (name) => {
+    return name
+        .toLowerCase()                // Convert to lowercase
+        .replace(/['-]/g, '')         // Remove apostrophes and hyphens
+        .replace(/\s+/g, '_');        // Replace spaces with underscores
+};
+
 function App() {
     const [fighters, setFighters] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -14,26 +22,27 @@ function App() {
     const [selectedGenders, setSelectedGenders] = useState([]);
     const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
 
+    const handleAdvancedSearch = () => {
+        handleSearch(); // Trigger search when doing advanced search
+    };
+
     const maleWeightClasses = [
-        "Flyweight", "Bantamweight", "Featherweight", "Lightweight", "Welterweight", 
+        "Flyweight", "Bantamweight", "Featherweight", "Lightweight", "Welterweight",
         "Middleweight", "Light Heavyweight", "Heavyweight", "Catch Weight", "Open Weight", "Unknown"
     ];
 
     const femaleWeightClasses = [
-        "Women's Strawweight", "Women's Flyweight", 
+        "Women's Strawweight", "Women's Flyweight",
         "Women's Bantamweight", "Women's Featherweight"
     ];
 
     const genders = ["Male", "Female"];
+    const fighterListRef = useRef(null);
 
-    const fighterListRef = useRef(null); // Add useRef to refer to the fighter list
-
-    // Function to scroll to the fighter list
     const scrollToFighters = () => {
         fighterListRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
 
-    // Fetch fighters and process the data
     useEffect(() => {
         fetch(`https://api.sportsdata.io/v3/mma/scores/json/FightersBasic?key=${import.meta.env.VITE_API_KEY}`)
             .then(response => response.json())
@@ -57,9 +66,8 @@ function App() {
             .catch(error => console.error('Error fetching data:', error));
     }, []);
 
-    // Handle sorting logic
-    const handleSort = () => {
-        let sortedFighters = [...filteredFighters];
+    const handleSort = (results) => {
+        let sortedFighters = [...results];
         switch (sortBy) {
             case 'alphabetical':
                 sortedFighters.sort((a, b) => {
@@ -86,34 +94,30 @@ function App() {
                 sortedFighters.sort((a, b) => b.Submissions - a.Submissions);
                 break;
             default:
-                break;
+                return results;
         }
-        setFilteredFighters(sortedFighters);
+        return sortedFighters;
     };
 
-    // Handle search functionality
     const handleSearch = () => {
         let results = fighters;
 
-        // If a search term exists, filter based on that
         if (searchTerm.trim() !== '') {
             results = fighters.filter(fighter => {
                 const fullName = `${fighter.FirstName || ''} ${fighter.LastName || ''}`.toLowerCase();
-                return fullName.includes(searchTerm.toLowerCase()) || 
-                       (fighter.FirstName || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
-                       (fighter.LastName || '').toLowerCase().includes(searchTerm.toLowerCase());
+                return fullName.includes(searchTerm.toLowerCase()) ||
+                    (fighter.FirstName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    (fighter.LastName || '').toLowerCase().includes(searchTerm.toLowerCase());
             });
         }
 
-        // Filter by weight classes if any are selected
         if (selectedWeightClasses.length > 0) {
             results = results.filter(fighter => {
-                const fighterWeightClass = fighter.WeightClass || "Unknown"; // Assign "Unknown" to fighters with no weight class
+                const fighterWeightClass = fighter.WeightClass || "Unknown";
                 return selectedWeightClasses.includes(fighterWeightClass);
             });
         }
 
-        // Filter by gender if any are selected
         if (selectedGenders.length > 0) {
             results = results.filter(fighter => {
                 const gender = maleWeightClasses.includes(fighter.WeightClass) || !fighter.WeightClass ? "Male" : "Female";
@@ -121,62 +125,58 @@ function App() {
             });
         }
 
+        results = handleSort(results);
         setFilteredFighters(results);
     };
 
-    // Handle pressing the "Enter" key to trigger search
     const handleKeyPress = (e) => {
         if (e.key === 'Enter') {
-            handleSearch(); // Trigger search when Enter is pressed
+            handleSearch();
         }
     };
 
-    // Toggle weight class filters
     const toggleWeightClass = (weightClass) => {
-        setSelectedWeightClasses(prev => 
-            prev.includes(weightClass) 
-            ? prev.filter(wc => wc !== weightClass) 
-            : [...prev, weightClass]
+        setSelectedWeightClasses(prev =>
+            prev.includes(weightClass)
+                ? prev.filter(wc => wc !== weightClass)
+                : [...prev, weightClass]
         );
     };
 
-    // Toggle gender filters
     const toggleGender = (gender) => {
-        setSelectedGenders(prev => 
-            prev.includes(gender) 
-            ? prev.filter(g => g !== gender) 
-            : [...prev, gender]
+        setSelectedGenders(prev =>
+            prev.includes(gender)
+                ? prev.filter(g => g !== gender)
+                : [...prev, gender]
         );
     };
 
-    // Toggle advanced search section visibility
     const toggleAdvancedSearch = () => {
-        setShowAdvancedSearch(prev => !prev); // Toggle the state
+        setShowAdvancedSearch(prev => !prev);
     };
 
-    // Function to disable weight classes based on gender filter
     const isWeightClassDisabled = (weightClass) => {
         if (selectedGenders.length === 2) {
-            return false; // If both genders are selected, none of the weight classes should be disabled
+            return false;
         }
         if (selectedGenders.includes("Female") && !femaleWeightClasses.includes(weightClass)) {
-            return true; // Disable male weight classes if "Female" is selected
+            return true;
         }
         if (selectedGenders.includes("Male") && !maleWeightClasses.includes(weightClass)) {
-            return true; // Disable female weight classes if "Male" is selected
+            return true;
         }
         return false;
     };
 
     return (
         <Router>
-            <Header scrollToFighters={scrollToFighters} /> {/* Pass scrollToFighters as a prop */}
-
             <Routes>
                 <Route
                     path="/"
                     element={
                         <div className="app">
+                            <Header scrollToFighters={scrollToFighters} />
+
                             <h1>UFC Fighters Directory</h1>
 
                             <div className="search-container">
@@ -184,14 +184,12 @@ function App() {
                                     type="text"
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
-                                    onKeyDown={handleKeyPress} // Listen for Enter key press
+                                    onKeyDown={handleKeyPress}
                                     placeholder="Search fighters"
                                 />
-                                <button onClick={handleSearch}>Search</button>
 
-                                {/* Sort Dropdown */}
                                 <select onChange={(e) => setSortBy(e.target.value)} value={sortBy}>
-                                    <option value="" disabled>Sort by</option>
+                                    <option value="">No sorting</option>
                                     <option value="alphabetical">Alphabetical</option>
                                     <option value="mostWins">Most Wins</option>
                                     <option value="mostLosses">Most Losses</option>
@@ -200,64 +198,83 @@ function App() {
                                     <option value="mostSubs">Most Submissions</option>
                                 </select>
 
-                                <button onClick={handleSort}>Sort</button>
+                                <button onClick={handleSearch}>Search</button>
 
-                                {/* Advanced Search Toggle */}
                                 <button onClick={toggleAdvancedSearch} style={{ marginLeft: '10px' }}>
                                     {showAdvancedSearch ? 'Hide Advanced Search' : 'Advanced Search'}
                                 </button>
                             </div>
 
-                            {/* Advanced Search Section */}
                             {showAdvancedSearch && (
-                                <div className="advanced-search-box fighter-card"> {/* Match styling of fighter card */}
-                                    <h2>Advanced Search</h2>
+                                <div className="advanced-search-box fighter-card">
+                                    <div className="weight-class-container">
+                                        <div className="male-divisions">
+                                            <h3>Male Divisions</h3>
+                                            {maleWeightClasses.slice(0, 8).map(wc => (
+                                                <div key={wc}>
+                                                    <label>
+                                                        <input
+                                                            type="checkbox"
+                                                            onChange={() => toggleWeightClass(wc)}
+                                                            disabled={isWeightClassDisabled(wc)}
+                                                        /> {wc}
+                                                    </label>
+                                                </div>
+                                            ))}
+                                        </div>
 
-                                    <div>
-                                        <h3>Filter by Gender:</h3>
-                                        {genders.map(gender => (
-                                            <div key={gender}>
-                                                <label>
-                                                    <input 
-                                                        type="checkbox" 
-                                                        onChange={() => toggleGender(gender)} 
-                                                    /> {gender}
-                                                </label>
-                                            </div>
-                                        ))}
+                                        <div className="female-divisions">
+                                            <h3>Female Divisions</h3>
+                                            {femaleWeightClasses.map(wc => (
+                                                <div key={wc}>
+                                                    <label>
+                                                        <input
+                                                            type="checkbox"
+                                                            onChange={() => toggleWeightClass(wc)}
+                                                            disabled={isWeightClassDisabled(wc)}
+                                                        /> {wc}
+                                                    </label>
+                                                </div>
+                                            ))}
+                                        </div>
+
+                                        <div className="other-divisions">
+                                            <h3>Other Divisions</h3>
+                                            {maleWeightClasses.slice(8).map(wc => (
+                                                <div key={wc}>
+                                                    <label>
+                                                        <input
+                                                            type="checkbox"
+                                                            onChange={() => toggleWeightClass(wc)}
+                                                            disabled={isWeightClassDisabled(wc)}
+                                                        /> {wc}
+                                                    </label>
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
 
-                                    <div>
-                                        <h3>Filter by Weight Class:</h3>
-                                        {maleWeightClasses.concat(femaleWeightClasses).map(wc => (
-                                            <div key={wc}>
-                                                <label style={{ color: isWeightClassDisabled(wc) ? 'gray' : 'white' }}>
-                                                    <input 
-                                                        type="checkbox" 
-                                                        onChange={() => toggleWeightClass(wc)} 
-                                                        disabled={isWeightClassDisabled(wc)} 
-                                                    /> {wc}
-                                                </label>
-                                            </div>
-                                        ))}
+                                    <div className="advanced-search-button-container">
+                                        <button className="advanced-search-button" onClick={handleAdvancedSearch}>
+                                            Advanced Search
+                                        </button>
                                     </div>
                                 </div>
                             )}
 
-                            <div className="fighter-list" ref={fighterListRef}> {/* Attach the ref to the fighter list */}
+                            <div className="fighter-list" ref={fighterListRef}>
                                 {filteredFighters.length > 0 ? (
                                     filteredFighters.map(fighter => (
                                         <FighterCard key={fighter.FighterId} fighter={fighter} />
                                     ))
                                 ) : (
-                                    <p>No fighters found</p> // Display message if no search results
+                                    <p>No fighters found</p>
                                 )}
                             </div>
                         </div>
                     }
                 />
 
-                {/* Route for Fighter Profile */}
                 <Route path="/fighter/:id" element={<FighterProfile />} />
             </Routes>
         </Router>
