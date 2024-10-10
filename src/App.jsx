@@ -21,7 +21,16 @@ function App() {
     const [selectedWeightClasses, setSelectedWeightClasses] = useState([]);
     const [selectedGenders, setSelectedGenders] = useState([]);
     const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
-    const [favorites, setFavorites] = useState([]); // State for managing favorites
+    const [favorites, setFavorites] = useState(() => {
+        // Load favorites from local storage on initial load
+        const savedFavorites = localStorage.getItem('favorites');
+        return savedFavorites ? JSON.parse(savedFavorites) : [];
+    }); // State for managing favorites
+
+    useEffect(() => {
+        // Save favorites to local storage whenever they change
+        localStorage.setItem('favorites', JSON.stringify(favorites));
+    }, [favorites]);
 
     const handleAdvancedSearch = () => {
         handleSearch(); // Trigger search when doing advanced search
@@ -295,7 +304,16 @@ function App() {
                     }
                 />
 
-                <Route path="/fighter/:id" element={<FighterProfile />} />
+                {/* Adjusted Route to pass favorites and toggleFavorite to FighterProfile */}
+                <Route
+                    path="/fighter/:id"
+                    element={
+                        <FighterProfile 
+                            favorites={favorites}
+                            toggleFavorite={toggleFavorite}
+                        />
+                    }
+                />
             </Routes>
         </Router>
     );
