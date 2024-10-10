@@ -1,17 +1,16 @@
 import React from 'react';
-import { useLocation, useNavigate } from 'react-router-dom'; // Import useNavigate
-import './FighterProfile.css'; // Import only for FighterProfile
+import { useLocation, useNavigate } from 'react-router-dom';
+import './FighterProfile.css';
 
-const FighterProfile = () => {
-    const { state } = useLocation(); // Access the state passed via navigate
-    const { fighter } = state || {};  // Destructure the fighter object from the state
-    const navigate = useNavigate(); // Get the navigate function
+const FighterProfile = ({ isFavorite, toggleFavorite }) => {
+    const { state } = useLocation();
+    const { fighter } = state || {};
+    const navigate = useNavigate();
 
     if (!fighter) {
-        return <p>No fighter data found.</p>; // Handle cases where state might be empty
+        return <p>No fighter data found.</p>;
     }
 
-    // Construct the image path for the fighter
     const imageName = `${fighter.FirstName}_${fighter.LastName}.png`;
     const imageUrl = `/src/common/images/${imageName}`;
 
@@ -40,6 +39,15 @@ const FighterProfile = () => {
             <div className="fighter-profile-image">
                 <img src={imageUrl} alt={`${fighter.FirstName} ${fighter.LastName}`} onError={(e) => { e.target.src = '/src/common/images/default.png'; }} />
             </div>
+
+            {/* Favorite Star Icon positioned next to the Back button */}
+            <button onClick={() => toggleFavorite(fighter.FighterId)} className="profile-star-button">
+                <img
+                    src={isFavorite ? "/src/common/images/star.png" : "/src/common/images/star_gray.png"}
+                    alt={isFavorite ? "Favorited" : "Not Favorited"}
+                    className="profile-star-icon"
+                />
+            </button>
         </div>
     );
 };

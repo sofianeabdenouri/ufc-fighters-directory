@@ -65,10 +65,27 @@
     transform: scale(1.05);
 }
 
+/* Star button styling */
+.profile-star-button {
+    position: absolute;
+    bottom: 80px; /* Align at the bottom of the container */
+    right: 25px; /* Place it to the left of the "Back to Directory" button */
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+.profile-star-icon {
+    width: 30px; /* Adjust size */
+    height: 30px;
+}
+
 /* Fighter profile image section */
 .fighter-profile-image {
     flex: 1;
     text-align: center;
+    position: relative; /* Relative for positioning the star */
 }
 
 .fighter-profile-image img {
@@ -133,5 +150,10 @@
     .fighter-profile-back-btn {
         bottom: 10px;
         right: 10px;
+    }
+
+    .profile-star-button {
+        bottom: 10px;
+        right: 100px;
     }
 }

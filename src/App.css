@@ -40,11 +40,12 @@ h1 {
 }
 
 .fighter-card {
+  position: relative; /* For the star to be placed */
   flex: 0 1 420px; /* Fixed width */
   margin: 1px;
   border: 1px solid #ccc;
   padding: 10px;
-  width: 180px; /* Fixed width */
+  width: 200px; /* Fixed width */
   height: 420px; /* Fixed height */
   text-align: center;
   background-color: #2b2b2b;
@@ -57,10 +58,13 @@ h1 {
   overflow: hidden; /* Ensure overflow content doesn't expand the card */
 }
 
-/* For a single card, center it and ensure it has enough width */
-.fighter-list:only-child .fighter-card {
-  flex: 0 1 300px; /* Set a wider width for a single result */
-  max-width: 300px;
+/* Wrapper for nickname and star */
+.nickname-wrapper {
+  display: flex;
+  justify-content: center; /* Center the nickname */
+  align-items: center;
+  width: 100%; /* Make sure nickname and star are on the same line */
+  position: relative; /* For absolute positioning of the star */
 }
 
 /* Nickname styling */
@@ -71,11 +75,14 @@ h1 {
   white-space: nowrap; /* Prevent text from wrapping */
   overflow: hidden; /* Hide overflow */
   text-overflow: ellipsis; /* Add ellipsis if text is too long */
+  text-align: center; /* Center text inside the nickname */
+  flex: 1; /* Take up remaining space */
 }
 
 /* Fighter name styling */
 .fighter-card h2 {
-  font-size: 24px;
+  font-size: 18px; /* Adjust font size for better fit */
+  color: #fff;
   margin-bottom: 10px;
   white-space: nowrap; /* Prevent text from wrapping */
   overflow: hidden; /* Hide overflow */
@@ -289,6 +296,7 @@ button:hover {
   background-color: #000000; /* Darker background on hover */
   color: white;
 }
+
 .advanced-search-button-container {
   display: flex;
   justify-content: center;
@@ -310,3 +318,29 @@ button:hover {
   background-color: #005bb5; /* Slightly darker blue on hover */
 }
 
+/* Star button */
+.star-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0; /* Remove any padding so the star itself is clickable */
+  position: absolute; /* Position the star next to the nickname */
+  right: 0; /* Align the star to the right */
+}
+
+/* Star icon */
+.star-icon {
+  width: 24px;
+  height: 24px;
+  display: inline-block;
+}
+/* Custom styles for the select dropdown */
+.select-favorites {
+  background-color: #FFC006; /* Yellow background for the dropdown */
+  color: black; /* Black text for contrast */
+}
+
+/* Option styling (only applies when using custom dropdown components, not native HTML) */
+option[value="favorites"] {
+  color: #FFC006; /* Set the color of the option */
+}
