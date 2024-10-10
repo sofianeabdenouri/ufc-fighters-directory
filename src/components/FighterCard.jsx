@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const FighterCard = ({ fighter }) => {
+const FighterCard = ({ fighter, isFavorite, toggleFavorite }) => {
     const {
         FighterId,
         FirstName,
@@ -36,11 +36,22 @@ const FighterCard = ({ fighter }) => {
 
     return (
         <div className="fighter-card">
-{Nickname ? (
-    <p className="nickname">"{Nickname}"</p>
-) : (
-    <p className="nickname">&nbsp;</p> // Render a non-breaking space if no nickname
-)}
+            <div className="nickname-wrapper">
+                {Nickname ? (
+                    <p className="nickname">"{Nickname}"</p>
+                ) : (
+                    <p className="nickname">&nbsp;</p> // Render a non-breaking space if no nickname
+                )}
+                {/* Favorite Star Icon positioned next to the nickname */}
+                <button onClick={() => toggleFavorite(FighterId)} className="star-button">
+                    <img
+                        src={isFavorite ? "/src/common/images/star.png" : "/src/common/images/star_gray.png"}
+                        alt={isFavorite ? "Favorited" : "Not Favorited"}
+                        className="star-icon"
+                    />
+                </button>
+            </div>
+
             <h2>{FirstName} {LastName}</h2>
             <p>{WeightClass}</p>
 

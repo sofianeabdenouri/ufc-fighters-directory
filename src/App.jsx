@@ -21,6 +21,7 @@ function App() {
     const [selectedWeightClasses, setSelectedWeightClasses] = useState([]);
     const [selectedGenders, setSelectedGenders] = useState([]);
     const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
+    const [favorites, setFavorites] = useState([]); // State for managing favorites
 
     const handleAdvancedSearch = () => {
         handleSearch(); // Trigger search when doing advanced search
@@ -68,6 +69,7 @@ function App() {
 
     const handleSort = (results) => {
         let sortedFighters = [...results];
+
         switch (sortBy) {
             case 'alphabetical':
                 sortedFighters.sort((a, b) => {
@@ -93,9 +95,13 @@ function App() {
             case 'mostSubs':
                 sortedFighters.sort((a, b) => b.Submissions - a.Submissions);
                 break;
+            case 'favorites': // New case for sorting by favorites
+                sortedFighters = sortedFighters.filter(fighter => favorites.includes(fighter.FighterId));
+                break;
             default:
                 return results;
         }
+
         return sortedFighters;
     };
 
@@ -168,6 +174,14 @@ function App() {
         return false;
     };
 
+    const toggleFavorite = (fighterId) => {
+        setFavorites(prevFavorites =>
+            prevFavorites.includes(fighterId)
+                ? prevFavorites.filter(id => id !== fighterId)
+                : [...prevFavorites, fighterId]
+        );
+    };
+
     return (
         <Router>
             <Routes>
@@ -196,6 +210,7 @@ function App() {
                                     <option value="mostDraws">Most Draws</option>
                                     <option value="mostKOs">Most KOs</option>
                                     <option value="mostSubs">Most Submissions</option>
+                                    <option value="favorites">Favorites</option> {/* Added Favorites sorting */}
                                 </select>
 
                                 <button onClick={handleSearch}>Search</button>
@@ -265,7 +280,12 @@ function App() {
                             <div className="fighter-list" ref={fighterListRef}>
                                 {filteredFighters.length > 0 ? (
                                     filteredFighters.map(fighter => (
-                                        <FighterCard key={fighter.FighterId} fighter={fighter} />
+                                        <FighterCard 
+                                            key={fighter.FighterId} 
+                                            fighter={fighter} 
+                                            isFavorite={favorites.includes(fighter.FighterId)} 
+                                            toggleFavorite={toggleFavorite}
+                                        />
                                     ))
                                 ) : (
                                     <p>No fighters found</p>
