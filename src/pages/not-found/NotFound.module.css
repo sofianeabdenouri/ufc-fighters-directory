@@ -1,10 +1,15 @@
-
-.NotFound{
-    background-color:#000000
+.NotFound {
+    display: flex;
+    flex-direction: column; /* Stack items vertically */
+    justify-content: center; /* Center vertically */
+    align-items: center; /* Center horizontally */
+    min-height: 100vh; /* Ensure it takes the full height of the viewport */
 }
 
-.Title{
-    color: #FFFFFF
+.Title {
+    color: #FFFFFF;
+    text-align: center; /* Center the title text */
+    margin-bottom: 20px; /* Add some spacing below the title */
 }
 
 .Button {
@@ -13,13 +18,20 @@
     color: #000000c0;
     border: #f1f1f1 1px solid;
     padding: 10px 5px;
-    background-color: #f1f1f1;;
+    background-color: #f1f1f1;
     font-size: 1.25rem;
     border-radius: 5px;
-    text-shadow: 0px 0px 0px #f1f1f1;;
-
+    text-shadow: 0px 0px 0px #f1f1f1;
+    cursor: pointer;
+    text-align: center; /* Center the button text */
 }
+
 .Button:hover {
     background-color: #000000c0;
     color: #f1f1f1;
+}
+
+img {
+    max-width: 100%; /* Ensure the GIF is responsive */
+    height: auto;
 }
