@@ -20,10 +20,30 @@ h1 {
 .search-container {
   display: flex;
   justify-content: center;
-  margin: 0 0 20px 0; /* Ensure there is no top margin, just bottom */
-  gap: 10px; /* Add spacing between input, dropdown, and button */
+  align-items: center;
+  width: 100vw; /* Make it full width */
+  margin: 0; /* Remove margins */
+  padding: 10px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background-color: #242424; /* Same background as page */
+  transition: border-bottom 0.3s ease; /* Smooth transition for the border */
+
+}
+/* Only apply the border-bottom when scrolled */
+.search-container.scrolled {
+  border-bottom: 2px solid #f1f1f1; /* Apply the border only when scrolled */
 }
 
+input {
+  width: 20%; /* Full width for the input */
+  max-width: 600px; /* You can adjust the max-width */
+  padding: 10px;
+  font-size: 1rem;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
 .fighter-list {
   display: flex;
   flex-wrap: wrap;

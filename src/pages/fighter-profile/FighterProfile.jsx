@@ -1,6 +1,7 @@
 import React from 'react';
 import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import './FighterProfile.css';
+import NotFound from '../not-found/NotFound'; // Import the NotFound component
 
 const FighterProfile = ({ favorites, toggleFavorite }) => {
     const { state } = useLocation();
@@ -8,7 +9,9 @@ const FighterProfile = ({ favorites, toggleFavorite }) => {
     const navigate = useNavigate();
 
     const { fighter } = state || {}; // Fallback if state is missing
-    if (!fighter) return <p>No fighter data found.</p>;
+    
+    // If fighter is not found in state, render the NotFound component
+    if (!fighter) return <NotFound />;
 
     const imageName = `${fighter.FirstName}_${fighter.LastName}.png`;
     const imageUrl = `/src/common/images/${imageName}`;
