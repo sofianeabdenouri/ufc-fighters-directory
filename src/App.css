@@ -11,9 +11,9 @@
 }
 
 h1 {
-  text-align: center; /* Centering the title */
-  margin: 0; /* Remove extra margins */
-  padding: 20px 0; /* Add some padding to ensure proper spacing */
+  text-align: center;
+  margin: 0; /* Remove bottom margin */
+  padding: 10px 0; /* Add some padding to ensure proper spacing */
 }
 
 /* Container for the input field and button */
@@ -363,4 +363,26 @@ button:hover {
 /* Option styling (only applies when using custom dropdown components, not native HTML) */
 option[value="favorites"] {
   color: #FFC006; /* Set the color of the option */
+}
+.description {
+  color: #777; /* Slightly darker color for the subtitle */
+  font-weight: normal;
+  text-align: center;
+  margin-top: 5px; /* Reduce top margin */
+  margin-bottom: 0; /* Remove bottom margin if there's more content after */
+  font-size: 0.8rem; /* Adjust font size if necessary */
+}
+.footer {
+  text-align: center;
+  font-size: 0.85rem;
+  color: #999; /* Lighter color for the disclaimer */
+  padding: 20px;
+  background-color: #333;
+  width: 100%;
+}
+
+.footer p {
+  margin: 0;
+  line-height: 1.5;
+  padding: 0 15px;
 }

@@ -201,7 +201,7 @@ function App() {
                             <Header scrollToFighters={scrollToFighters} />
 
                             <h1>UFC Fighters Directory</h1>
-
+                            <h5 className="description">Live up-to-date records for every fighter</h5>
                             <div className="search-container">
                                 <input
                                     type="text"
@@ -300,6 +300,12 @@ function App() {
                                     <p>No fighters found</p>
                                 )}
                             </div>
+                            {/* Footer for fan project */}
+                            <footer className="footer">
+                                <p>
+                                    This is a fan-made project and is in no way affiliated with, authorized, or endorsed by the Ultimate Fighting Championship (UFC) or any of its partners, subsidiaries, or associated organizations.<br/> All UFC-related trademarks, names, and logos are the property of their respective owners. <br/> The information presented on this site is for entertainment and informational purposes only, and while every effort is made to ensure accuracy, it is not official or guaranteed to be up-to-date.
+                                </p>
+                            </footer>
                         </div>
                     }
                 />
