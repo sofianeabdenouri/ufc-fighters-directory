@@ -20,10 +20,8 @@ const Header: React.FC<HeaderProps> = ({ scrollToFighters, conditionalRender = t
                 Your browser does not support the video tag.
             </video>
 
-            {/* Add the black overlay div */}
             <div className={classes.VideoOverlay}></div>
             <div className={classes.Content}>
-                
                 <div className={classes.SubContent}>
                     <h1>Welcome to the Ultimate Fighting Championship</h1>
                     <p>A World Where Martial Arts Legends Are Born</p>

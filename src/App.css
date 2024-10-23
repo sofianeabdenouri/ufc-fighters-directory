@@ -37,7 +37,7 @@ h1 {
 }
 
 input {
-  width: 20%; /* Full width for the input */
+  width: 100%; /* Full width for the input */
   max-width: 600px; /* You can adjust the max-width */
   padding: 10px;
   font-size: 1rem;
@@ -385,4 +385,55 @@ option[value="favorites"] {
   margin: 0;
   line-height: 1.5;
   padding: 0 15px;
+}
+/* Search input wrapper for positioning clear button */
+.search-input-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+/* Clear button inside the search bar */
+.clear-search {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: #888;
+}
+
+.clear-search:hover {
+  color: #000;
+}
+/* Scroll to top button */
+.scroll-to-top {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 10px 15px;
+  background-color: #444;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 24px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  z-index: 1000;
+}
+
+.scroll-to-top:hover {
+  background-color: #666;
+}
+@font-face {
+  font-family: 'Sternbach';
+  src: url('../common/fonts/Sternbach Bold Italic.otf') format('opentype');
+  font-weight: bold;
+  font-style: italic;
+}
+
+.font-h1 {
+  font-family: 'Sternbach Bold Italic', sans-serif;
 }

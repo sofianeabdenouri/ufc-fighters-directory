@@ -13,6 +13,11 @@ const sanitizeNameForImage = (name) => {
         .replace(/\s+/g, '_');        // Replace spaces with underscores
 };
 
+// Utility function to remove accents from strings
+const removeAccents = (str) => {
+    return str.normalize('NFD').replace(/[\u0300-\u036f]/g, ''); // Removes accents from characters
+};
+
 function App() {
     const [fighters, setFighters] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -22,15 +27,49 @@ function App() {
     const [selectedGenders, setSelectedGenders] = useState([]);
     const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
     const [favorites, setFavorites] = useState(() => {
-        // Load favorites from local storage on initial load
         const savedFavorites = localStorage.getItem('favorites');
         return savedFavorites ? JSON.parse(savedFavorites) : [];
     }); // State for managing favorites
+    const [showScrollButton, setShowScrollButton] = useState(false); // For scroll-to-top button
 
+    // Scroll restoration logic
     useEffect(() => {
-        // Save favorites to local storage whenever they change
-        localStorage.setItem('favorites', JSON.stringify(favorites));
-    }, [favorites]);
+        // Save scroll position before leaving the page
+        const saveScrollPosition = () => {
+            sessionStorage.setItem('scrollPosition', window.scrollY);
+        };
+
+        // Add event listener to save scroll position
+        window.addEventListener('beforeunload', saveScrollPosition);
+
+        // Restore scroll position when user revisits
+        const savedScrollPosition = sessionStorage.getItem('scrollPosition');
+        if (savedScrollPosition && window.location.pathname === "/") {
+            window.scrollTo(0, parseInt(savedScrollPosition, 10));
+        }
+
+        return () => {
+            // Cleanup: remove event listener
+            window.removeEventListener('beforeunload', saveScrollPosition);
+        };
+    }, []);
+
+    // Toggle scroll-to-top button based on scroll position
+    useEffect(() => {
+        const handleScroll = () => {
+            if (window.pageYOffset > 300) {
+                setShowScrollButton(true);
+            } else {
+                setShowScrollButton(false);
+            }
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    const handleScrollToTop = () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
 
     const handleAdvancedSearch = () => {
         handleSearch(); // Trigger search when doing advanced search
@@ -116,13 +155,16 @@ function App() {
 
     const handleSearch = () => {
         let results = fighters;
+        const normalizedSearchTerm = removeAccents(searchTerm.trim().toLowerCase());
 
-        if (searchTerm.trim() !== '') {
+        if (normalizedSearchTerm !== '') {
             results = fighters.filter(fighter => {
-                const fullName = `${fighter.FirstName || ''} ${fighter.LastName || ''}`.toLowerCase();
-                return fullName.includes(searchTerm.toLowerCase()) ||
-                    (fighter.FirstName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    (fighter.LastName || '').toLowerCase().includes(searchTerm.toLowerCase());
+                const fullName = `${fighter.FirstName || ''} ${fighter.LastName || ''}`;
+                const normalizedFullName = removeAccents(fullName.toLowerCase());
+
+                return normalizedFullName.includes(normalizedSearchTerm) ||
+                    removeAccents((fighter.FirstName || '').toLowerCase()).includes(normalizedSearchTerm) ||
+                    removeAccents((fighter.LastName || '').toLowerCase()).includes(normalizedSearchTerm);
             });
         }
 
@@ -148,6 +190,11 @@ function App() {
         if (e.key === 'Enter') {
             handleSearch();
         }
+    };
+
+    const clearSearch = () => {
+        setSearchTerm('');
+        setFilteredFighters(fighters); // Reset to the full fighter list
     };
 
     const toggleWeightClass = (weightClass) => {
@@ -200,16 +247,23 @@ function App() {
                         <div className="app">
                             <Header scrollToFighters={scrollToFighters} />
 
-                            <h1>UFC Fighters Directory</h1>
+                            <h1 className="font-h1">UFC Fighters Directory</h1>
                             <h5 className="description">Live up-to-date records for every fighter</h5>
                             <div className="search-container">
-                                <input
-                                    type="text"
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    onKeyDown={handleKeyPress}
-                                    placeholder="Search fighters"
-                                />
+                                <div className="search-input-wrapper">
+                                    <input
+                                        type="text"
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        onKeyDown={handleKeyPress}
+                                        placeholder="Search fighters"
+                                    />
+                                    {searchTerm && (
+                                        <button className="clear-search" onClick={clearSearch}>
+                                            &times;
+                                        </button>
+                                    )}
+                                </div>
 
                                 <select onChange={(e) => setSortBy(e.target.value)} value={sortBy}>
                                     <option value="">No sorting</option>
@@ -217,7 +271,7 @@ function App() {
                                     <option value="mostWins">Most Wins</option>
                                     <option value="mostLosses">Most Losses</option>
                                     <option value="mostDraws">Most Draws</option>
-                                    <option value="mostKOs">Most KOs</option>
+                                    <option value="mostKOs">Most Knockouts</option>
                                     <option value="mostSubs">Most Submissions</option>
                                     <option value="favorites">Favorites</option> {/* Added Favorites sorting */}
                                 </select>
@@ -286,6 +340,11 @@ function App() {
                                 </div>
                             )}
 
+                            {/* Display number of results */}
+                            <div className="result-count">
+                                {filteredFighters.length} fighters found.
+                            </div>
+
                             <div className="fighter-list" ref={fighterListRef}>
                                 {filteredFighters.length > 0 ? (
                                     filteredFighters.map(fighter => (
@@ -300,6 +359,14 @@ function App() {
                                     <p>No fighters found</p>
                                 )}
                             </div>
+
+                            {/* Scroll to top button */}
+                            {showScrollButton && (
+                                <button onClick={handleScrollToTop} className="scroll-to-top">
+                                    ↑ Top
+                                </button>
+                            )}
+
                             {/* Footer for fan project */}
                             <footer className="footer">
                                 <p>

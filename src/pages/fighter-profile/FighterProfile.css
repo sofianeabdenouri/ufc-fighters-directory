@@ -1,23 +1,43 @@
 /* Container for the whole profile */
 .fighter-profile-container {
     display: flex;
-    flex-direction: row; /* Place the image and the details side by side */
+    flex-direction: row; /* Image and details side by side */
     justify-content: center; /* Center the container horizontally */
     align-items: flex-start;
     padding: 20px;
     background: linear-gradient(to bottom, #202020, #1c1c1c);
     border-radius: 20px;
     color: white;
-    max-width: 1200px; /* Set a max-width for centering */
+    width: 850px; /* Set a fixed width of 850px */
     margin: 20px auto; /* Center the container horizontally */
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.8);
     position: relative; /* Make the container relative for absolute positioning */
 }
 
+/* Fighter profile image section */
+.fighter-profile-image {
+    flex: 1;
+    text-align: center;
+    position: relative; /* Relative for positioning the star */
+}
+
+.fighter-profile-image img {
+    width: 300px; /* Fixed width for the image */
+    height: 300px; /* Fixed height for the image */
+    border-radius: 50%; /* Make the image circular */
+    object-fit: cover;
+    border: 5px solid #ffba08; /* Yellow border around the image */
+    transition: transform 0.3s ease-in-out;
+}
+
+.fighter-profile-image img:hover {
+    transform: scale(1.05);
+}
+
 /* Fighter profile details section */
 .fighter-profile-details {
     flex: 2;
-    margin-right: 20px;
+    margin-left: 20px; /* Space between image and details */
 }
 
 .fighter-profile-details h1 {
@@ -28,18 +48,6 @@
     text-transform: uppercase;
     letter-spacing: 2px;
     text-align: center; /* Center the text */
-}
-
-.fighter-profile-details p {
-    font-size: 1.2rem;
-    line-height: 1.6;
-    border-bottom: 1px solid #ffba08;
-    padding-bottom: 8px;
-    margin-bottom: 15px;
-}
-
-.fighter-profile-details p:last-child {
-    border-bottom: none;
 }
 
 /* Back Button Styling */
@@ -59,12 +67,6 @@
     transition: background-color 0.3s ease-in-out, transform 0.3s ease-in-out;
 }
 
-.fighter-profile-back-btn:hover {
-    background-color: #ffaa00;
-    color: #000;
-    transform: scale(1.05);
-}
-
 /* Star button styling */
 .profile-star-button {
     position: absolute;
@@ -81,59 +83,13 @@
     height: 30px;
 }
 
-/* Fighter profile image section */
-.fighter-profile-image {
-    flex: 1;
-    text-align: center;
-    position: relative; /* Relative for positioning the star */
-}
-
-.fighter-profile-image img {
-    width: 300px;
-    height: 300px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 5px solid #ffba08;
-    transition: transform 0.3s ease-in-out;
-}
-
-.fighter-profile-image img:hover {
-    transform: scale(1.05);
-}
-
-/* Header styling */
-.header-container {
-    text-align: center;
-    margin: 0 auto;
-    padding: 20px;
-}
-
-.header-content {
-    color: #ffba08;
-    font-size: 2.5rem;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-}
-
-.header-subcontent {
-    font-size: 1.5rem;
-    color: white;
-    margin-top: 10px;
-}
-
-.header-video {
-    max-width: 100%;
-    height: auto;
-    border-radius: 15px;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.8);
-}
-
 /* Responsive Design */
 @media (max-width: 768px) {
     .fighter-profile-container {
         flex-direction: column;
         align-items: center;
         padding: 10px;
+        width: 100%; /* Use full width on smaller screens */
     }
 
     .fighter-profile-details {

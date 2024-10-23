@@ -24,10 +24,23 @@ const FighterProfile = ({ favorites, toggleFavorite }) => {
         toggleFavorite(fighter.FighterId);
     };
 
+    // Function to calculate age from birthdate
+    const calculateAge = (birthDate) => {
+        const today = new Date();
+        const birthDateObj = new Date(birthDate);
+        let age = today.getFullYear() - birthDateObj.getFullYear();
+        const monthDiff = today.getMonth() - birthDateObj.getMonth();
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDateObj.getDate())) {
+            age--;
+        }
+        return age;
+    };
+
     return (
         <div className="fighter-profile-container">
             <div className="fighter-profile-details">
                 <h1>{fighter.FirstName} {fighter.LastName}</h1>
+                <p>Age: {calculateAge(fighter.BirthDate)}</p> {/* Calculate and display the age */}
                 <p>Nickname: {fighter.Nickname || "N/A"}</p>
                 <p>Weight Class: {fighter.WeightClass}</p>
                 <p>Wins: {fighter.Wins}</p>
@@ -38,7 +51,6 @@ const FighterProfile = ({ favorites, toggleFavorite }) => {
                 <p>Reach: {fighter.Reach} inches</p>
                 <p>Technical Knockouts: {fighter.TechnicalKnockouts}</p>
                 <p>Submissions: {fighter.Submissions}</p>
-                <p>Birthdate: {new Date(fighter.BirthDate).toLocaleDateString()}</p>
 
                 {/* Back Button */}
                 <button className="fighter-profile-back-btn" onClick={() => navigate('/')}>
