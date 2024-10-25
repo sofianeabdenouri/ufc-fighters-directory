@@ -61,7 +61,7 @@ input {
 
 .fighter-card {
   position: relative; /* For the star to be placed */
-  flex: 0 1 420px; /* Fixed width */
+  flex: 0 1 300px; /* Fixed width */
   margin: 1px;
   border: 1px solid #ccc;
   padding: 10px;
@@ -429,11 +429,54 @@ option[value="favorites"] {
 }
 @font-face {
   font-family: 'Sternbach';
-  src: url('../common/fonts/Sternbach Bold Italic.otf') format('opentype');
-  font-weight: bold;
-  font-style: italic;
+  src: url('./src/common/fonts/Sternbach.otf') format('opentype');
 }
 
 .font-h1 {
-  font-family: 'Sternbach Bold Italic', sans-serif;
+  font-family: 'Sternbach', sans-serif;
+  color: darkred; /* Dark red text */
+  text-shadow: 2px 2px 4px black; /* Black shadow effect */
+  -webkit-text-stroke: 1px white; /* White outline */
+  font-weight: bold;
+  font-style: italic;
+  text-align: center; /* Center the text */
+}
+.pagination {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+.pagination button {
+    padding: 5px 10px;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    background-color: #000000;
+    border-radius: 4px;
+}
+
+.pagination button.active {
+    background-color: #007bff;
+    color: white;
+    font-weight: bold;
+}
+
+.ellipsis-button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+}
+
+.page-input {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.page-input input {
+    width: 50px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
 }

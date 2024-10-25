@@ -31,7 +31,73 @@ function App() {
         return savedFavorites ? JSON.parse(savedFavorites) : [];
     }); // State for managing favorites
     const [showScrollButton, setShowScrollButton] = useState(false); // For scroll-to-top button
+    const [currentPage, setCurrentPage] = useState(1);
+    const fightersPerPage = useRef(0); // Dynamically calculate fighters per page
+    const totalPages = Math.ceil(filteredFighters.length / fightersPerPage.current); // Total number of pages
+    const [showPageInput, setShowPageInput] = useState(false);
+    const [pageInputValue, setPageInputValue] = useState('');
+    
+    const handlePageInputChange = (e) => {
+        setPageInputValue(e.target.value);
+    };
+    
+    const goToPage = () => {
+        const page = parseInt(pageInputValue, 10);
+        if (page >= 1 && page <= totalPages) {
+            setCurrentPage(page);
+            setShowPageInput(false); // Hide input after setting page
+        }
+    };
+    
+    const getPaginationNumbers = () => {
+        const pages = [];
+        
+        if (totalPages <= 7) {
+            // If total pages are small, show all without '...'
+            for (let i = 1; i <= totalPages; i++) pages.push(i);
+        } else {
+            // If near the beginning
+            if (currentPage <= 4) {
+                for (let i = 1; i <= 5; i++) pages.push(i);
+                pages.push('...');
+            }
+            // If near the end
+            else if (currentPage >= totalPages - 3) {
+                pages.push('...');
+                for (let i = totalPages - 4; i <= totalPages; i++) pages.push(i);
+            }
+            // If in the middle
+            else {
+                pages.push('...');
+                for (let i = currentPage - 2; i <= currentPage + 2; i++) pages.push(i);
+                pages.push('...');
+            }
+        }
+    
+        return pages;
+    };
+    
+    
+    
+// Dynamically calculate fighters per page based on window size
+useEffect(() => {
+    const calculateFightersPerRow = () => {
+        const width = fighterListRef.current?.offsetWidth || window.innerWidth;
+        return Math.floor(width / 300); // Assuming each fighter card is 200px wide
+    };
 
+    const handleResize = () => {
+        const fightersPerRow = calculateFightersPerRow();
+        fightersPerPage.current = fightersPerRow * 2; // 3 rows per page
+        setCurrentPage(1); // Reset to the first page when resizing
+    };
+
+    handleResize(); // Run on mount
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+}, []);
+
+    
     // Scroll restoration logic
     useEffect(() => {
         // Save scroll position before leaving the page
@@ -345,20 +411,100 @@ function App() {
                                 {filteredFighters.length} fighters found.
                             </div>
 
-                            <div className="fighter-list" ref={fighterListRef}>
-                                {filteredFighters.length > 0 ? (
-                                    filteredFighters.map(fighter => (
-                                        <FighterCard 
-                                            key={fighter.FighterId} 
-                                            fighter={fighter} 
-                                            isFavorite={favorites.includes(fighter.FighterId)} 
-                                            toggleFavorite={toggleFavorite}
-                                        />
-                                    ))
-                                ) : (
-                                    <p>No fighters found</p>
-                                )}
-                            </div>
+
+  {/* PAGINATION LOGIC HERE */}
+  {(() => {
+                            const paginatedFighters = filteredFighters.slice(
+                                (currentPage - 1) * fightersPerPage.current,
+                                currentPage * fightersPerPage.current
+                            );
+
+                             return (
+                                <div className="fighter-list" ref={fighterListRef}>
+                                    {paginatedFighters.length > 0 ? (
+                                        paginatedFighters.map((fighter) => (
+                                            <FighterCard
+                                                key={fighter.FighterId}
+                                                fighter={fighter}
+                                                isFavorite={favorites.includes(
+                                                    fighter.FighterId
+                                                )}
+                                                toggleFavorite={toggleFavorite}
+                                            />
+                                        ))
+                                    ) : (
+                                        <p>No fighters found</p>
+                                    )}
+                                </div>
+                                     );
+                                    })()}
+{/* Pagination Controls */}
+<div className="pagination">
+    <button
+        disabled={currentPage === 1}
+        onClick={() => setCurrentPage(1)}
+    >
+        « First
+    </button>
+
+    <button
+        disabled={currentPage === 1}
+        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+    >
+        ‹ Prev
+    </button>
+
+    {getPaginationNumbers().map((page, index) =>
+        page === '...' ? (
+            <button
+                key={index}
+                onClick={() => setShowPageInput(true)}
+                className="ellipsis-button"
+            >
+                ...
+            </button>
+        ) : (
+            <button
+                key={index}
+                className={page === currentPage ? 'active' : ''}
+                onClick={() => setCurrentPage(page)}
+            >
+                {page}
+            </button>
+        )
+    )}
+
+    {showPageInput && (
+        <div className="page-input">
+            <input
+                type="number"
+                value={pageInputValue}
+                onChange={handlePageInputChange}
+                min={1}
+                max={totalPages}
+                placeholder="Page"
+            />
+            <button onClick={goToPage}>Go</button>
+        </div>
+    )}
+
+    <button
+        disabled={currentPage === totalPages}
+        onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+    >
+        Next ›
+    </button>
+
+    <button
+        disabled={currentPage === totalPages}
+        onClick={() => setCurrentPage(totalPages)}
+    >
+        Last »
+    </button>
+</div>
+
+
+
 
                             {/* Scroll to top button */}
                             {showScrollButton && (
