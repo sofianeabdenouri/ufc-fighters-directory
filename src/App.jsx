@@ -6,12 +6,20 @@ import Header from './header/Header';
 import './App.css';
 
 // Utility function to sanitize fighter names for use in image paths
-const sanitizeNameForImage = (name) => {
-    return name
-        .toLowerCase()                // Convert to lowercase
-        .replace(/['-]/g, '')         // Remove apostrophes and hyphens
-        .replace(/\s+/g, '_');        // Replace spaces with underscores
+const sanitizeNameForImage = (firstName = '', lastName = '') => {
+    return [firstName, lastName]
+        .filter(Boolean)               // Remove empty or undefined names
+        .join(' ')                     // Join with space if both names are present
+        .normalize('NFD')              // Decompose accented characters (e.g., "ř" → "r")
+        .replace(/[\u0300-\u036f]/g, '') // Remove accents
+        .toLowerCase()                 // Convert to lowercase
+        .replace(/['-]/g, '')          // Remove apostrophes and hyphens
+        .replace(/[^a-z0-9\s]/g, '')   // Remove non-alphanumeric characters
+        .replace(/\s+/g, '_')          // Replace spaces with underscores
+        .trim();                       // Remove leading/trailing spaces
 };
+
+
 
 // Utility function to remove accents from strings
 const removeAccents = (str) => {
@@ -35,10 +43,35 @@ function App() {
     const fightersPerPage = useRef(0); // Dynamically calculate fighters per page
     const totalPages = Math.ceil(filteredFighters.length / fightersPerPage.current); // Total number of pages
     const [showPageInput, setShowPageInput] = useState(false);
-    const [pageInputValue, setPageInputValue] = useState('');
-    
+const [pageInputValue, setPageInputValue] = useState('');
+const [errorMessage, setErrorMessage] = useState('');
+const handleKeyDown = (e) => {
+    const allowedKeys = ['Backspace', 'ArrowLeft', 'ArrowRight', 'Delete'];
+    if (!/^\d$/.test(e.key) && !allowedKeys.includes(e.key)) {
+        e.preventDefault();
+    }
+};
+useEffect(() => {
+    setShowPageInput(false); // Hide the ellipsis input on page change
+    setPageInputValue('');   // Clear the input value on page change
+}, [currentPage]);
+
     const handlePageInputChange = (e) => {
         setPageInputValue(e.target.value);
+        setErrorMessage(''); // Clear any previous error message
+    };
+    
+    const handlePageInputKeyPress = (e) => {
+        if (e.key === 'Enter') {
+            const page = parseInt(pageInputValue, 10);
+            if (page >= 1 && page <= totalPages) {
+                setCurrentPage(page);
+                setShowPageInput(false);
+                setPageInputValue(''); // Clear input value after navigation
+            } else {
+                setErrorMessage('Please enter a valid page number');
+            }
+        }
     };
     
     const goToPage = () => {
@@ -46,8 +79,13 @@ function App() {
         if (page >= 1 && page <= totalPages) {
             setCurrentPage(page);
             setShowPageInput(false); // Hide input after setting page
+            setErrorMessage('');
+            setPageInputValue(''); // Clear input after navigation
+        } else {
+            setErrorMessage('Please enter a valid page number');
         }
     };
+    
     
     const getPaginationNumbers = () => {
         const pages = [];
@@ -221,36 +259,33 @@ useEffect(() => {
 
     const handleSearch = () => {
         let results = fighters;
-        const normalizedSearchTerm = removeAccents(searchTerm.trim().toLowerCase());
-
-        if (normalizedSearchTerm !== '') {
-            results = fighters.filter(fighter => {
-                const fullName = `${fighter.FirstName || ''} ${fighter.LastName || ''}`;
-                const normalizedFullName = removeAccents(fullName.toLowerCase());
-
-                return normalizedFullName.includes(normalizedSearchTerm) ||
-                    removeAccents((fighter.FirstName || '').toLowerCase()).includes(normalizedSearchTerm) ||
-                    removeAccents((fighter.LastName || '').toLowerCase()).includes(normalizedSearchTerm);
+        const normalizedSearchTerm = sanitizeNameForImage(searchTerm.trim());
+    
+        if (normalizedSearchTerm) {
+            results = fighters.filter((fighter) => {
+                const sanitizedFullName = sanitizeNameForImage(fighter.FirstName, fighter.LastName);
+                return sanitizedFullName.includes(normalizedSearchTerm);
             });
         }
-
+    
         if (selectedWeightClasses.length > 0) {
-            results = results.filter(fighter => {
-                const fighterWeightClass = fighter.WeightClass || "Unknown";
-                return selectedWeightClasses.includes(fighterWeightClass);
-            });
+            results = results.filter(fighter =>
+                selectedWeightClasses.includes(fighter.WeightClass || 'Unknown')
+            );
         }
-
+    
         if (selectedGenders.length > 0) {
             results = results.filter(fighter => {
-                const gender = maleWeightClasses.includes(fighter.WeightClass) || !fighter.WeightClass ? "Male" : "Female";
+                const gender = maleWeightClasses.includes(fighter.WeightClass) || !fighter.WeightClass ? 'Male' : 'Female';
                 return selectedGenders.includes(gender);
             });
         }
-
+    
         results = handleSort(results);
         setFilteredFighters(results);
     };
+    
+    
 
     const handleKeyPress = (e) => {
         if (e.key === 'Enter') {
@@ -297,12 +332,18 @@ useEffect(() => {
     };
 
     const toggleFavorite = (fighterId) => {
-        setFavorites(prevFavorites =>
-            prevFavorites.includes(fighterId)
-                ? prevFavorites.filter(id => id !== fighterId)
-                : [...prevFavorites, fighterId]
-        );
+        setFavorites((prevFavorites) => {
+            const updatedFavorites = prevFavorites.includes(fighterId)
+                ? prevFavorites.filter((id) => id !== fighterId)
+                : [...prevFavorites, fighterId];
+            
+            // Update localStorage with the new favorites list
+            localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
+    
+            return updatedFavorites;
+        });
     };
+    
 
     return (
         <Router>
@@ -408,8 +449,8 @@ useEffect(() => {
 
                             {/* Display number of results */}
                             <div className="result-count">
-                                {filteredFighters.length} fighters found.
-                            </div>
+    {Math.min(fightersPerPage.current, filteredFighters.slice((currentPage - 1) * fightersPerPage.current, currentPage * fightersPerPage.current).length)} fighters shown — {filteredFighters.length} fighters found
+</div>
 
 
   {/* PAGINATION LOGIC HERE */}
@@ -453,40 +494,61 @@ useEffect(() => {
     >
         ‹ Prev
     </button>
-
+    
     {getPaginationNumbers().map((page, index) =>
-        page === '...' ? (
+    page === '...' ? (
+        showPageInput ? (
+            <div key={index} style={{ display: 'inline-block', textAlign: 'center' }}>
+                {errorMessage && (
+                    <div className="ellipses-error-message">{errorMessage}</div>
+                )}
+                <input
+                    type="text"
+                    value={pageInputValue}
+                    onChange={(e) => {
+                        // Only allow numbers
+                        if (/^\d*$/.test(e.target.value)) {
+                            setPageInputValue(e.target.value);
+                            setErrorMessage('');
+                        }
+                    }}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                            goToPage();
+                        }
+                    }}
+                    placeholder=""
+                    className="ellipses-page-input"
+                    style={{ width: '35px', height: '35px', textAlign: 'center' }}
+                    autoFocus
+                    onBlur={() => setShowPageInput(false)}
+                />
+            </div>
+        ) : (
             <button
                 key={index}
-                onClick={() => setShowPageInput(true)}
+                onClick={() => {
+                    setShowPageInput(true);
+                    setErrorMessage('');
+                }}
                 className="ellipsis-button"
             >
                 ...
             </button>
-        ) : (
-            <button
-                key={index}
-                className={page === currentPage ? 'active' : ''}
-                onClick={() => setCurrentPage(page)}
-            >
-                {page}
-            </button>
         )
-    )}
+    ) : (
+        <button
+            key={index}
+            className={page === currentPage ? 'active' : ''}
+            onClick={() => setCurrentPage(page)}
+        >
+            {page}
+        </button>
+    )
+)}
 
-    {showPageInput && (
-        <div className="page-input">
-            <input
-                type="number"
-                value={pageInputValue}
-                onChange={handlePageInputChange}
-                min={1}
-                max={totalPages}
-                placeholder="Page"
-            />
-            <button onClick={goToPage}>Go</button>
-        </div>
-    )}
+
+
 
     <button
         disabled={currentPage === totalPages}
@@ -509,7 +571,7 @@ useEffect(() => {
                             {/* Scroll to top button */}
                             {showScrollButton && (
                                 <button onClick={handleScrollToTop} className="scroll-to-top">
-                                    ↑ Top
+                                    ↑
                                 </button>
                             )}
 

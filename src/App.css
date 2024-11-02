@@ -24,13 +24,10 @@ h1 {
   width: 100vw; /* Make it full width */
   margin: 0; /* Remove margins */
   padding: 10px;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
   background-color: #242424; /* Same background as page */
   transition: border-bottom 0.3s ease; /* Smooth transition for the border */
-
 }
+
 /* Only apply the border-bottom when scrolled */
 .search-container.scrolled {
   border-bottom: 2px solid #f1f1f1; /* Apply the border only when scrolled */
@@ -266,7 +263,7 @@ input {
 
 /* Padding and spacing for each division section */
 .male-divisions, .female-divisions, .other-divisions {
-  padding: 10px; /* Add padding to each section */
+  padding: 0px; /* Add padding to each section */
   background-color: #2b2b2b; /* Background to distinguish sections */
   border-radius: 10px;
 }
@@ -479,4 +476,21 @@ option[value="favorites"] {
     padding: 5px;
     border: 1px solid #ccc;
     border-radius: 4px;
+}
+/* Styling for the ellipses page input */
+.ellipses-page-input {
+  width: 50px;
+  padding: 5px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  text-align: center;
+}
+
+/* Error message styling */
+.ellipses-error-message {
+  color: red;
+  font-size: 12px;
+  margin-top: 5px;
+  text-align: center;
 }

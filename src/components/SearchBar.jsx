@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import './SearchBar.css'; // Assuming you'll add the necessary CSS for styling
 
+// Utility function to sanitize names (removes accents, converts to lowercase)
+const sanitizeName = (name) => {
+    return name
+        .normalize('NFD')              // Decompose accented characters
+        .replace(/[\u0300-\u036f]/g, '') // Remove accent marks
+        .toLowerCase()                 // Convert to lowercase
+        .trim();                       // Remove extra spaces
+};
+
 function SearchBar({ fighters, setFilteredFighters }) {
     const [searchTerm, setSearchTerm] = useState('');
     const [scrolled, setScrolled] = useState(false); // New state to track if the user has scrolled past
@@ -14,12 +23,14 @@ function SearchBar({ fighters, setFilteredFighters }) {
 
     useEffect(() => {
         const delayDebounceFn = setTimeout(() => {
-            if (searchTerm.trim() === '') {
+            const sanitizedTerm = sanitizeName(searchTerm);
+
+            if (sanitizedTerm === '') {
                 setFilteredFighters(removeDuplicates(fighters)); // Reset to the original list if search term is empty
             } else {
                 const filtered = fighters.filter(fighter => {
-                    const fullName = `${fighter.FirstName} ${fighter.LastName}`.toLowerCase();
-                    return fullName.includes(searchTerm.trim().toLowerCase());
+                    const fullName = sanitizeName(`${fighter.FirstName} ${fighter.LastName}`);
+                    return fullName.includes(sanitizedTerm);
                 });
                 setFilteredFighters(removeDuplicates(filtered));
             }

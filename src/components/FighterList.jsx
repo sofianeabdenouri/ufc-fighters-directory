@@ -1,25 +1,30 @@
-import React, { useState, useEffect } from 'react';
-import FighterCard from './components/FighterCard'; // Adjust this import path
-
-const apiKey = 'YOUR_API_KEY'; // Add your API key here
-const apiUrl = `https://api.sportsdata.io/v3/mma/scores/json/FightersBasic?key=${apiKey}`;
+// Utility function to sanitize names (removes accents, special characters)
+const sanitizeName = (name) => {
+    return name
+        .normalize('NFD')              // Decompose accented characters
+        .replace(/[\u0300-\u036f]/g, '') // Remove accents
+        .toLowerCase()                 // Convert to lowercase
+        .trim();                       // Remove extra spaces
+};
 
 function FighterList() {
     const [fighters, setFighters] = useState([]);
     const [filteredFighters, setFilteredFighters] = useState([]);
-    const [searchTerm, setSearchTerm] = useState(''); // Search term state
+    const [searchTerm, setSearchTerm] = useState('');
     const [sortBy, setSortBy] = useState('');
 
-    // Fetch data
+    const apiKey = 'YOUR_API_KEY'; // Replace with your API key
+    const apiUrl = `https://api.sportsdata.io/v3/mma/scores/json/FightersBasic?key=${apiKey}`;
+
+    // Fetch fighters data
     useEffect(() => {
         fetch(apiUrl)
-            .then(response => response.json())
-            .then(data => {
-                // Remove duplicates by keeping only 1 fighter with the same FirstName + LastName
+            .then((response) => response.json())
+            .then((data) => {
                 const uniqueFighters = [];
                 const namesSet = new Set();
 
-                data.forEach(fighter => {
+                data.forEach((fighter) => {
                     const fullName = `${fighter.FirstName} ${fighter.LastName}`;
                     if (!namesSet.has(fullName)) {
                         namesSet.add(fullName);
@@ -28,25 +33,24 @@ function FighterList() {
                 });
 
                 setFighters(uniqueFighters);
-                setFilteredFighters(uniqueFighters); // Initial set
+                setFilteredFighters(uniqueFighters);
             })
-            .catch(error => console.error('Error fetching data:', error));
+            .catch((error) => console.error('Error fetching data:', error));
     }, []);
 
     // Handle search input
     const handleSearch = () => {
-        const term = searchTerm.trim().toLowerCase();
+        const sanitizedTerm = sanitizeName(searchTerm);
 
-        // Filter based on the search term
-        const filtered = fighters.filter(fighter => {
-            const fullName = `${fighter.FirstName} ${fighter.LastName}`.toLowerCase();
-            return fullName.includes(term);
+        const filtered = fighters.filter((fighter) => {
+            const fullName = sanitizeName(`${fighter.FirstName} ${fighter.LastName}`);
+            return fullName.includes(sanitizedTerm);
         });
 
-        setFilteredFighters(filtered); // Update filtered fighters
+        setFilteredFighters(filtered);
     };
 
-    // Handle sort
+    // Handle sorting logic
     const handleSort = (e) => {
         const sortType = e.target.value;
         setSortBy(sortType);
@@ -66,21 +70,19 @@ function FighterList() {
                 break;
         }
 
-        setFilteredFighters(sortedFighters); // Update filtered list after sorting
+        setFilteredFighters(sortedFighters);
     };
 
     return (
         <div>
-            {/* Search Bar */}
             <input
                 type="text"
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)} // Capture input
+                onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search fighters"
             />
-            <button onClick={handleSearch}>Search</button> {/* Trigger search on button click */}
+            <button onClick={handleSearch}>Search</button>
 
-            {/* Sort Dropdown */}
             <select value={sortBy} onChange={handleSort}>
                 <option value="">Sort by</option>
                 <option value="alphabetical">Alphabetical</option>
@@ -88,9 +90,8 @@ function FighterList() {
                 <option value="mostLosses">Most Losses</option>
             </select>
 
-            {/* Fighter List */}
             <div className="fighter-list">
-                {filteredFighters.map(fighter => (
+                {filteredFighters.map((fighter) => (
                     <FighterCard key={fighter.FighterId} fighter={fighter} />
                 ))}
             </div>
