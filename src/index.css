@@ -24,12 +24,14 @@ a:hover {
 
 body {
   margin: 0;
-  display: flex;
+  display: absolute;
   justify-content: center; /* Center all page content */
   align-items: center; /* Center vertically */
   min-width: 320px;
-  min-height: 100vh;
+  min-height: 100%;
   background-color: #242424;
+  overflow-x: hidden;
+
 }
 
 

@@ -117,22 +117,17 @@ useEffect(() => {
     
     
     
-// Dynamically calculate fighters per page based on window size
+// Dynamically set fighters per page to 5 fighters per row and 3 rows
 useEffect(() => {
-    const calculateFightersPerRow = () => {
-        const width = fighterListRef.current?.offsetWidth || window.innerWidth;
-        return Math.floor(width / 300); // Assuming each fighter card is 200px wide
-    };
-
-    const handleResize = () => {
-        const fightersPerRow = calculateFightersPerRow();
-        fightersPerPage.current = fightersPerRow * 2; // 3 rows per page
+    const setFixedGrid = () => {
+        const fightersPerRow = 5; // Set fixed fighters per row
+        fightersPerPage.current = fightersPerRow * 3; // 5 fighters per row, 3 rows
         setCurrentPage(1); // Reset to the first page when resizing
     };
 
-    handleResize(); // Run on mount
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    setFixedGrid(); // Run on mount
+    window.addEventListener('resize', setFixedGrid);
+    return () => window.removeEventListener('resize', setFixedGrid);
 }, []);
 
     
@@ -462,6 +457,7 @@ useEffect(() => {
 
                              return (
                                 <div className="fighter-list" ref={fighterListRef}>
+                                    
                                     {paginatedFighters.length > 0 ? (
                                         paginatedFighters.map((fighter) => (
                                             <FighterCard

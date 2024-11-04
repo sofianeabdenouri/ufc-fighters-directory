@@ -7,7 +7,8 @@
   min-height: 100vh; /* Full page height */
   margin: 0 auto;
   width: 100%; /* Ensure full width */
-  padding-top: 20px; /* Add some padding so content is not pressed against the top */
+  overflow-x: hidden; /* Prevent horizontal overflow */
+  box-sizing: border-box; /* Include padding and border in width calculations */
 }
 
 h1 {
@@ -21,7 +22,7 @@ h1 {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 100vw; /* Make it full width */
+  width: 100%; /* Use 100% instead of 100vw */
   margin: 0; /* Remove margins */
   padding: 10px;
   background-color: #242424; /* Same background as page */
@@ -44,25 +45,25 @@ input {
 .fighter-list {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center; /* Ensure the list is centered */
-  align-items: center; /* Align items vertically in the center */
+  justify-content: center; /* Centers items horizontally */
+  align-items: center; /* Centers items vertically */
   gap: 10px;
-  width: 100%;
-  margin-top: 0; /* Remove any top margin */
-  padding: 0; /* Ensure there's no extra padding */
+  max-width: 1700px; /* 5 * 330px + 4 * 10px (gaps) = 1700px */
+  margin: 0 auto; /* Centers .fighter-list within the page */
+  padding: 0;
+  box-sizing: border-box;
 }
+
 
 .fighter-list:empty {
   justify-content: center; /* Keep the flexbox centered even when empty */
 }
 
 .fighter-card {
-  position: relative; /* For the star to be placed */
-  flex: 0 1 300px; /* Fixed width */
+  flex: 0 1 330px; /* Fixed width of 330px per card */
   margin: 1px;
   border: 1px solid #ccc;
   padding: 10px;
-  width: 200px; /* Fixed width */
   height: 420px; /* Fixed height */
   text-align: center;
   background-color: #2b2b2b;
@@ -70,9 +71,9 @@ input {
   border-radius: 10px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between; /* Space between items inside the card */
-  box-sizing: border-box; /* Ensure padding and borders don't affect size */
-  overflow: hidden; /* Ensure overflow content doesn't expand the card */
+  justify-content: space-between;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 /* Wrapper for nickname and star */

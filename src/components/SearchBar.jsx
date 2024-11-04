@@ -1,57 +1,37 @@
-import React, { useState, useEffect } from 'react';
-import './SearchBar.css'; // Assuming you'll add the necessary CSS for styling
+import React, { useState, useEffect, useMemo, useDeferredValue } from 'react';
+import './SearchBar.css';
 
-// Utility function to sanitize names (removes accents, converts to lowercase)
 const sanitizeName = (name) => {
     return name
-        .normalize('NFD')              // Decompose accented characters
-        .replace(/[\u0300-\u036f]/g, '') // Remove accent marks
-        .toLowerCase()                 // Convert to lowercase
-        .trim();                       // Remove extra spaces
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .trim();
 };
 
 function SearchBar({ fighters, setFilteredFighters }) {
     const [searchTerm, setSearchTerm] = useState('');
-    const [scrolled, setScrolled] = useState(false); // New state to track if the user has scrolled past
+    const deferredSearchTerm = useDeferredValue(searchTerm); // Defer the search term
+    const [scrolled, setScrolled] = useState(false);
 
-    // Helper function to remove duplicates by FighterId
-    const removeDuplicates = (fighters) => {
-        const uniqueFighters = new Map();
-        fighters.forEach(fighter => uniqueFighters.set(fighter.FighterId, fighter));
-        return Array.from(uniqueFighters.values());
-    };
+    const filteredResults = useMemo(() => {
+        const sanitizedTerm = sanitizeName(deferredSearchTerm);
+        if (sanitizedTerm === '') return fighters;
+        return fighters.filter(fighter => {
+            const fullName = sanitizeName(`${fighter.FirstName} ${fighter.LastName}`);
+            return fullName.includes(sanitizedTerm);
+        });
+    }, [deferredSearchTerm, fighters]);
 
     useEffect(() => {
-        const delayDebounceFn = setTimeout(() => {
-            const sanitizedTerm = sanitizeName(searchTerm);
+        setFilteredFighters(filteredResults);
+    }, [filteredResults, setFilteredFighters]);
 
-            if (sanitizedTerm === '') {
-                setFilteredFighters(removeDuplicates(fighters)); // Reset to the original list if search term is empty
-            } else {
-                const filtered = fighters.filter(fighter => {
-                    const fullName = sanitizeName(`${fighter.FirstName} ${fighter.LastName}`);
-                    return fullName.includes(sanitizedTerm);
-                });
-                setFilteredFighters(removeDuplicates(filtered));
-            }
-        }, 300); // Debounce time in ms
-
-        return () => clearTimeout(delayDebounceFn);
-    }, [searchTerm, fighters, setFilteredFighters]);
-
-    // Track scroll position to determine when to apply the border
     useEffect(() => {
         const handleScroll = () => {
-            const searchBarOffset = 100; // Change this value based on when you want the border to appear
-            if (window.scrollY > searchBarOffset) {
-                setScrolled(true);
-            } else {
-                setScrolled(false);
-            }
+            setScrolled(window.scrollY > 100);
         };
-
         window.addEventListener('scroll', handleScroll);
-
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 

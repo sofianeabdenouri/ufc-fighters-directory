@@ -70,8 +70,8 @@
 /* Star button styling */
 .profile-star-button {
     position: absolute;
-    bottom: 80px; /* Align at the bottom of the container */
-    right: 25px; /* Place it to the left of the "Back to Directory" button */
+    bottom: 115px; /* Align at the bottom of the container */
+    right: 110px; /* Place it to the left of the "Back to Directory" button */
     background: none;
     border: none;
     cursor: pointer;
@@ -79,8 +79,8 @@
 }
 
 .profile-star-icon {
-    width: 30px; /* Adjust size */
-    height: 30px;
+    width: 80px; /* Adjust size */
+    height: 80px;
 }
 
 /* Responsive Design */
