@@ -18,15 +18,17 @@ h1 {
 }
 
 /* Container for the input field and button */
+/* Adjust gap between search bar and dropdown filters */
 .search-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 100%; /* Use 100% instead of 100vw */
-  margin: 0; /* Remove margins */
+  width: 100%;
+  margin: 0;
   padding: 10px;
-  background-color: #242424; /* Same background as page */
-  transition: border-bottom 0.3s ease; /* Smooth transition for the border */
+  gap: 2px; /* Add gap between elements */
+  background-color: #242424;
+  transition: border-bottom 0.3s ease;
 }
 
 /* Only apply the border-bottom when scrolled */
@@ -289,6 +291,7 @@ button {
   color: white;
   border: 1px solid #ccc;
   cursor: pointer;
+  
 }
 
 button:hover {
@@ -388,6 +391,8 @@ option[value="favorites"] {
 .search-input-wrapper {
   position: relative;
   display: inline-block;
+  margin-right: 30px; /* Adds space between the input field and the dropdown */
+
 }
 
 /* Clear button inside the search bar */
@@ -494,4 +499,44 @@ option[value="favorites"] {
   font-size: 12px;
   margin-top: 5px;
   text-align: center;
+}
+.search-container select {
+  margin-right: 10px; /* Adds space between the dropdown and the search button */
+}
+.favorites-button {
+  background-color: #FFC006; /* Yellow background like the dropdown */
+  color: black; /* Black text for contrast */
+  border: none;
+  padding: 10px 20px; /* Adjust padding as needed */
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-left: 15px; /* Space between search button and favorites button */
+}
+
+.favorites-button:hover {
+  background-color: #e5a800; /* Darker yellow on hover */
+}
+.pagination-button {
+  padding: 5px 10px;
+  cursor: pointer;
+  border: 1px solid #ccc;
+  background-color: #000;
+  color: #fff;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+.pagination-button:hover:not(.disabled-button) {
+  background-color: #555;
+}
+
+.disabled-button {
+  color: #888;
+  background-color: #f0f0f0;
+  cursor: not-allowed;
+  pointer-events: none;
+  border-color: #ccc;
 }

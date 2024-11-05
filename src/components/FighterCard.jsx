@@ -21,17 +21,24 @@ const FighterCard = ({ fighter, isFavorite, toggleFavorite }) => {
     const navigate = useNavigate();
 
     // Function to clean and format fighter names for image file names
-    const formatName = (name) => {
-        return name
-            ? name.trim().replace(/[^a-zA-Z0-9]/g, '_').toLowerCase() // Replace special characters and spaces with underscores
-            : '';
+    const sanitizeNameForImage = (firstName = '', lastName = '') => {
+        const fullName = [firstName, lastName]
+            .filter(Boolean)               // Remove empty or undefined names
+            .join(' ')                     // Join with space if both names are present
+            .normalize('NFD')              // Normalize to decompose accented characters
+            .replace(/[\u0300-\u036f]/g, '') // Remove accents
+            .toLowerCase()                 // Convert to lowercase
+            .replace(/['-]/g, '')          // Remove apostrophes and hyphens
+            .replace(/[^a-z0-9\s]/g, '')   // Remove non-alphanumeric characters
+            .replace(/\s+/g, '_')          // Replace spaces with underscores
+            .trim();                       // Remove leading/trailing spaces
+        
+        return fullName;
     };
-
-    const firstName = formatName(FirstName || ''); // Handle cases where only the first name exists
-    const lastName = formatName(LastName || ''); // Handle cases where no last name is present
+    
 
     // Construct image filename
-    const imageName = `${firstName}${lastName ? `_${lastName}` : ''}.png`; // Handle case where there's no last name
+    const imageName = `${sanitizeNameForImage(FirstName, LastName)}.png`;
     const imageUrl = `/src/common/images/${imageName}`; // Assuming your images are in this folder
 
     return (

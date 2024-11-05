@@ -1,11 +1,19 @@
 // Utility function to sanitize names (removes accents, special characters)
-const sanitizeName = (name) => {
-    return name
-        .normalize('NFD')              // Decompose accented characters
+const sanitizeName = (firstName = '', lastName = '') => {
+    const fullName = [firstName, lastName]
+        .filter(Boolean)               // Remove empty or undefined names
+        .join(' ')                     // Join with space if both names are present
+        .normalize('NFD')              // Normalize to decompose accented characters
         .replace(/[\u0300-\u036f]/g, '') // Remove accents
         .toLowerCase()                 // Convert to lowercase
-        .trim();                       // Remove extra spaces
+        .replace(/['-]/g, '')          // Remove apostrophes and hyphens
+        .replace(/[^a-z0-9\s]/g, '')   // Remove non-alphanumeric characters
+        .replace(/\s+/g, '_')          // Replace spaces with underscores
+        .trim();                       // Remove leading/trailing spaces
+    
+    return fullName;
 };
+
 
 function FighterList() {
     const [fighters, setFighters] = useState([]);
@@ -41,14 +49,15 @@ function FighterList() {
     // Handle search input
     const handleSearch = () => {
         const sanitizedTerm = sanitizeName(searchTerm);
-
+    
         const filtered = fighters.filter((fighter) => {
-            const fullName = sanitizeName(`${fighter.FirstName} ${fighter.LastName}`);
+            const fullName = sanitizeName(fighter.FirstName, fighter.LastName);
             return fullName.includes(sanitizedTerm);
         });
-
+    
         setFilteredFighters(filtered);
     };
+    
 
     // Handle sorting logic
     const handleSort = (e) => {
