@@ -1,5 +1,7 @@
 /* Container for the whole profile */
 .fighter-profile-container {
+    width: 850px; /* Fixed width */
+    height: 600px; /* Fixed height */
     display: flex;
     flex-direction: row; /* Image and details side by side */
     justify-content: center; /* Center the container horizontally */

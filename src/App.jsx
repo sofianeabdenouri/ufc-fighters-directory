@@ -78,17 +78,32 @@ useEffect(() => {
         }
     };
     const handleFavoritesFilter = () => {
-        // Filter for favorite fighters
-        let favoriteFighters = fighters.filter(fighter => favorites.includes(fighter.FighterId));
-        
-        // Apply current sort option
-        favoriteFighters = handleSort(favoriteFighters);
-        
-        // Update state with sorted favorites
-        setFilteredFighters(favoriteFighters);
-        setCurrentPage(1); // Reset to page 1 after filtering
-    };
+    // Filter for favorite fighters first
+    let favoriteFighters = fighters.filter(fighter => favorites.includes(fighter.FighterId));
     
+    // Apply selected weight class filters
+    if (selectedWeightClasses.length > 0) {
+        favoriteFighters = favoriteFighters.filter(fighter =>
+            selectedWeightClasses.includes(fighter.WeightClass || 'Unknown')
+        );
+    }
+
+    // Apply selected gender filters
+    if (selectedGenders.length > 0) {
+        favoriteFighters = favoriteFighters.filter(fighter => {
+            const gender = maleWeightClasses.includes(fighter.WeightClass) || !fighter.WeightClass ? 'Male' : 'Female';
+            return selectedGenders.includes(gender);
+        });
+    }
+    
+    // Apply current sorting option
+    favoriteFighters = handleSort(favoriteFighters);
+    
+    // Update state with sorted and filtered favorites
+    setFilteredFighters(favoriteFighters);
+    setCurrentPage(1); // Reset to page 1 after filtering
+};
+
     
     const goToPage = () => {
         const page = parseInt(pageInputValue, 10);
@@ -294,7 +309,12 @@ useEffect(() => {
         results = handleSort(results);
         setFilteredFighters(results);
         setCurrentPage(1); // Reset to page 1 after search
+    
+        // Reset the advanced filters
+        setSelectedWeightClasses([]);
+        setSelectedGenders([]);
     };
+    
     
     
 
@@ -458,11 +478,7 @@ useEffect(() => {
                                         </div>
                                     </div>
 
-                                    <div className="advanced-search-button-container">
-                                        <button className="advanced-search-button" onClick={handleAdvancedSearch}>
-                                            Advanced Search
-                                        </button>
-                                    </div>
+                                    
                                 </div>
                             )}
 
