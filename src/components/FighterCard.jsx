@@ -23,23 +23,29 @@ const FighterCard = ({ fighter, isFavorite, toggleFavorite }) => {
     // Function to clean and format fighter names for image file names
     const sanitizeNameForImage = (firstName = '', lastName = '') => {
         const fullName = [firstName, lastName]
-            .filter(Boolean)               // Remove empty or undefined names
-            .join(' ')                     // Join with space if both names are present
-            .normalize('NFD')              // Normalize to decompose accented characters
-            .replace(/[\u0300-\u036f]/g, '') // Remove accents
-            .toLowerCase()                 // Convert to lowercase
-            .replace(/['-]/g, '')          // Remove apostrophes and hyphens
-            .replace(/[^a-z0-9\s]/g, '')   // Remove non-alphanumeric characters
-            .replace(/\s+/g, '_')          // Replace spaces with underscores
-            .trim();                       // Remove leading/trailing spaces
-        
+            .filter(Boolean)
+            .join(' ')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .replace(/['-]/g, '')
+            .replace(/[^a-z0-9\s]/g, '')
+            .replace(/\s+/g, '_')
+            .trim();
         return fullName;
     };
-    
 
     // Construct image filename
     const imageName = `${sanitizeNameForImage(FirstName, LastName)}.png`;
-    const imageUrl = `/src/common/images/${imageName}`; // Assuming your images are in this folder
+    const imageUrl = `/src/common/images/${imageName}`;
+
+    const handleNavigate = () => {
+        // Save the current scroll position
+        sessionStorage.setItem('scrollPosition', window.scrollY);
+
+        // Navigate to the fighter's profile
+        navigate(`/fighter/${FighterId}`, { state: { fighter } });
+    };
 
     return (
         <div className="fighter-card">
@@ -89,7 +95,7 @@ const FighterCard = ({ fighter, isFavorite, toggleFavorite }) => {
             {/* Visit Profile Button */}
             <button
                 className="visit-profile-btn"
-                onClick={() => navigate(`/fighter/${FighterId}`, { state: { fighter } })}
+                onClick={handleNavigate} // Use the updated handler
             >
                 Visit Profile
             </button>

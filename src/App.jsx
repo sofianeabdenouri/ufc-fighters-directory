@@ -6,21 +6,33 @@ import Header from './header/Header';
 import './App.css';
 
 // Utility function to sanitize fighter names for use in image paths
-const sanitizeNameForImage = (firstName = '', lastName = '') => {
-    // Join composed names if both are present
+const sanitizeNameForImage = (firstName = '', lastName = '', nickname = '', isDuplicate = false) => {
     const fullName = [firstName, lastName]
-        .filter(Boolean)               // Remove empty or undefined names
-        .join(' ')                     // Join with space if both names are present
-        .normalize('NFD')              // Normalize to decompose accented characters
-        .replace(/[\u0300-\u036f]/g, '') // Remove accents
-        .toLowerCase()                 // Convert to lowercase
-        .replace(/['-]/g, '')          // Remove apostrophes and hyphens
-        .replace(/[^a-z0-9\s]/g, '')   // Remove non-alphanumeric characters
-        .replace(/\s+/g, '_')          // Replace spaces with underscores
-        .trim();                       // Remove leading/trailing spaces
-    
+        .filter(Boolean)
+        .join(' ')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .replace(/['-]/g, '')
+        .replace(/[^a-z0-9\s]/g, '')
+        .replace(/\s+/g, '_')
+        .trim();
+
+    if (isDuplicate && nickname) {
+        const sanitizedNickname = nickname
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .replace(/['-]/g, '')
+            .replace(/[^a-z0-9\s]/g, '')
+            .replace(/\s+/g, '_')
+            .trim();
+        return `${fullName}_${sanitizedNickname}`;
+    }
+
     return fullName;
 };
+
 
 
 
@@ -45,9 +57,14 @@ function App() {
     const [currentPage, setCurrentPage] = useState(1);
     const fightersPerPage = useRef(0); // Dynamically calculate fighters per page
     const totalPages = Math.ceil(filteredFighters.length / fightersPerPage.current); // Total number of pages
-    const [showPageInput, setShowPageInput] = useState(false);
+    const [showPageInput, setShowPageInput] = useState({ left: false, right: false });
 const [pageInputValue, setPageInputValue] = useState('');
 const [errorMessage, setErrorMessage] = useState('');
+
+const handleEllipsisClick = (side) => {
+    setShowPageInput((prev) => ({ ...prev, [side]: true }));
+    setErrorMessage('');
+};
 
 const handleKeyDown = (e) => {
     const allowedKeys = ['Backspace', 'ArrowLeft', 'ArrowRight', 'Delete'];
@@ -105,46 +122,44 @@ useEffect(() => {
 };
 
     
-    const goToPage = () => {
-        const page = parseInt(pageInputValue, 10);
-        if (page >= 1 && page <= totalPages) {
-            setCurrentPage(page);
-            setShowPageInput(false); // Hide input after setting page
-            setErrorMessage('');
-            setPageInputValue(''); // Clear input after navigation
+const goToPage = (side) => {
+    const page = parseInt(pageInputValue, 10);
+    if (page >= 1 && page <= totalPages) {
+        setCurrentPage(page);
+        setShowPageInput({ left: false, right: false }); // Close both inputs
+        setErrorMessage('');
+        setPageInputValue('');
+    } else {
+        setErrorMessage('Invalid page number');
+    }
+};
+
+    
+    
+const getPaginationNumbers = () => {
+    const pages = [];
+    if (totalPages <= 7) {
+        for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+        if (currentPage <= 4) {
+            for (let i = 1; i <= 5; i++) pages.push(i);
+            pages.push('rightEllipsis');
+            pages.push(totalPages);
+        } else if (currentPage >= totalPages - 3) {
+            pages.push(1);
+            pages.push('leftEllipsis');
+            for (let i = totalPages - 4; i <= totalPages; i++) pages.push(i);
         } else {
-            setErrorMessage('Please enter a valid page number');
+            pages.push(1);
+            pages.push('leftEllipsis');
+            for (let i = currentPage - 2; i <= currentPage + 2; i++) pages.push(i);
+            pages.push('rightEllipsis');
+            pages.push(totalPages);
         }
-    };
-    
-    
-    const getPaginationNumbers = () => {
-        const pages = [];
-        
-        if (totalPages <= 7) {
-            // If total pages are small, show all without '...'
-            for (let i = 1; i <= totalPages; i++) pages.push(i);
-        } else {
-            // If near the beginning
-            if (currentPage <= 4) {
-                for (let i = 1; i <= 5; i++) pages.push(i);
-                pages.push('...');
-            }
-            // If near the end
-            else if (currentPage >= totalPages - 3) {
-                pages.push('...');
-                for (let i = totalPages - 4; i <= totalPages; i++) pages.push(i);
-            }
-            // If in the middle
-            else {
-                pages.push('...');
-                for (let i = currentPage - 2; i <= currentPage + 2; i++) pages.push(i);
-                pages.push('...');
-            }
-        }
-    
-        return pages;
-    };
+    }
+    return pages;
+};
+
     
     
     
@@ -385,7 +400,7 @@ useEffect(() => {
                         <div className="app">
                             <Header scrollToFighters={scrollToFighters} />
 
-                            <h1 className="font-h1">UFC Fighters Directory</h1>
+                            <h1 className="font-h1">UFC Records</h1>
                             <h5 className="description">Live up-to-date records for every fighter</h5>
                             <div className="search-container">
     <div className="search-input-wrapper">
@@ -518,89 +533,103 @@ useEffect(() => {
 {/* Pagination Controls */}
 {totalPages > 1 && (
     <div className="pagination">
-        <button
-            disabled={currentPage === 1}
-            onClick={() => setCurrentPage(1)}
-            className={currentPage === 1 ? 'disabled-button' : ''}
-        >
-            « First
-        </button>
+    <button
+        disabled={currentPage === 1}
+        onClick={() => setCurrentPage(1)}
+        className={currentPage === 1 ? 'disabled-button' : ''}
+    >
+        « First
+    </button>
 
-        <button
-            disabled={currentPage === 1}
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            className={currentPage === 1 ? 'disabled-button' : ''}
-        >
-            ‹ Prev
-        </button>
+    <button
+        disabled={currentPage === 1}
+        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+        className={currentPage === 1 ? 'disabled-button' : ''}
+    >
+        ‹ Prev
+    </button>
 
-        {getPaginationNumbers().map((page, index) =>
-            page === '...' ? (
-                showPageInput ? (
-                    <div key={index} style={{ display: 'inline-block', textAlign: 'center' }}>
-                        {errorMessage && (
-                            <div className="ellipses-error-message">{errorMessage}</div>
-                        )}
-                        <input
-                            type="text"
-                            value={pageInputValue}
-                            onChange={(e) => {
-                                if (/^\d*$/.test(e.target.value)) {
-                                    setPageInputValue(e.target.value);
-                                    setErrorMessage('');
-                                }
-                            }}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                    goToPage();
-                                }
-                            }}
-                            placeholder=""
-                            className="ellipses-page-input"
-                            style={{ width: '35px', height: '35px', textAlign: 'center' }}
-                            autoFocus
-                            onBlur={() => setShowPageInput(false)}
-                        />
-                    </div>
-                ) : (
-                    <button
-                        key={index}
-                        onClick={() => {
-                            setShowPageInput(true);
-                            setErrorMessage('');
+    {getPaginationNumbers().map((page, index) =>
+        page === 'leftEllipsis' ? (
+            showPageInput.left ? (
+                <div key={index} style={{ display: 'inline-block', textAlign: 'center' }}>
+                    {errorMessage && <div className="ellipses-error-message">{errorMessage}</div>}
+                    <input
+                        type="text"
+                        value={pageInputValue}
+                        onChange={(e) => setPageInputValue(e.target.value)}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter') goToPage('left');
                         }}
-                        className="ellipsis-button"
-                    >
-                        ...
-                    </button>
-                )
+                        placeholder="Go"
+                        className="ellipses-page-input"
+                        onBlur={() => setShowPageInput((prev) => ({ ...prev, left: false }))}
+                        autoFocus
+                    />
+                </div>
             ) : (
                 <button
                     key={index}
-                    className={page === currentPage ? 'active' : ''}
-                    onClick={() => setCurrentPage(page)}
+                    onClick={() => handleEllipsisClick('left')}
+                    className="ellipsis-button"
                 >
-                    {page}
+                    ...
                 </button>
             )
-        )}
+        ) : page === 'rightEllipsis' ? (
+            showPageInput.right ? (
+                <div key={index} style={{ display: 'inline-block', textAlign: 'center' }}>
+                    {errorMessage && <div className="ellipses-error-message">{errorMessage}</div>}
+                    <input
+                        type="text"
+                        value={pageInputValue}
+                        onChange={(e) => setPageInputValue(e.target.value)}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter') goToPage('right');
+                        }}
+                        placeholder="Go"
+                        className="ellipses-page-input"
+                        onBlur={() => setShowPageInput((prev) => ({ ...prev, right: false }))}
+                        autoFocus
+                    />
+                </div>
+            ) : (
+                <button
+                    key={index}
+                    onClick={() => handleEllipsisClick('right')}
+                    className="ellipsis-button"
+                >
+                    ...
+                </button>
+            )
+        ) : (
+            <button
+                key={index}
+                className={page === currentPage ? 'active' : ''}
+                onClick={() => setCurrentPage(page)}
+            >
+                {page}
+            </button>
+        )
+    )}
 
-        <button
-            disabled={currentPage === totalPages}
-            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-            className={currentPage === totalPages ? 'disabled-button' : ''}
-        >
-            Next ›
-        </button>
+    <button
+        disabled={currentPage === totalPages}
+        onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+        className={currentPage === totalPages ? 'disabled-button' : ''}
+    >
+        Next ›
+    </button>
 
-        <button
-            disabled={currentPage === totalPages}
-            onClick={() => setCurrentPage(totalPages)}
-            className={currentPage === totalPages ? 'disabled-button' : ''}
-        >
-            Last »
-        </button>
-    </div>
+    <button
+        disabled={currentPage === totalPages}
+        onClick={() => setCurrentPage(totalPages)}
+        className={currentPage === totalPages ? 'disabled-button' : ''}
+    >
+        Last »
+    </button>
+</div>
+
 )}
 
 

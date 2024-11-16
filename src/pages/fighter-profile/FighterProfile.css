@@ -36,7 +36,6 @@
     transform: scale(1.05);
 }
 
-/* Fighter profile details section */
 .fighter-profile-details {
     flex: 2;
     margin-left: 20px; /* Space between image and details */
@@ -51,6 +50,24 @@
     letter-spacing: 2px;
     text-align: center; /* Center the text */
 }
+
+.fighter-profile-details p {
+    display: flex; /* Use flexbox for better control of alignment */
+    justify-content: space-between; /* Align bold and non-bold text */
+    align-items: center; /* Align vertically within the line */
+    margin: 10px 0; /* Add spacing between each line */
+}
+
+.fighter-profile-details p b {
+    text-align: left; /* Ensure bold text stays left-aligned */
+    flex: 1; /* Allow it to take only as much space as necessary */
+}
+
+.fighter-profile-details p span {
+    text-align: center; /* Center-align the non-bold text */
+    flex: 2; /* Ensure the non-bold text takes more space */
+}
+
 
 /* Back Button Styling */
 .fighter-profile-back-btn {

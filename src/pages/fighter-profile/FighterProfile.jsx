@@ -54,18 +54,57 @@ const FighterProfile = ({ favorites, toggleFavorite }) => {
     return (
         <div className="fighter-profile-container">
             <div className="fighter-profile-details">
-                <h1>{fighter.FirstName} {fighter.LastName}</h1>
-                <p>Age: {calculateAge(fighter.BirthDate)}</p>
-                <p>Nickname: {fighter.Nickname || 'N/A'}</p>
-                <p>Weight Class: {fighter.WeightClass}</p>
-                <p>Wins: {fighter.Wins}</p>
-                <p>Losses: {fighter.Losses}</p>
-                <p>Draws: {fighter.Draws}</p>
-                <p>Height: {fighter.Height} inches</p>
-                <p>Weight: {fighter.Weight} lbs</p>
-                <p>Reach: {fighter.Reach} inches</p>
-                <p>Technical Knockouts: {fighter.TechnicalKnockouts}</p>
-                <p>Submissions: {fighter.Submissions}</p>
+            <h1>{fighter.FirstName} {fighter.LastName}</h1>
+<p>
+    <b>Age:</b> <span>{calculateAge(fighter.BirthDate)}</span>
+</p>
+<p>
+    <b>Nickname:</b> <span>{fighter.Nickname || 'N/A'}</span>
+</p>
+<p>
+    <b>Sex:</b>
+    <span>
+        {fighter.WeightClass.includes("Women's") ? (
+            <>
+                 <span style={{ color: "#ff69b4", fontSize: "14px" }}>♀</span> Female
+            </>
+        ) : (
+            <>
+                <span style={{ color: "#7faefd", fontSize: "px" }}>♂</span> Male 
+            </>
+        )}
+    </span>
+</p>
+
+<p>
+    <b>Weight Class:</b> <span>{fighter.WeightClass}</span>
+</p>
+<p>
+    <b>Wins:</b> <span>{fighter.Wins}</span>
+</p>
+<p>
+    <b>Losses:</b> <span>{fighter.Losses}</span>
+</p>
+<p>
+    <b>Draws:</b> <span>{fighter.Draws}</span>
+</p>
+<p>
+    <b>Height:</b> <span>{fighter.Height} inches</span>
+</p>
+<p>
+    <b>Weight:</b> <span>{fighter.Weight} lbs</span>
+</p>
+<p>
+    <b>Reach:</b> <span>{fighter.Reach} inches</span>
+</p>
+<p>
+    <b>Technical Knockouts:</b> <span>{fighter.TechnicalKnockouts}</span>
+</p>
+<p>
+    <b>Submissions:</b> <span>{fighter.Submissions}</span>
+</p>
+
+
 
                 <button className="fighter-profile-back-btn" onClick={() => navigate('/')}>
                     Back to Directory
