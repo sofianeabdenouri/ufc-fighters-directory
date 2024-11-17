@@ -37,36 +37,45 @@
 }
 
 .fighter-profile-details {
-    flex: 2;
+    flex: 2; /* Adjust width for proportion with image */
     margin-left: 20px; /* Space between image and details */
+    display: flex; /* Use flexbox for alignment */
+    flex-direction: column; /* Stack items vertically */
+    align-items: center; /* Center-align everything horizontally */
+    text-align: center; /* Ensure text inside is centered */
 }
 
+
 .fighter-profile-details h1 {
-    font-size: 3rem;
+    font-size: 2.2rem;
     font-weight: bold;
     color: #ffba08; /* Bright yellow for bold headers */
-    margin-bottom: 20px;
+    margin-bottom: 5px;
     text-transform: uppercase;
     letter-spacing: 2px;
     text-align: center; /* Center the text */
 }
 
 .fighter-profile-details p {
-    display: flex; /* Use flexbox for better control of alignment */
-    justify-content: space-between; /* Align bold and non-bold text */
-    align-items: center; /* Align vertically within the line */
-    margin: 10px 0; /* Add spacing between each line */
+    display: flex; /* Flexbox for aligning bold and non-bold text */
+    justify-content: flex-start; /* Align the bold text to the left */
+    align-items: center;
+    width: 100%; /* Ensure full-width alignment */
+    margin: 8px 0; /* Add spacing between rows */
+    text-align: left; /* Ensure bold text aligns left */
 }
 
 .fighter-profile-details p b {
-    text-align: left; /* Ensure bold text stays left-aligned */
-    flex: 1; /* Allow it to take only as much space as necessary */
+    width: 50%; /* Adjust the width of the bold text */
+    text-align: left; /* Keep the bold text aligned to the left */
 }
 
 .fighter-profile-details p span {
-    text-align: center; /* Center-align the non-bold text */
-    flex: 2; /* Ensure the non-bold text takes more space */
+    width: 50%; /* Adjust the width of the non-bold content */
+    text-align: left; /* Center-align the non-bold text */
 }
+
+
 
 
 /* Back Button Styling */
@@ -89,7 +98,7 @@
 /* Star button styling */
 .profile-star-button {
     position: absolute;
-    bottom: 115px; /* Align at the bottom of the container */
+    bottom: 145px; /* Align at the bottom of the container */
     right: 110px; /* Place it to the left of the "Back to Directory" button */
     background: none;
     border: none;

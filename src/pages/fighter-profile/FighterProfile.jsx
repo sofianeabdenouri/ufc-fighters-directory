@@ -1,125 +1,186 @@
-// FighterProfile.jsx
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import './FighterProfile.css';
 import NotFound from '../not-found/NotFound';
 
 const FighterProfile = ({ favorites, toggleFavorite }) => {
-    const { state } = useLocation();
+    const location = useLocation();
     const { id } = useParams();
     const navigate = useNavigate();
 
-    const { fighter } = state || {};
+    const [fighter, setFighter] = useState(location.state?.fighter || null);
+    const [loading, setLoading] = useState(!fighter);
+    const [error, setError] = useState(null);
 
-    if (!fighter) return <NotFound />;
+    // Fetch fighter data if it's not available in the state
+    useEffect(() => {
+        if (!fighter) {
+            setLoading(true);
+            fetch(`https://api.sportsdata.io/v3/mma/scores/json/Fighter/${id}?key=${import.meta.env.VITE_API_KEY}`)
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch fighter data');
+                    }
+                    return response.json();
+                })
+                .then((data) => {
+                    if (data && data.FighterId) {
+                        setFighter(data);
+                    } else {
+                        throw new Error('Fighter not found');
+                    }
+                })
+                .catch((err) => {
+                    setError(err.message || 'An error occurred while fetching fighter data');
+                })
+                .finally(() => {
+                    setLoading(false);
+                });
+        }
+    }, [id, fighter]);
 
-    // Utility function to sanitize fighter names for image paths
+    if (loading) {
+        return <div className="fighter-profile-container">Loading...</div>;
+    }
+
+    if (error) {
+        return (
+            <div className="fighter-profile-container">
+                <p>{error}</p>
+                <button onClick={() => navigate('/')}>Back to Directory</button>
+            </div>
+        );
+    }
+
+    if (!fighter) {
+        return <NotFound />;
+    }
+
+    const {
+        FirstName,
+        LastName,
+        Nickname,
+        WeightClass,
+        Wins,
+        Losses,
+        Draws,
+        TechnicalKnockouts,
+        Submissions,
+        Height,
+        Weight,
+        Reach,
+        BirthDate,
+    } = fighter;
+
     const sanitizeNameForImage = (firstName = '', lastName = '') => {
-        // Join composed names if both are present
-        const fullName = [firstName, lastName]
-            .filter(Boolean)               // Remove empty or undefined names
-            .join(' ')                     // Join with space if both names are present
-            .normalize('NFD')              // Normalize to decompose accented characters
-            .replace(/[\u0300-\u036f]/g, '') // Remove accents
-            .toLowerCase()                 // Convert to lowercase
-            .replace(/['-]/g, '')          // Remove apostrophes and hyphens
-            .replace(/[^a-z0-9\s]/g, '')   // Remove non-alphanumeric characters
-            .replace(/\s+/g, '_')          // Replace spaces with underscores
-            .trim();                       // Remove leading/trailing spaces
-        
-        return fullName;
+        return [firstName, lastName]
+            .filter(Boolean)
+            .join(' ')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .replace(/['-]/g, '')
+            .replace(/[^a-z0-9\s]/g, '')
+            .replace(/\s+/g, '_')
+            .trim();
     };
 
-    // Apply the sanitization logic for first and last names
-    const imageName = sanitizeNameForImage(fighter.FirstName, fighter.LastName);
+    const imageName = sanitizeNameForImage(FirstName, LastName);
     const imageUrl = `/src/common/images/${imageName}.png`;
 
-    const isFavorite = favorites.includes(fighter.FighterId);
-
-    const handleToggleFavorite = () => {
-        toggleFavorite(fighter.FighterId);
-    };
-
     const calculateAge = (birthDate) => {
+        if (!birthDate) return 'N/A';
         const today = new Date();
         const birthDateObj = new Date(birthDate);
         let age = today.getFullYear() - birthDateObj.getFullYear();
-        const monthDiff = today.getMonth() - birthDateObj.getMonth();
-        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDateObj.getDate())) {
+        if (
+            today.getMonth() < birthDateObj.getMonth() ||
+            (today.getMonth() === birthDateObj.getMonth() && today.getDate() < birthDateObj.getDate())
+        ) {
             age--;
         }
         return age;
     };
 
+    const formatHeight = (heightInInches) => {
+        if (!heightInInches || heightInInches <= 0) return 'N/A';
+        const feet = Math.floor(heightInInches / 12);
+        const inches = heightInInches % 12;
+        const cm = Math.round(heightInInches * 2.54);
+        return `${feet}′ ${inches}″ / ${cm}cm`;
+    };
+
+    const formatReach = (reachInInches) => {
+        if (!reachInInches || reachInInches <= 0) return 'N/A';
+        const cm = Math.round(reachInInches * 2.54);
+        return `${reachInInches}″ / ${cm}cm`;
+    };
+
+    const formatWeight = (weightInLbs) => {
+        if (!weightInLbs || weightInLbs <= 0) return 'N/A';
+        const kg = Math.round(weightInLbs * 0.453592);
+        return `${weightInLbs} lbs / ${kg} kg`;
+    };
+
+    const isFavorite = favorites.includes(fighter.FighterId);
+
     return (
         <div className="fighter-profile-container">
             <div className="fighter-profile-details">
-            <h1>{fighter.FirstName} {fighter.LastName}</h1>
-<p>
-    <b>Age:</b> <span>{calculateAge(fighter.BirthDate)}</span>
-</p>
-<p>
-    <b>Nickname:</b> <span>{fighter.Nickname || 'N/A'}</span>
-</p>
-<p>
-    <b>Sex:</b>
-    <span>
-        {fighter.WeightClass.includes("Women's") ? (
-            <>
-                 <span style={{ color: "#ff69b4", fontSize: "14px" }}>♀</span> Female
-            </>
-        ) : (
-            <>
-                <span style={{ color: "#7faefd", fontSize: "px" }}>♂</span> Male 
-            </>
-        )}
-    </span>
-</p>
+                <h1>{FirstName || 'Unknown'} {LastName || ''}</h1>
+                <p><b>Age:</b> {calculateAge(BirthDate)}</p>
+                <p><b>Nickname:</b> {Nickname || 'N/A'}</p>
+                <p>
+                    <b>Sex:</b> 
+                    <span>
+                        {WeightClass?.includes("Women's") ? (
+                            <>
+                                <span style={{ color: "#ff69b4", fontSize: "14px" }}>♀</span> Female
+                            </>
+                        ) : (
+                            <>
+                                <span style={{ color: "#7faefd", fontSize: "14px" }}>♂</span> Male
+                            </>
+                        )}
+                    </span>
+                </p>
+                <p><b>Weight Class:</b> {WeightClass || 'Unknown'}</p>
+                <p><b>Wins:</b> {Wins || 0}</p>
+                <p><b>Losses:</b> {Losses || 0}</p>
+                <p><b>Draws:</b> {Draws || 0}</p>
+                <p><b>Height:</b> {formatHeight(Height)}</p>
+                <p><b>Reach:</b> {formatReach(Reach)}</p>
+                <p><b>Weight:</b> {formatWeight(Weight)}</p>
+                <p><b>Knockouts:</b> {TechnicalKnockouts || 0}</p>
+                <p><b>Submissions:</b> {Submissions || 0}</p>
 
-<p>
-    <b>Weight Class:</b> <span>{fighter.WeightClass}</span>
-</p>
-<p>
-    <b>Wins:</b> <span>{fighter.Wins}</span>
-</p>
-<p>
-    <b>Losses:</b> <span>{fighter.Losses}</span>
-</p>
-<p>
-    <b>Draws:</b> <span>{fighter.Draws}</span>
-</p>
-<p>
-    <b>Height:</b> <span>{fighter.Height} inches</span>
-</p>
-<p>
-    <b>Weight:</b> <span>{fighter.Weight} lbs</span>
-</p>
-<p>
-    <b>Reach:</b> <span>{fighter.Reach} inches</span>
-</p>
-<p>
-    <b>Technical Knockouts:</b> <span>{fighter.TechnicalKnockouts}</span>
-</p>
-<p>
-    <b>Submissions:</b> <span>{fighter.Submissions}</span>
-</p>
+                <button
+    className="fighter-profile-back-btn"
+    onClick={() => {
+        // Save scroll position before navigating back
+        sessionStorage.setItem('scrollPosition', window.scrollY);
+        navigate(-1); // Navigate to the previous page in history
+    }}
+>
+    Back to Directory
+</button>
 
 
-
-                <button className="fighter-profile-back-btn" onClick={() => navigate('/')}>
-                    Back to Directory
-                </button>
             </div>
 
             <div className="fighter-profile-image">
                 <img
                     src={imageUrl}
-                    alt={`${fighter.FirstName} ${fighter.LastName}`}
-                    onError={(e) => { e.target.src = '/src/common/images/default.png'; }}
+                    alt={`${FirstName || 'Unknown'} ${LastName || ''}`}
+                    onError={(e) => {
+                        e.target.src = WeightClass?.startsWith("Women's")
+                            ? '/src/common/images/default_f.png'
+                            : '/src/common/images/default.png';
+                    }}
                 />
             </div>
 
-            <button onClick={handleToggleFavorite} className="profile-star-button">
+            <button onClick={() => toggleFavorite(fighter.FighterId)} className="profile-star-button">
                 <img
                     src={isFavorite ? '/src/common/images/star.png' : '/src/common/images/star_gray.png'}
                     alt={isFavorite ? 'Favorited' : 'Not Favorited'}

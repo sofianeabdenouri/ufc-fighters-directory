@@ -161,7 +161,28 @@ const getPaginationNumbers = () => {
 };
 
     
-    
+    // Save and restore scroll position when navigating
+useEffect(() => {
+    // Save scroll position when navigating away
+    const saveScrollPosition = () => {
+        sessionStorage.setItem('scrollPosition', window.scrollY);
+    };
+
+    // Add a listener for route changes to save the scroll position
+    window.addEventListener('beforeunload', saveScrollPosition);
+
+    // Restore scroll position when navigating back
+    const savedScrollPosition = sessionStorage.getItem('scrollPosition');
+    if (savedScrollPosition && window.location.pathname === '/') {
+        window.scrollTo(0, parseInt(savedScrollPosition, 10));
+    }
+
+    // Cleanup listener on unmount
+    return () => {
+        window.removeEventListener('beforeunload', saveScrollPosition);
+    };
+}, []);
+
     
 // Dynamically set fighters per page to 5 fighters per row and 3 rows
 useEffect(() => {
@@ -235,30 +256,55 @@ useEffect(() => {
     const scrollToFighters = () => {
         fighterListRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
-
     useEffect(() => {
         fetch(`https://api.sportsdata.io/v3/mma/scores/json/FightersBasic?key=${import.meta.env.VITE_API_KEY}`)
-            .then(response => response.json())
-            .then(data => {
-                const uniqueFighters = [];
-                const nameSet = new Set();
-
-                data.forEach(fighter => {
-                    const fullName = `${fighter.FirstName} ${fighter.LastName}`;
-                    const hasRecords = fighter.Wins > 0 || fighter.Losses > 0 || fighter.Draws > 0 || fighter.Height > 0 || fighter.Weight > 0;
-
-                    if (!nameSet.has(fullName) && hasRecords) {
-                        nameSet.add(fullName);
-                        uniqueFighters.push(fighter);
-                    }
+            .then((response) => response.json())
+            .then((data) => {
+                // Filter out fighters with no fights (Wins, Losses, or Draws must be > 0)
+                const fightersWithFights = data.filter((fighter) => {
+                    const totalFights = (fighter.Wins || 0) + (fighter.Losses || 0) + (fighter.Draws || 0);
+                    return totalFights > 0;
                 });
-
-                setFighters(uniqueFighters);
-                setFilteredFighters(uniqueFighters);
+    
+                // Group fighters by full name
+                const groupedFighters = fightersWithFights.reduce((acc, fighter) => {
+                    const fullName = `${fighter.FirstName} ${fighter.LastName}`.trim();
+                    if (!acc[fullName]) acc[fullName] = [];
+                    acc[fullName].push(fighter);
+                    return acc;
+                }, {});
+    
+                // Flatten groups while removing duplicates with identical records
+                const selectedFighters = Object.values(groupedFighters).flatMap((group) => {
+                    if (group.length === 1) return group; // No duplicates, keep the single fighter
+    
+                    // Deduplicate fighters with identical records
+                    const uniqueFighters = group.reduce((unique, currentFighter) => {
+                        const isDuplicate = unique.some((fighter) =>
+                            fighter.Wins === currentFighter.Wins &&
+                            fighter.Losses === currentFighter.Losses &&
+                            fighter.Draws === currentFighter.Draws &&
+                            fighter.Nickname === currentFighter.Nickname
+                        );
+                        if (!isDuplicate) unique.push(currentFighter);
+                        return unique;
+                    }, []);
+    
+                    // Mark duplicates
+                    return uniqueFighters.map((fighter) => ({
+                        ...fighter,
+                        isDuplicate: uniqueFighters.length > 1, // Mark as duplicate only if more than one remains
+                    }));
+                });
+    
+                // Update the state with filtered fighters
+                setFighters(selectedFighters);
+                setFilteredFighters(selectedFighters);
             })
-            .catch(error => console.error('Error fetching data:', error));
+            .catch((error) => console.error('Error fetching data:', error));
     }, []);
-
+    
+    
     const handleSort = (results) => {
         let sortedFighters = [...results];
 
