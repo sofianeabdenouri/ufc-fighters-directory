@@ -155,17 +155,15 @@ const FighterProfile = ({ favorites, toggleFavorite }) => {
                 <p><b>Submissions:</b> {Submissions || 0}</p>
 
                 <button
-    className="fighter-profile-back-btn"
-    onClick={() => {
-        // Save scroll position before navigating back
-        sessionStorage.setItem('scrollPosition', window.scrollY);
-        navigate(-1); // Navigate to the previous page in history
-    }}
->
-    Back to Directory
-</button>
-
-
+                    className="fighter-profile-back-btn"
+                    onClick={() => {
+                        // Save scroll position before navigating back
+                        sessionStorage.setItem('scrollPosition', window.scrollY);
+                        navigate('/');
+                    }}
+                >
+                    Back to Directory
+                </button>
             </div>
 
             <div className="fighter-profile-image">
