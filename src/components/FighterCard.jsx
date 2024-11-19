@@ -1,8 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const FighterCard = ({ fighter, isFavorite, toggleFavorite }) => {
+const FighterCard = ({ fighter, isFavorite, toggleFavorite }) => {
     const {
+        FighterId,
         FighterId,
         FirstName,
         LastName,

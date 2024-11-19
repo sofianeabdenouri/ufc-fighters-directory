@@ -27,7 +27,7 @@ const sanitizeNameForImage = (firstName = '', lastName = '', nickname = '', isDu
             .replace(/[^a-z0-9\s]/g, '')
             .replace(/\s+/g, '_')
             .trim();
-        return `${fullName}_${sanitizedNickname}`;
+        return ${fullName}_${sanitizedNickname};
     }
 
     return fullName;
@@ -161,28 +161,7 @@ const getPaginationNumbers = () => {
 };
 
     
-    // Save and restore scroll position when navigating
-useEffect(() => {
-    // Save scroll position when navigating away
-    const saveScrollPosition = () => {
-        sessionStorage.setItem('scrollPosition', window.scrollY);
-    };
-
-    // Add a listener for route changes to save the scroll position
-    window.addEventListener('beforeunload', saveScrollPosition);
-
-    // Restore scroll position when navigating back
-    const savedScrollPosition = sessionStorage.getItem('scrollPosition');
-    if (savedScrollPosition && window.location.pathname === '/') {
-        window.scrollTo(0, parseInt(savedScrollPosition, 10));
-    }
-
-    // Cleanup listener on unmount
-    return () => {
-        window.removeEventListener('beforeunload', saveScrollPosition);
-    };
-}, []);
-
+    
     
 // Dynamically set fighters per page to 5 fighters per row and 3 rows
 useEffect(() => {
@@ -257,7 +236,7 @@ useEffect(() => {
         fighterListRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
     useEffect(() => {
-        fetch(`https://api.sportsdata.io/v3/mma/scores/json/FightersBasic?key=${import.meta.env.VITE_API_KEY}`)
+        fetch(https://api.sportsdata.io/v3/mma/scores/json/FightersBasic?key=${import.meta.env.VITE_API_KEY})
             .then((response) => response.json())
             .then((data) => {
                 // Filter out fighters with no fights (Wins, Losses, or Draws must be > 0)
@@ -268,7 +247,7 @@ useEffect(() => {
     
                 // Group fighters by full name
                 const groupedFighters = fightersWithFights.reduce((acc, fighter) => {
-                    const fullName = `${fighter.FirstName} ${fighter.LastName}`.trim();
+                    const fullName = ${fighter.FirstName} ${fighter.LastName}.trim();
                     if (!acc[fullName]) acc[fullName] = [];
                     acc[fullName].push(fighter);
                     return acc;
