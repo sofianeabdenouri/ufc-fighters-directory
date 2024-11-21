@@ -12,6 +12,203 @@ function App() {
     const [selectedGenders, setSelectedGenders] = useState([]);
     const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
     const [favorites, setFavorites] = useState([]);
+    const [favorites, setFavorites] = useState([]);
+    useEffect(() => {
+        const fetchFavorites = async () => {
+            try {
+                const response = await fetch(`http://localhost:5000/favorites/user123`);
+                const data = await response.json();
+                setFavorites(data); // Initialize favorites from backend
+            } catch (error) {
+                console.error('Error fetching favorites:', error);
+            }
+        };
+    
+        fetchFavorites();
+    }, []);
+    
+    const [showScrollButton, setShowScrollButton] = useState(false); // For scroll-to-top button
+    const [currentPage, setCurrentPage] = useState(1);
+    const fightersPerPage = useRef(0); // Dynamically calculate fighters per page
+    const totalPages = Math.ceil(filteredFighters.length / fightersPerPage.current); // Total number of pages
+    const [showPageInput, setShowPageInput] = useState({ left: false, right: false });
+const [pageInputValue, setPageInputValue] = useState('');
+const [errorMessage, setErrorMessage] = useState('');
+
+const handleEllipsisClick = (side) => {
+    setShowPageInput((prev) => ({ ...prev, [side]: true }));
+    setErrorMessage('');
+};
+
+const handleKeyDown = (e) => {
+    const allowedKeys = ['Backspace', 'ArrowLeft', 'ArrowRight', 'Delete'];
+    if (!/^\d$/.test(e.key) && !allowedKeys.includes(e.key)) {
+        e.preventDefault();
+    }
+};
+useEffect(() => {
+    setShowPageInput(false); // Hide the ellipsis input on page change
+    setPageInputValue('');   // Clear the input value on page change
+}, [currentPage]);
+
+    const handlePageInputChange = (e) => {
+        setPageInputValue(e.target.value);
+        setErrorMessage(''); // Clear any previous error message
+    };
+    
+    const handlePageInputKeyPress = (e) => {
+        if (e.key === 'Enter') {
+            const page = parseInt(pageInputValue, 10);
+            if (page >= 1 && page <= totalPages) {
+                setCurrentPage(page);
+                setShowPageInput(false);
+                setPageInputValue(''); // Clear input value after navigation
+            } else {
+                setErrorMessage('Please enter a valid page number');
+            }
+        }
+    };
+    const handleFavoritesFilter = () => {
+    // Filter for favorite fighters first
+    let favoriteFighters = fighters.filter(fighter => favorites.includes(fighter.FighterId));
+    
+    // Apply selected weight class filters
+    if (selectedWeightClasses.length > 0) {
+        favoriteFighters = favoriteFighters.filter(fighter =>
+            selectedWeightClasses.includes(fighter.WeightClass || 'Unknown')
+        );
+    }
+
+    // Apply selected gender filters
+    if (selectedGenders.length > 0) {
+        favoriteFighters = favoriteFighters.filter(fighter => {
+            const gender = maleWeightClasses.includes(fighter.WeightClass) || !fighter.WeightClass ? 'Male' : 'Female';
+            return selectedGenders.includes(gender);
+        });
+    }
+    
+    // Apply current sorting option
+    favoriteFighters = handleSort(favoriteFighters);
+    
+    // Update state with sorted and filtered favorites
+    setFilteredFighters(favoriteFighters);
+    setCurrentPage(1); // Reset to page 1 after filtering
+};
+
+    
+const goToPage = (side) => {
+    const page = parseInt(pageInputValue, 10);
+    if (page >= 1 && page <= totalPages) {
+        setCurrentPage(page);
+        setShowPageInput({ left: false, right: false }); // Close both inputs
+        setErrorMessage('');
+        setPageInputValue('');
+    } else {
+        setErrorMessage('Invalid page number');
+    }
+};
+
+    
+    
+const getPaginationNumbers = () => {
+    const pages = [];
+    if (totalPages <= 7) {
+        for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+        if (currentPage <= 4) {
+            for (let i = 1; i <= 5; i++) pages.push(i);
+            pages.push('rightEllipsis');
+            pages.push(totalPages);
+        } else if (currentPage >= totalPages - 3) {
+            pages.push(1);
+            pages.push('leftEllipsis');
+            for (let i = totalPages - 4; i <= totalPages; i++) pages.push(i);
+        } else {
+            pages.push(1);
+            pages.push('leftEllipsis');
+            for (let i = currentPage - 2; i <= currentPage + 2; i++) pages.push(i);
+            pages.push('rightEllipsis');
+            pages.push(totalPages);
+        }
+    }
+    return pages;
+};
+
+
+
+    
+// Dynamically set fighters per page to 5 fighters per row and 3 rows
+useEffect(() => {
+    const setFixedGrid = () => {
+        const fightersPerRow = 5; // Set fixed fighters per row
+        fightersPerPage.current = fightersPerRow * 3; // 5 fighters per row, 3 rows
+    };
+
+    setFixedGrid(); // Run on mount
+    window.addEventListener('resize', setFixedGrid);
+    return () => window.removeEventListener('resize', setFixedGrid);
+}, []);
+
+    
+    // Scroll restoration logic
+    useEffect(() => {
+        // Save scroll position before leaving the page
+        const saveScrollPosition = () => {
+            sessionStorage.setItem('scrollPosition', window.scrollY);
+        };
+
+        // Add event listener to save scroll position
+        window.addEventListener('beforeunload', saveScrollPosition);
+
+        // Restore scroll position when user revisits
+        const savedScrollPosition = sessionStorage.getItem('scrollPosition');
+        if (savedScrollPosition && window.location.pathname === "/") {
+            window.scrollTo(0, parseInt(savedScrollPosition, 10));
+        }
+
+        return () => {
+            // Cleanup: remove event listener
+            window.removeEventListener('beforeunload', saveScrollPosition);
+        };
+    }, []);
+
+    // Toggle scroll-to-top button based on scroll position
+    useEffect(() => {
+        const handleScroll = () => {
+            if (window.pageYOffset > 300) {
+                setShowScrollButton(true);
+            } else {
+                setShowScrollButton(false);
+            }
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    const handleScrollToTop = () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    const handleAdvancedSearch = () => {
+        handleSearch(); // Trigger search when doing advanced search
+    };
+
+    const maleWeightClasses = [
+        "Flyweight", "Bantamweight", "Featherweight", "Lightweight", "Welterweight",
+        "Middleweight", "Light Heavyweight", "Heavyweight", "Catch Weight", "Open Weight", "Unknown"
+    ];
+
+    const femaleWeightClasses = [
+        "Women's Strawweight", "Women's Flyweight",
+        "Women's Bantamweight", "Women's Featherweight"
+    ];
+
+    const genders = ["Male", "Female"];
+    const fighterListRef = useRef(null);
+
+    const scrollToFighters = () => {
+        fighterListRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
     useEffect(() => {
         fetch(`https://api.sportsdata.io/v3/mma/scores/json/FightersBasic?key=${import.meta.env.VITE_API_KEY}`)
             .then(response => response.json())
@@ -120,6 +317,38 @@ function App() {
             ...prevFilters,
             [name]: value
         }));
+        if (selectedGenders.includes("Male") && !maleWeightClasses.includes(weightClass)) {
+            return true;
+        }
+        return false;
+    };
+
+    const toggleFavorite = async (fighterId) => {
+        try {
+            if (favorites.includes(fighterId)) {
+                // If already in favorites, remove it
+                await fetch(`http://localhost:5000/favorites/user123`, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ fighterId }),
+                });
+    
+                setFavorites((prevFavorites) =>
+                    prevFavorites.filter((id) => id !== fighterId)
+                );
+            } else {
+                // If not in favorites, add it
+                await fetch(`http://localhost:5000/favorites/user123`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ fighterId }),
+                });
+    
+                setFavorites((prevFavorites) => [...prevFavorites, fighterId]);
+            }
+        } catch (error) {
+            console.error('Error toggling favorite:', error);
+        }
     };
 
     return (
