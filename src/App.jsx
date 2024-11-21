@@ -49,10 +49,21 @@ function App() {
     const [selectedWeightClasses, setSelectedWeightClasses] = useState([]);
     const [selectedGenders, setSelectedGenders] = useState([]);
     const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
-    const [favorites, setFavorites] = useState(() => {
-        const savedFavorites = localStorage.getItem('favorites');
-        return savedFavorites ? JSON.parse(savedFavorites) : [];
-    }); // State for managing favorites
+    const [favorites, setFavorites] = useState([]);
+    useEffect(() => {
+        const fetchFavorites = async () => {
+            try {
+                const response = await fetch(`http://localhost:5000/favorites/user123`);
+                const data = await response.json();
+                setFavorites(data); // Initialize favorites from backend
+            } catch (error) {
+                console.error('Error fetching favorites:', error);
+            }
+        };
+    
+        fetchFavorites();
+    }, []);
+    
     const [showScrollButton, setShowScrollButton] = useState(false); // For scroll-to-top button
     const [currentPage, setCurrentPage] = useState(1);
     const fightersPerPage = useRef(0); // Dynamically calculate fighters per page
@@ -402,17 +413,32 @@ useEffect(() => {
         return false;
     };
 
-    const toggleFavorite = (fighterId) => {
-        setFavorites((prevFavorites) => {
-            const updatedFavorites = prevFavorites.includes(fighterId)
-                ? prevFavorites.filter((id) => id !== fighterId)
-                : [...prevFavorites, fighterId];
-            
-            // Update localStorage with the new favorites list
-            localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
+    const toggleFavorite = async (fighterId) => {
+        try {
+            if (favorites.includes(fighterId)) {
+                // If already in favorites, remove it
+                await fetch(`http://localhost:5000/favorites/user123`, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ fighterId }),
+                });
     
-            return updatedFavorites;
-        });
+                setFavorites((prevFavorites) =>
+                    prevFavorites.filter((id) => id !== fighterId)
+                );
+            } else {
+                // If not in favorites, add it
+                await fetch(`http://localhost:5000/favorites/user123`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ fighterId }),
+                });
+    
+                setFavorites((prevFavorites) => [...prevFavorites, fighterId]);
+            }
+        } catch (error) {
+            console.error('Error toggling favorite:', error);
+        }
     };
     
 
