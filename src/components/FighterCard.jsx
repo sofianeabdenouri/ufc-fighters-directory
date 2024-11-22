@@ -59,7 +59,7 @@ const FighterCard = ({ fighter, isFavorite, toggleFavorite }) => {
         return `${sanitizeNameForImage(FirstName, LastName, Nickname, isDuplicate)}.png`;
     };
 
-    const imageUrl = `/src/common/images/${getImageName()}`;
+    const imageUrl = `/images/${getImageName()}`;
 
     const handleNavigate = () => {
         // Save scroll position before navigating

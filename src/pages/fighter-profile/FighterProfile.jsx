@@ -86,7 +86,7 @@ const FighterProfile = ({ favorites, toggleFavorite }) => {
     };
 
     const imageName = sanitizeNameForImage(FirstName, LastName);
-    const imageUrl = `/src/common/images/${imageName}.png`;
+    const imageUrl = `/images/${getImageName()}`;
 
     const calculateAge = (birthDate) => {
         if (!birthDate) return 'N/A';
