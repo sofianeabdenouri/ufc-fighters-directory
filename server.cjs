@@ -26,6 +26,7 @@ async function connectToDB() {
   }
 }
 
+
 connectToDB();
 
 app.get('/favorites/:userId', async (req, res) => {
