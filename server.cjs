@@ -1,16 +1,19 @@
-const express = require('express');
-const cors = require('cors');
-const bodyParser = require('body-parser');
-const { MongoClient } = require('mongodb');
+import express from 'express';
+import cors from 'cors';
+import bodyParser from 'body-parser';
+import { MongoClient } from 'mongodb';
+import dotenv from 'dotenv';
+
+dotenv.config(); // Load environment variables from .env
 
 const app = express();
-const port = 5000;
+const port = process.env.PORT || 5000; // Use PORT from environment if available
 
 app.use(cors());
 app.use(bodyParser.json());
 
 // MongoDB URI and Client
-const uri = process.env.MONGODB_URI;
+const uri = process.env.MONGODB_URI; // Get MongoDB URI from environment
 const client = new MongoClient(uri);
 
 let db;
@@ -25,12 +28,13 @@ async function connectToDB() {
         console.log('Connected to MongoDB!');
     } catch (error) {
         console.error('Failed to connect to MongoDB:', error);
+        process.exit(1);
     }
 }
 
 connectToDB();
 
-// Endpoints
+// API Endpoints
 app.get('/favorites/:userId', async (req, res) => {
     const { userId } = req.params;
 
