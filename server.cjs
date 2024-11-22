@@ -10,22 +10,23 @@ app.use(cors());
 app.use(bodyParser.json());
 
 const uri = process.env.MONGODB_URI;
-const client = new MongoClient(uri);
-
-let db;
-let favoritesCollection;
+const client = new MongoClient(uri, {
+  useUnifiedTopology: true,
+  tls: true,
+});
 
 async function connectToDB() {
-    try {
-        await client.connect();
-        db = client.db('Cluster0');
-        favoritesCollection = db.collection('favorites');
-        console.log('Connected to MongoDB!');
-    } catch (error) {
-        console.error('Failed to connect to MongoDB:', error);
-        process.exit(1);
-    }
+  try {
+    await client.connect();
+    db = client.db('Cluster0'); // Replace 'Cluster0' with your actual database name
+    favoritesCollection = db.collection('favorites');
+    console.log('Connected to MongoDB!');
+  } catch (error) {
+    console.error('Failed to connect to MongoDB:', error);
+    process.exit(1);
+  }
 }
+
 
 connectToDB();
 
