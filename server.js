@@ -15,12 +15,12 @@ const client = new MongoClient(uri);
 
 let db;
 let favoritesCollection;
-
+const dbName = MONGODB_NAME;
 // Connect to MongoDB
 async function connectToDB() {
     try {
         await client.connect();
-        db = client.db('Cluster0'); // Use your database name here
+        db = client.db(dbName); // Use your database name here
         favoritesCollection = db.collection('favorites'); // Use the 'favorites' collection
         console.log('Connected to MongoDB!');
     } catch (error) {
