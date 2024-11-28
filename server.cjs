@@ -10,7 +10,6 @@ app.use(cors());
 app.use(bodyParser.json());
 
 const uri = process.env.MONGODB_URI;
-const dbName = MONGODB_NAME;
 const client = new MongoClient(uri, {
   tls: true,
 });
@@ -18,7 +17,7 @@ const client = new MongoClient(uri, {
 async function connectToDB() {
   try {
     await client.connect();
-    db = client.db(MONGODB_NAME); 
+    db = client.db('Cluster0'); // Replace 'Cluster0' with your actual database name
     favoritesCollection = db.collection('favorites');
     console.log('Connected to MongoDB!');
   } catch (error) {
@@ -26,7 +25,6 @@ async function connectToDB() {
     process.exit(1);
   }
 }
-
 
 connectToDB();
 

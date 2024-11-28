@@ -15,6 +15,7 @@ const FighterProfile = ({ favorites, toggleFavorite }) => {
     // Fetch fighter data if it's not available in the state
     useEffect(() => {
         if (!fighter) {
+            console.log('Fetching fighter data for Fighter ID:', id); // Log the Fighter ID
             setLoading(true);
             fetch(`https://api.sportsdata.io/v3/mma/scores/json/Fighter/${id}?key=${import.meta.env.VITE_API_KEY}`)
                 .then((response) => {
@@ -24,6 +25,7 @@ const FighterProfile = ({ favorites, toggleFavorite }) => {
                     return response.json();
                 })
                 .then((data) => {
+                    console.log('Fetched Fighter Data:', data); // Log the full fighter data response
                     if (data && data.FighterId) {
                         setFighter(data);
                     } else {
@@ -31,6 +33,7 @@ const FighterProfile = ({ favorites, toggleFavorite }) => {
                     }
                 })
                 .catch((err) => {
+                    console.error('Error fetching fighter data:', err); // Log the error
                     setError(err.message || 'An error occurred while fetching fighter data');
                 })
                 .finally(() => {
@@ -86,7 +89,7 @@ const FighterProfile = ({ favorites, toggleFavorite }) => {
     };
 
     const imageName = sanitizeNameForImage(FirstName, LastName);
-    const imageUrl = `/images/${getImageName()}`;
+    const imageUrl = `/src/common/images/${imageName}.png`;
 
     const calculateAge = (birthDate) => {
         if (!birthDate) return 'N/A';
@@ -105,8 +108,8 @@ const FighterProfile = ({ favorites, toggleFavorite }) => {
     const formatHeight = (heightInInches) => {
         if (!heightInInches || heightInInches <= 0) return 'N/A';
         const feet = Math.floor(heightInInches / 12);
-        const inches = heightInInches % 12;
-        const cm = Math.round(heightInInches * 2.54);
+        const inches = Math.round(heightInInches % 12); // Round inches
+        const cm = Math.round(heightInInches * 2.54); // Round cm
         return `${feet}′ ${inches}″ / ${cm}cm`;
     };
 
@@ -157,9 +160,7 @@ const FighterProfile = ({ favorites, toggleFavorite }) => {
                 <button
                     className="fighter-profile-back-btn"
                     onClick={() => {
-                        // Save scroll position before navigating back
-                        sessionStorage.setItem('scrollPosition', window.scrollY);
-                        navigate('/');
+                        navigate('/'); // Navigate back
                     }}
                 >
                     Back to Directory

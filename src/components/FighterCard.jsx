@@ -59,15 +59,16 @@ const FighterCard = ({ fighter, isFavorite, toggleFavorite }) => {
         return `${sanitizeNameForImage(FirstName, LastName, Nickname, isDuplicate)}.png`;
     };
 
-    const imageUrl = `/images/${getImageName()}`;
+    const imageUrl = `/src/common/images/${getImageName()}`;
 
     const handleNavigate = () => {
-        // Save scroll position before navigating
-        sessionStorage.setItem('scrollPosition', window.scrollY);
-
-        // Navigate to the fighter's profile
-        navigate(`/fighter/${FighterId}`, { state: { fighter } });
+        // Save scroll position on App.jsx
+        sessionStorage.setItem("scrollPosition", window.scrollY);
+    
+        // Navigate to FighterProfile
+        navigate(`/fighter/${FighterId}`);
     };
+    
 
     return (
         <div className="fighter-card">
