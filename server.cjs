@@ -15,6 +15,8 @@ const dbName = process.env.MONGODB_NAME;
 
 const client = new MongoClient(uri, {
   tls: true, // Ensure secure connection to MongoDB
+  tlsInsecure: false, // Reject invalid certificates
+  serverSelectionTimeoutMS: 10000, // Timeout after 10 seconds
 });
 
 let db;
