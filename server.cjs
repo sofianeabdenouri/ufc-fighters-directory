@@ -2,7 +2,6 @@ require('dotenv').config(); // Load environment variables
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const fetch = require('node-fetch'); // For making API requests
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -13,8 +12,13 @@ app.use(bodyParser.json());
 // Route to fetch fighters from the SportsData API
 app.get('/fighters', async (req, res) => {
   try {
+    // Dynamically import `node-fetch` since it is an ESM module
+    const fetch = (await import('node-fetch')).default;
+
     // Fetch fighters using the SportsData API
-    const response = await fetch(`https://api.sportsdata.io/v3/mma/scores/json/FightersBasic?key=${process.env.VITE_API_KEY}`);
+    const response = await fetch(
+      `https://api.sportsdata.io/v3/mma/scores/json/FightersBasic?key=${process.env.VITE_API_KEY}`
+    );
 
     if (!response.ok) {
       throw new Error(`Failed to fetch fighters: ${response.statusText}`);
