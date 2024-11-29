@@ -51,18 +51,18 @@ function App() {
     const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
     const [favorites, setFavorites] = useState([]);
     useEffect(() => {
-        const fetchFavorites = async () => {
+        const fetchFavorites = () => {
             try {
-                const response = await fetch(`http://localhost:5000/favorites/user123`);
-                const data = await response.json();
-                setFavorites(data); // Initialize favorites from backend
+                const savedFavorites = JSON.parse(localStorage.getItem('favorites')) || [];
+                setFavorites(savedFavorites); // Load favorites from localStorage
             } catch (error) {
-                console.error('Error fetching favorites:', error);
+                console.error('Error loading favorites from localStorage:', error);
             }
         };
     
         fetchFavorites();
     }, []);
+    
     
     const [showScrollButton, setShowScrollButton] = useState(false); // For scroll-to-top button
     const [currentPage, setCurrentPage] = useState(1);
@@ -246,7 +246,7 @@ useEffect(() => {
         fighterListRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
     useEffect(() => {
-        fetch(`https://api.sportsdata.io/v3/mma/scores/json/FightersBasic?key=${import.meta.env.VITE_API_KEY}`)
+        fetch(`${import.meta.env.VITE_API_URL}/fighters`)
         .then((response) => response.json())
             .then((data) => {
                 // Filter out fighters with no fights (Wins, Losses, or Draws must be > 0)
@@ -412,28 +412,21 @@ useEffect(() => {
         return false;
     };
 
-    const toggleFavorite = async (fighterId) => {
+    const toggleFavorite = (fighterId) => {
         try {
-            if (favorites.includes(fighterId)) {
-                // If already in favorites, remove it
-                await fetch(`http://localhost:5000/favorites/user123`, {
-                    method: 'DELETE',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ fighterId }),
-                });
+            // Retrieve favorites from localStorage or initialize as an empty array
+            const storedFavorites = JSON.parse(localStorage.getItem('favorites')) || [];
     
-                setFavorites((prevFavorites) =>
-                    prevFavorites.filter((id) => id !== fighterId)
-                );
+            if (storedFavorites.includes(fighterId)) {
+                // If already in favorites, remove it
+                const updatedFavorites = storedFavorites.filter((id) => id !== fighterId);
+                localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
+                setFavorites(updatedFavorites); // Update the state
             } else {
                 // If not in favorites, add it
-                await fetch(`http://localhost:5000/favorites/user123`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ fighterId }),
-                });
-    
-                setFavorites((prevFavorites) => [...prevFavorites, fighterId]);
+                const updatedFavorites = [...storedFavorites, fighterId];
+                localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
+                setFavorites(updatedFavorites); // Update the state
             }
         } catch (error) {
             console.error('Error toggling favorite:', error);
