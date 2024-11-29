@@ -17,18 +17,17 @@ const FighterProfile = ({ favorites, toggleFavorite }) => {
         if (!fighter) {
             console.log('Fetching fighter data for Fighter ID:', id); // Log the Fighter ID
             setLoading(true);
-            fetch(`${import.meta.env.VITE_API_URL}/fighters`)
-                .then((response) => {
+            fetch(`${import.meta.env.VITE_API_URL}/fighters/${id}`)
+            .then((response) => {
                     if (!response.ok) {
                         throw new Error('Failed to fetch fighter data');
                     }
                     return response.json();
                 })
                 .then((data) => {
-                    console.log('Fetched Fighters Data:', data); // Log the fetched data
-                    const matchedFighter = data.find((fighter) => fighter.FighterId === id);
-                    if (matchedFighter) {
-                        setFighter(matchedFighter);
+                    console.log('Fetched Fighter Data:', data); // Log the full fighter data response
+                    if (data && data.FighterId) {
+                        setFighter(data);
                     } else {
                         throw new Error('Fighter not found');
                     }
@@ -42,7 +41,6 @@ const FighterProfile = ({ favorites, toggleFavorite }) => {
                 });
         }
     }, [id, fighter]);
-    
 
     if (loading) {
         return <div className="fighter-profile-container">Loading...</div>;
