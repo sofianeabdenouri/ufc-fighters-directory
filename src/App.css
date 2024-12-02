@@ -474,8 +474,9 @@ option[value="favorites"] {
 }
 @font-face {
   font-family: 'Sternbach';
-  src: url('./src/common/fonts/Sternbach.otf') format('opentype');
+  src: url('./common/fonts/Sternbach.otf') format('opentype');
 }
+
 
 .font-h1 {
   font-family: 'Sternbach', sans-serif;

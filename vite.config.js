@@ -11,6 +11,10 @@ export default defineConfig({
           src: 'src/common/images/**/*',
           dest: 'common/images', // Keep the same folder structure in the build
         },
+        {
+          src: 'src/common/fonts/**/*',
+          dest: 'common/fonts', // Ensure fonts are copied correctly
+        },
       ],
     }),
   ],
