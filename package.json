@@ -7,10 +7,10 @@
     "node": "18.x"
   },
   "scripts": {
-    "start": "concurrently \"npm run backend\" \"npm run frontend\"",
+    "start": "node server.cjs", 
     "frontend": "vite",
     "backend": "node server.cjs",
-    "dev": "vite",
+    "dev": "concurrently \"npm run backend\" \"npm run frontend\"",
     "build": "vite build",
     "preview": "vite preview"
   },
