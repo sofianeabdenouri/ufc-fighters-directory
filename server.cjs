@@ -6,7 +6,13 @@ const bodyParser = require('body-parser');
 const app = express();
 const port = process.env.PORT || 5000;
 
-app.use(cors());
+// Add CORS middleware to allow requests from your frontend
+app.use(cors({
+  origin: process.env.CORS_ORIGIN || 'http://localhost:3000', // Your frontend domain
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed HTTP methods
+  credentials: true, // Include credentials if needed (e.g., cookies, authentication)
+}));
+
 app.use(bodyParser.json());
 
 // Route to fetch fighters from the SportsData API
