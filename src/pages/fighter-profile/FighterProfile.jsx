@@ -77,8 +77,8 @@ const FighterProfile = ({ favorites, toggleFavorite }) => {
         BirthDate,
     } = fighter;
 
-    const sanitizeNameForImage = (firstName = '', lastName = '') => {
-        return [firstName, lastName]
+    const sanitizeNameForImage = (firstName = '', lastName = '', nickname = '', isDuplicate = false) => {
+        const baseName = [firstName, lastName]
             .filter(Boolean)
             .join(' ')
             .normalize('NFD')
@@ -88,11 +88,35 @@ const FighterProfile = ({ favorites, toggleFavorite }) => {
             .replace(/[^a-z0-9\s]/g, '')
             .replace(/\s+/g, '_')
             .trim();
+    
+        if (isDuplicate && nickname) {
+            const sanitizedNickname = nickname
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .toLowerCase()
+                .replace(/['-]/g, '')
+                .replace(/[^a-z0-9\s]/g, '')
+                .replace(/\s+/g, '_')
+                .trim();
+            return `${baseName}_${sanitizedNickname}`;
+        }
+    
+        return baseName;
     };
+    
 
     const imageName = sanitizeNameForImage(FirstName, LastName);
-    const imageUrl = `/images/${imageName}.png`;
-
+    const getImageName = () => {
+        if (!fighter.FirstName && !fighter.LastName) {
+            // Default images for unknown fighters
+            const isFemale = fighter.WeightClass?.startsWith("Women's");
+            return isFemale ? 'default_f.png' : 'default.png';
+        }
+        return `${sanitizeNameForImage(fighter.FirstName, fighter.LastName, fighter.Nickname, fighter.isDuplicate)}.png`;
+    };
+    
+    const imageUrl = `/common/images/${getImageName()}`;
+    
     const calculateAge = (birthDate) => {
         if (!birthDate) return 'N/A';
         const today = new Date();
@@ -170,25 +194,26 @@ const FighterProfile = ({ favorites, toggleFavorite }) => {
             </div>
 
             <div className="fighter-profile-image">
-                <img
-                    src={imageUrl}
-                    alt={`${FirstName || 'Unknown'} ${LastName || ''}`}
-                    onError={(e) => {
-                        e.target.src = WeightClass?.startsWith("Women's")
-                        ? '/images/default_f.png'
-                        : '/images/default.png';
-                    }}
-                />
+            <img
+    src={imageUrl}
+    alt={`${fighter.FirstName || 'Unknown'} ${fighter.LastName || ''}`}
+    onError={(e) => {
+        e.target.src = fighter.WeightClass?.startsWith("Women's")
+            ? '/common/images/default_f.png'
+            : '/common/images/default.png';
+    }}
+/>
+
             </div>
 
             <button onClick={() => toggleFavorite(fighter.FighterId)} className="profile-star-button">
-            <img
-    src={isFavorite ? '/images/star.png' : '/images/star_gray.png'}
-    alt={isFavorite ? 'Favorited' : 'Not Favorited'}
-    className="profile-star-icon"
-/>
+    <img
+        src={isFavorite ? '/common/images/star.png' : '/common/images/star_gray.png'}
+        alt={isFavorite ? 'Favorited' : 'Not Favorited'}
+        className="profile-star-icon"
+    />
+</button>
 
-            </button>
         </div>
     );
 };
