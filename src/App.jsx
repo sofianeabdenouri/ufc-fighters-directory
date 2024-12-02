@@ -246,8 +246,14 @@ useEffect(() => {
         fighterListRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
     useEffect(() => {
-        fetch(`${import.meta.env.VITE_API_URL}/fighters`)
-        .then((response) => response.json())
+        const apiUrl = `${import.meta.env.VITE_API_URL.replace(/\/+$/, '')}/fighters`; // Remove trailing slash
+        fetch(apiUrl)
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then((data) => {
                 // Filter out fighters with no fights (Wins, Losses, or Draws must be > 0)
                 const fightersWithFights = data.filter((fighter) => {
