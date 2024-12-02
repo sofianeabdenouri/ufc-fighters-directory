@@ -17,7 +17,9 @@ const FighterProfile = ({ favorites, toggleFavorite }) => {
         if (!fighter) {
             console.log('Fetching fighter data for Fighter ID:', id); // Log the Fighter ID
             setLoading(true);
-            fetch(`${import.meta.env.VITE_API_URL}/fighters/${id}`)
+            // Fix API URL with proper handling of trailing slash
+            const apiUrl = `${import.meta.env.VITE_API_URL.replace(/\/+$/, '')}/fighters/${id}`;
+            fetch(apiUrl)            
             .then((response) => {
                     if (!response.ok) {
                         throw new Error('Failed to fetch fighter data');
@@ -173,8 +175,8 @@ const FighterProfile = ({ favorites, toggleFavorite }) => {
                     alt={`${FirstName || 'Unknown'} ${LastName || ''}`}
                     onError={(e) => {
                         e.target.src = WeightClass?.startsWith("Women's")
-                            ? '/src/common/images/default_f.png'
-                            : '/src/common/images/default.png';
+                        ? '/images/default_f.png'
+                        : '/images/default.png';
                     }}
                 />
             </div>
