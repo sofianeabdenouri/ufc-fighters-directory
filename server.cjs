@@ -54,6 +54,28 @@ app.get('/fighters', async (req, res) => {
   }
 });
 
+// Route to fetch a specific fighter by ID
+app.get('/fighters/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const fetch = (await import('node-fetch')).default;
+    const response = await fetch(
+      `https://api.sportsdata.io/v3/mma/scores/json/Fighter/${id}?key=${process.env.VITE_API_KEY}`
+    );
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch fighter: ${response.statusText}`);
+    }
+
+    const fighter = await response.json();
+    res.json(fighter);
+  } catch (error) {
+    console.error('Error fetching fighter:', error.message);
+    res.status(500).send('Failed to fetch fighter data');
+  }
+});
+
 // Example favorites-related route
 app.get('/favorites/:userId', async (req, res) => {
   const { userId } = req.params;
