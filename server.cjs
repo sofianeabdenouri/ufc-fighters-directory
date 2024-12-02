@@ -6,12 +6,14 @@ const bodyParser = require('body-parser');
 const app = express();
 const port = process.env.PORT || 5000;
 
-// Add CORS middleware to allow requests from your frontend
+const cors = require('cors');
+
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:3000', // Your frontend domain
-  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed HTTP methods
-  credentials: true, // Include credentials if needed (e.g., cookies, authentication)
+  origin: process.env.CORS_ORIGIN, // Use the environment variable
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true, // Include credentials if needed
 }));
+
 
 app.use(bodyParser.json());
 
