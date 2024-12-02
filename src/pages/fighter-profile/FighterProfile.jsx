@@ -89,7 +89,7 @@ const FighterProfile = ({ favorites, toggleFavorite }) => {
     };
 
     const imageName = sanitizeNameForImage(FirstName, LastName);
-    const imageUrl = `/src/common/images/${imageName}.png`;
+    const imageUrl = `/images/${imageName}.png`;
 
     const calculateAge = (birthDate) => {
         if (!birthDate) return 'N/A';
@@ -180,11 +180,12 @@ const FighterProfile = ({ favorites, toggleFavorite }) => {
             </div>
 
             <button onClick={() => toggleFavorite(fighter.FighterId)} className="profile-star-button">
-                <img
-                    src={isFavorite ? '/src/common/images/star.png' : '/src/common/images/star_gray.png'}
-                    alt={isFavorite ? 'Favorited' : 'Not Favorited'}
-                    className="profile-star-icon"
-                />
+            <img
+    src={isFavorite ? '/images/star.png' : '/images/star_gray.png'}
+    alt={isFavorite ? 'Favorited' : 'Not Favorited'}
+    className="profile-star-icon"
+/>
+
             </button>
         </div>
     );

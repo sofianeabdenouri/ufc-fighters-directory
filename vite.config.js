@@ -9,7 +9,7 @@ export default defineConfig({
       targets: [
         {
           src: 'src/common/images/**/*',
-          dest: 'images',
+          dest: 'common/images', // Keep the same folder structure in the build
         },
       ],
     }),

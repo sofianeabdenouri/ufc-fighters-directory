@@ -59,16 +59,15 @@ const FighterCard = ({ fighter, isFavorite, toggleFavorite }) => {
         return `${sanitizeNameForImage(FirstName, LastName, Nickname, isDuplicate)}.png`;
     };
 
-    const imageUrl = `/src/common/images/${getImageName()}`;
+    const imageUrl = `/common/images/${getImageName()}`;
 
     const handleNavigate = () => {
         // Save scroll position on App.jsx
         sessionStorage.setItem("scrollPosition", window.scrollY);
-    
+
         // Navigate to FighterProfile
         navigate(`/fighter/${FighterId}`);
     };
-    
 
     return (
         <div className="fighter-card">
@@ -81,7 +80,7 @@ const FighterCard = ({ fighter, isFavorite, toggleFavorite }) => {
                 {/* Favorite Star Icon */}
                 <button onClick={() => toggleFavorite(FighterId)} className="star-button">
                     <img
-                        src={isFavorite ? '/src/common/images/star.png' : '/src/common/images/star_gray.png'}
+                        src={isFavorite ? '/common/images/star.png' : '/common/images/star_gray.png'}
                         alt={isFavorite ? 'Favorited' : 'Not Favorited'}
                         className="star-icon"
                     />
@@ -98,8 +97,8 @@ const FighterCard = ({ fighter, isFavorite, toggleFavorite }) => {
                     alt={`${FirstName || 'Unknown'} ${LastName || ''}`}
                     onError={(e) => {
                         e.target.src = WeightClass?.startsWith("Women's")
-                            ? '/src/common/images/default_f.png'
-                            : '/src/common/images/default.png';
+                            ? '/common/images/default_f.png'
+                            : '/common/images/default.png';
                     }}
                 />
             </div>
