@@ -2,14 +2,14 @@
   "name": "ufc-fighters-directory",
   "private": true,
   "version": "0.0.0",
-  "type": "module",
+  "type": "module",  
   "engines": {
     "node": "18.x"
   },
   "scripts": {
-    "start": "node server.cjs", 
+    "start": "node api/server.mjs", 
     "frontend": "vite",
-    "backend": "node server.cjs",
+    "backend": "node api/server.mjs",
     "dev": "concurrently \"npm run backend\" \"npm run frontend\"",
     "build": "vite build",
     "preview": "vite preview"
