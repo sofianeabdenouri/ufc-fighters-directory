@@ -11,6 +11,7 @@ const dbName = process.env.MONGODB_NAME;
 async function connectToDB() {
   if (!db) {
     try {
+      console.log('Connecting to MongoDB...');
       const client = new MongoClient(uri);
       await client.connect();
       console.log('Connected to MongoDB');
@@ -20,6 +21,8 @@ async function connectToDB() {
       console.error('Error connecting to MongoDB:', error.message);
       throw error;
     }
+  } else {
+    console.log('MongoDB connection already established');
   }
 }
 
@@ -32,27 +35,41 @@ const corsOptions = {
 
 // Main handler
 export default async function handler(req, res) {
+  console.log('Handler triggered');
+  
   // Apply CORS
   const corsMiddleware = cors(corsOptions);
   await new Promise((resolve, reject) => {
     corsMiddleware(req, res, (err) => {
-      if (err) return reject(err);
+      if (err) {
+        console.error('CORS middleware error:', err.message);
+        return reject(err);
+      }
+      console.log('CORS middleware applied successfully');
       resolve();
     });
   });
 
   // Connect to the database
-  await connectToDB();
+  try {
+    await connectToDB();
+  } catch (error) {
+    console.error('Database connection error:', error.message);
+    return res.status(500).send('Database connection failed');
+  }
 
   const { method, url } = req;
+  console.log(`Request received: ${method} ${url}`);
 
   // Root Route
   if (url === '/' && method === 'GET') {
+    console.log('Root route hit');
     return res.status(200).send('Welcome to the UFC Fighters Directory API!');
   }
 
   // Fetch Fighters Route
   if (url === '/fighters' && method === 'GET') {
+    console.log('Fetching fighters...');
     try {
       const response = await fetch(
         `https://api.sportsdata.io/v3/mma/scores/json/FightersBasic?key=${process.env.VITE_API_KEY}`
@@ -61,6 +78,7 @@ export default async function handler(req, res) {
         throw new Error(`Failed to fetch fighters: ${response.statusText}`);
       }
       const fighters = await response.json();
+      console.log('Fighters fetched successfully');
       return res.status(200).json(fighters);
     } catch (error) {
       console.error('Error fetching fighters:', error.message);
@@ -71,6 +89,7 @@ export default async function handler(req, res) {
   // Fetch Fighter by ID Route
   if (url.startsWith('/fighters/') && method === 'GET') {
     const id = url.split('/')[2];
+    console.log(`Fetching fighter by ID: ${id}`);
     try {
       const response = await fetch(
         `https://api.sportsdata.io/v3/mma/scores/json/Fighter/${id}?key=${process.env.VITE_API_KEY}`
@@ -79,9 +98,10 @@ export default async function handler(req, res) {
         throw new Error(`Failed to fetch fighter: ${response.statusText}`);
       }
       const fighter = await response.json();
+      console.log('Fighter fetched successfully:', fighter);
       return res.status(200).json(fighter);
     } catch (error) {
-      console.error('Error fetching fighter:', error.message);
+      console.error('Error fetching fighter by ID:', error.message);
       return res.status(500).send('Failed to fetch fighter data');
     }
   }
@@ -89,8 +109,10 @@ export default async function handler(req, res) {
   // Favorites Route (example usage)
   if (url.startsWith('/favorites/') && method === 'GET') {
     const userId = url.split('/')[2];
+    console.log(`Fetching favorites for userId: ${userId}`);
     try {
       const userFavorites = await favoritesCollection.findOne({ userId });
+      console.log('Favorites fetched successfully');
       return res
         .status(200)
         .json(userFavorites ? userFavorites.fighterIds : []);
@@ -101,5 +123,6 @@ export default async function handler(req, res) {
   }
 
   // Catch-all for unmatched routes
+  console.log(`Route not found: ${method} ${url}`);
   res.status(404).send('Route not found');
 }
