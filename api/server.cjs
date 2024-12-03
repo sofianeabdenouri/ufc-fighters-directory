@@ -1,6 +1,13 @@
 import { MongoClient } from 'mongodb';
 import fetch from 'node-fetch';
 
+// CORS configuration
+function addCorsHeaders(res) {
+  res.setHeader('Access-Control-Allow-Origin', process.env.CORS_ORIGIN || '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+}
+
 let db, favoritesCollection;
 
 // Connect to MongoDB
@@ -24,6 +31,14 @@ async function connectToDB() {
 
 // Main handler function
 export default async function handler(req, res) {
+  // Add CORS headers for every request
+  addCorsHeaders(res);
+
+  // Handle preflight (OPTIONS) requests
+  if (req.method === 'OPTIONS') {
+    return res.status(204).end(); // Respond with no content for preflight
+  }
+
   // Connect to MongoDB once
   await connectToDB();
 
