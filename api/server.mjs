@@ -1,3 +1,6 @@
+import dotenv from 'dotenv';
+dotenv.config(); // This will load variables from .env file
+
 import express from 'express';
 import { MongoClient } from 'mongodb';
 import fetch from 'node-fetch'; 
@@ -6,12 +9,16 @@ import cors from 'cors';
 const app = express();
 const port = process.env.PORT || 5000;
 
+// Use environment variables from .env file
 const uri = process.env.MONGODB_URI;
 const dbName = process.env.MONGODB_NAME;
 let favoritesCollection;
 
 // MongoDB connection setup
 async function connectToDB() {
+  console.log('MongoDB URI:', uri); // Log MongoDB URI
+  console.log('MongoDB DB Name:', dbName); // Log DB name
+
   try {
     const client = new MongoClient(uri);
     await client.connect();
