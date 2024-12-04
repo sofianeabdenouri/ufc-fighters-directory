@@ -3,11 +3,10 @@ dotenv.config(); // This will load variables from .env file
 
 import express from 'express';
 import { MongoClient } from 'mongodb';
-import fetch from 'node-fetch'; 
+import fetch from 'node-fetch';
 import cors from 'cors';
 
 const app = express();
-const port = process.env.PORT || 5000;
 
 // Use environment variables from .env file
 const uri = process.env.MONGODB_URI;
@@ -71,8 +70,5 @@ app.get('/', (req, res) => {
   res.status(200).send('Welcome to the UFC Fighters Directory API!');
 });
 
-// Start the server
-app.listen(port, () => {
-  console.log(`Server running on http://localhost:${port}`);
-  connectToDB(); // Ensure the DB connection is established
-});
+// Export handler for Vercel
+export default (req, res) => app(req, res);

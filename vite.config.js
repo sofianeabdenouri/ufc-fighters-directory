@@ -9,7 +9,7 @@ export default defineConfig({
       targets: [
         {
           src: 'src/common/images/**/*',
-          dest: 'common/images', // Keep the same folder structure in the build
+          dest: 'common/images', // Ensure the images are copied
         },
         {
           src: 'src/common/fonts/**/*',
@@ -19,6 +19,12 @@ export default defineConfig({
     }),
   ],
   build: {
-    outDir: 'dist', // Ensure this matches your Netlify publish directory
+    outDir: 'dist', // Ensure this matches your Vercel output directory
+    rollupOptions: {
+      output: {
+        // Ensure that assets are placed correctly in the output directory
+        assetFileNames: 'assets/[name]-[hash][extname]',
+      },
+    },
   },
 });
