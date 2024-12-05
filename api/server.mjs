@@ -42,7 +42,10 @@ async function connectToDB() {
 
     console.log('Connecting to MongoDB...');
     try {
-        const client = new MongoClient(uri);
+        const client = new MongoClient(uri, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+        });
         await client.connect();
         console.log('Connected to MongoDB');
         cachedDb = client.db(dbName); // Cache the database instance
@@ -113,10 +116,11 @@ if (process.env.NODE_ENV !== 'production') {
 // Export handler for Vercel
 export default async (req, res) => {
     try {
-        await connectToDB(); // Ensure DB connection for serverless deployment
+        const db = await connectToDB(); // Ensure DB connection for serverless deployment
+        req.db = db; // Attach the database instance to the request
+        app(req, res);
     } catch (error) {
         console.error('Error during serverless MongoDB connection:', error.message);
-        return res.status(500).send('Failed to connect to the database');
+        return res.status(500).json({ error: 'Failed to connect to the database', details: error.message });
     }
-    app(req, res);
 };
