@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-dotenv.config(); // This will load variables from .env file
+dotenv.config(); // Load environment variables from .env file
 
 import express from 'express';
 import { MongoClient } from 'mongodb';
@@ -7,7 +7,24 @@ import fetch from 'node-fetch';
 import cors from 'cors';
 
 const app = express();
+const allowedOrigins = [
+  'http://localhost:5173',       // Your local frontend for development
+  'https://ufcrec.vercel.app',  // Your deployed frontend
+];
 
+const corsOptions = {
+  origin: (origin, callback) => {
+      if (allowedOrigins.includes(origin) || !origin) {
+          callback(null, true);
+      } else {
+          callback(new Error('Not allowed by CORS'));
+      }
+  },
+  optionsSuccessStatus: 200, // For older browsers
+};
+app.options('*', cors(corsOptions)); // Allow preflight requests
+
+app.use(cors(corsOptions));
 // Use environment variables from .env file
 const uri = process.env.MONGODB_URI;
 const dbName = process.env.MONGODB_NAME;
@@ -69,6 +86,15 @@ app.get('/fighters/:id', async (req, res) => {
 app.get('/', (req, res) => {
   res.status(200).send('Welcome to the UFC Fighters Directory API!');
 });
+
+// Check if we are running locally or on Vercel
+if (process.env.NODE_ENV !== 'production') {
+  const port = process.env.PORT || 5001;
+  app.listen(port, () => {
+    console.log(`Server running on http://localhost:${port}`);
+    connectToDB(); // Ensure the DB connection is established
+  });
+}
 
 // Export handler for Vercel
 export default (req, res) => app(req, res);
