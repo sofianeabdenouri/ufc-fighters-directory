@@ -7,94 +7,116 @@ import fetch from 'node-fetch';
 import cors from 'cors';
 
 const app = express();
+
+// Allowed origins for CORS
 const allowedOrigins = [
-  'http://localhost:5173',       // Your local frontend for development
-  'https://ufcrec.vercel.app',  // Your deployed frontend
+    'http://localhost:5173', // Local frontend
+    'https://ufcrec.vercel.app', // Deployed frontend
 ];
 
+// CORS configuration
 const corsOptions = {
-  origin: (origin, callback) => {
-      if (allowedOrigins.includes(origin) || !origin) {
-          callback(null, true);
-      } else {
-          callback(new Error('Not allowed by CORS'));
-      }
-  },
-  optionsSuccessStatus: 200, // For older browsers
+    origin: (origin, callback) => {
+        if (allowedOrigins.includes(origin) || !origin) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    optionsSuccessStatus: 200, // For older browsers
 };
-app.options('*', cors(corsOptions)); // Allow preflight requests
+app.options('*', cors(corsOptions)); // Preflight requests
+app.use(cors(corsOptions)); // Enable CORS
 
-app.use(cors(corsOptions));
-// Use environment variables from .env file
+// MongoDB connection variables
 const uri = process.env.MONGODB_URI;
 const dbName = process.env.MONGODB_NAME;
-let favoritesCollection;
 
-// MongoDB connection setup
+let cachedDb = null; // Cache the database connection
+
 async function connectToDB() {
-  console.log('MongoDB URI:', uri); // Log MongoDB URI
-  console.log('MongoDB DB Name:', dbName); // Log DB name
+    if (cachedDb) {
+        console.log('Using cached database instance');
+        return cachedDb;
+    }
 
-  try {
-    const client = new MongoClient(uri);
-    await client.connect();
-    console.log('Connected to MongoDB');
-    const db = client.db(dbName);
-    favoritesCollection = db.collection('favorites');
-  } catch (error) {
-    console.error('Error connecting to MongoDB:', error.message);
-    process.exit(1); // Exit if DB connection fails
-  }
+    console.log('Connecting to MongoDB...');
+    try {
+        const client = new MongoClient(uri);
+        await client.connect();
+        console.log('Connected to MongoDB');
+        cachedDb = client.db(dbName); // Cache the database instance
+        return cachedDb;
+    } catch (error) {
+        console.error('Error connecting to MongoDB:', error.message);
+        throw error; // Throw error to avoid silent failure
+    }
 }
 
+// Log all requests
+app.use((req, res, next) => {
+    console.log(`${req.method} ${req.url}`);
+    next();
+});
+
 // API route to fetch fighters from SportsData API
-app.get('/fighters', async (req, res) => {
-  try {
-    const response = await fetch(
-      `https://api.sportsdata.io/v3/mma/scores/json/FightersBasic?key=${process.env.VITE_API_KEY}`
-    );
-    if (!response.ok) {
-      throw new Error(`Failed to fetch fighters: ${response.statusText}`);
+app.get('/api/fighters', async (req, res) => {
+    try {
+        console.log('Fetching fighters...');
+        const response = await fetch(
+            `https://api.sportsdata.io/v3/mma/scores/json/FightersBasic?key=${process.env.VITE_API_KEY}`
+        );
+        if (!response.ok) {
+            throw new Error(`Failed to fetch fighters: ${response.statusText}`);
+        }
+        const fighters = await response.json();
+        res.status(200).json(fighters);
+    } catch (error) {
+        console.error('Error fetching fighters:', error.message);
+        res.status(500).json({ error: 'Failed to fetch fighters', details: error.message });
     }
-    const fighters = await response.json();
-    res.json(fighters);
-  } catch (error) {
-    console.error('Error fetching fighters:', error.message);
-    res.status(500).send('Failed to fetch fighters');
-  }
 });
 
 // API route to fetch a specific fighter by ID
-app.get('/fighters/:id', async (req, res) => {
-  const { id } = req.params;
-  try {
-    const response = await fetch(
-      `https://api.sportsdata.io/v3/mma/scores/json/Fighter/${id}?key=${process.env.VITE_API_KEY}`
-    );
-    if (!response.ok) {
-      throw new Error(`Failed to fetch fighter: ${response.statusText}`);
+app.get('/api/fighters/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        console.log(`Fetching fighter with ID: ${id}`);
+        const response = await fetch(
+            `https://api.sportsdata.io/v3/mma/scores/json/Fighter/${id}?key=${process.env.VITE_API_KEY}`
+        );
+        if (!response.ok) {
+            throw new Error(`Failed to fetch fighter: ${response.statusText}`);
+        }
+        const fighter = await response.json();
+        res.status(200).json(fighter);
+    } catch (error) {
+        console.error(`Error fetching fighter with ID ${id}:`, error.message);
+        res.status(500).json({ error: `Failed to fetch fighter with ID ${id}`, details: error.message });
     }
-    const fighter = await response.json();
-    res.json(fighter);
-  } catch (error) {
-    console.error('Error fetching fighter:', error.message);
-    res.status(500).send('Failed to fetch fighter data');
-  }
 });
 
 // Default route
 app.get('/', (req, res) => {
-  res.status(200).send('Welcome to the UFC Fighters Directory API!');
+    res.status(200).send('Welcome to the UFC Fighters Directory API!');
 });
 
-// Check if we are running locally or on Vercel
+// Local server setup
 if (process.env.NODE_ENV !== 'production') {
-  const port = process.env.PORT || 5001;
-  app.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}`);
-    connectToDB(); // Ensure the DB connection is established
-  });
+    const port = process.env.PORT || 5001;
+    app.listen(port, async () => {
+        console.log(`Server running on http://localhost:${port}`);
+        await connectToDB(); // Ensure DB connection is tested on startup
+    });
 }
 
 // Export handler for Vercel
-export default (req, res) => app(req, res);
+export default async (req, res) => {
+    try {
+        await connectToDB(); // Ensure DB connection for serverless deployment
+    } catch (error) {
+        console.error('Error during serverless MongoDB connection:', error.message);
+        return res.status(500).send('Failed to connect to the database');
+    }
+    app(req, res);
+};
