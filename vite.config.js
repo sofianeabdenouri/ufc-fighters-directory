@@ -9,22 +9,40 @@ export default defineConfig({
       targets: [
         {
           src: 'src/common/images/**/*',
-          dest: 'common/images', // Ensure the images are copied
+          dest: 'common/images', // Copies images to `dist/common/images`
         },
         {
           src: 'src/common/fonts/**/*',
-          dest: 'common/fonts', // Ensure fonts are copied correctly
+          dest: 'common/fonts', // Copies fonts to `dist/common/fonts`
         },
       ],
     }),
   ],
   build: {
-    outDir: 'dist', // Ensure this matches your Vercel output directory
+    outDir: 'dist', // Output directory for the build
     rollupOptions: {
+      input: './index.html', // Specify the entry point
       output: {
-        // Ensure that assets are placed correctly in the output directory
+        // Configure how assets (CSS, JS, etc.) are output
         assetFileNames: 'assets/[name]-[hash][extname]',
       },
+    },
+  },
+  server: {
+    port: 5173, // Local development server port
+    open: true, // Automatically open in the browser
+    proxy: {
+      // Proxy API requests to the backend
+      '/api': {
+        target: 'http://localhost:5000', // Backend server address
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
+  resolve: {
+    alias: {
+      '@': '/src', // Allow `@/` to refer to the `src` folder
     },
   },
 });

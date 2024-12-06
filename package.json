@@ -7,12 +7,12 @@
     "node": "18.x"
   },
   "scripts": {
-    "start": "node api/server.mjs",
-    "frontend": "vite",
-    "backend": "node api/server.mjs",
+    "start": "node api/server.mjs",         
+    "frontend": "vite",                    
+    "backend": "node api/server.mjs",      
     "dev": "concurrently \"npm run backend\" \"npm run frontend\"",
-    "build": "vite build",
-    "preview": "vite preview"
+    "build": "vite build",                  
+    "preview": "vite preview"               
   },
   "dependencies": {
     "body-parser": "^1.20.3",
