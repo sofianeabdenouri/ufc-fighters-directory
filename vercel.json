@@ -3,11 +3,11 @@
   "functions": {
     "api/server.mjs": {
       "runtime": "nodejs18.x",
-      "maxDuration": 30 
+      "maxDuration": 30
     }
   },
   "routes": [
-    { "src": "/api/(.*)", "dest": "/api/server.mjs" },
+    { "src": "/api/(.*)", "dest": "api/server.mjs" },
     { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
