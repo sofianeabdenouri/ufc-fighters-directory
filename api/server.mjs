@@ -43,15 +43,14 @@ async function connectToDB() {
 
     console.log('Connecting to MongoDB...');
     try {
-        const client = new MongoClient(uri);
-
-        await client.connect();
+        const client = new MongoClient(uri); // Modern MongoDB driver
+        const connection = await client.connect();
         console.log('Connected to MongoDB');
-        cachedDb = client.db(dbName); // Cache the database instance
+        cachedDb = connection.db(dbName); // Cache the database connection
         return cachedDb;
     } catch (error) {
         console.error('Error connecting to MongoDB:', error.message);
-        throw error; // Throw error to avoid silent failure
+        throw error;
     }
 }
 
@@ -114,12 +113,17 @@ if (process.env.NODE_ENV !== 'production') {
 
 // Export handler for Vercel
 export default async (req, res) => {
+    console.log('Starting MongoDB connection...');
     try {
         const db = await connectToDB(); // Ensure DB connection for serverless deployment
-        req.db = db; // Attach the database instance to the request
-        app(req, res);
+        console.log('MongoDB connection established successfully.');
+        req.db = db; // Attach DB instance to the request
+        app(req, res); // Pass the request to Express
     } catch (error) {
-        console.error('Error during serverless MongoDB connection:', error.message);
-        return res.status(500).json({ error: 'Failed to connect to the database', details: error.message });
+        console.error('Error establishing MongoDB connection:', error.message);
+        return res.status(500).json({
+            error: 'Failed to connect to the database',
+            details: error.message,
+        });
     }
 };
