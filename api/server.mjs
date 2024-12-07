@@ -23,7 +23,7 @@ const corsOptions = {
             callback(new Error('Not allowed by CORS'));
         }
     },
-    optionsSuccessStatus: 200,
+    optionsSuccessStatus: 200, // Handle legacy browsers
 };
 
 app.options('*', cors(corsOptions)); // Preflight requests
@@ -44,9 +44,9 @@ async function connectToDB() {
     console.log('Connecting to MongoDB...');
     try {
         const client = new MongoClient(uri); // Modern MongoDB driver
-        const connection = await client.connect();
+        await client.connect();
         console.log('Connected to MongoDB');
-        cachedDb = connection.db(dbName); // Cache the database connection
+        cachedDb = client.db(dbName); // Cache the database connection
         return cachedDb;
     } catch (error) {
         console.error('Error connecting to MongoDB:', error.message);
