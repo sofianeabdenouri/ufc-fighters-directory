@@ -246,7 +246,7 @@ useEffect(() => {
         fighterListRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
     useEffect(() => {
-        const apiUrl = `${import.meta.env.VITE_API_URL.replace(/\/+$/, '')}/fighters`; // Remove trailing slash
+        const apiUrl = `${import.meta.env.VITE_API_URL.trim().replace(/\/+$/, '')}/fighters`;
         fetch(apiUrl)
             .then((response) => {
                 if (!response.ok) {

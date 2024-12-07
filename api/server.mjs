@@ -17,14 +17,15 @@ const allowedOrigins = [
 // CORS configuration
 const corsOptions = {
     origin: (origin, callback) => {
-        if (allowedOrigins.includes(origin) || !origin) {
+        if (!origin || allowedOrigins.includes(origin)) {
             callback(null, true);
         } else {
             callback(new Error('Not allowed by CORS'));
         }
     },
-    optionsSuccessStatus: 200, // For older browsers
+    optionsSuccessStatus: 200,
 };
+
 app.options('*', cors(corsOptions)); // Preflight requests
 app.use(cors(corsOptions)); // Enable CORS
 
@@ -42,10 +43,8 @@ async function connectToDB() {
 
     console.log('Connecting to MongoDB...');
     try {
-        const client = new MongoClient(uri, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-        });
+        const client = new MongoClient(uri);
+
         await client.connect();
         console.log('Connected to MongoDB');
         cachedDb = client.db(dbName); // Cache the database instance

@@ -21,8 +21,8 @@ function FighterList() {
     const [searchTerm, setSearchTerm] = useState('');
     const [sortBy, setSortBy] = useState('');
 
-    const apiKey = 'YOUR_API_KEY'; // Replace with your API key
-    const apiUrl = `https://api.sportsdata.io/v3/mma/scores/json/FightersBasic?key=${apiKey}`;
+    const apiKey = VITE_API_KEY; // Replace with your API key
+    const apiUrl = `${import.meta.env.VITE_API_URL.trim().replace(/\/+$/, '')}/fighters`;
 
     // Fetch fighters data
     useEffect(() => {
