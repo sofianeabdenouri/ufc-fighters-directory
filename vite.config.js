@@ -7,7 +7,7 @@ dotenv.config(); // Load variables from .env
 
 export default defineConfig(({ mode }) => {
   const isDevelopment = mode === 'development';
-  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  const apiUrl = process.env.VITE_API_URL || 'http://localhost:5000';
 
   return {
     plugins: [
@@ -41,7 +41,7 @@ export default defineConfig(({ mode }) => {
         '/api': {
           target: isDevelopment ? 'http://localhost:5000' : apiUrl,
           changeOrigin: true,
-          secure: true,
+          secure: false,
         },
       },
     },
