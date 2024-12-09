@@ -1,9 +1,13 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
+import dotenv from 'dotenv';
+
+dotenv.config(); // Load variables from .env
 
 export default defineConfig(({ mode }) => {
   const isDevelopment = mode === 'development';
+  const apiUrl = process.env.VITE_API_URL || 'http://localhost:5000';
 
   return {
     plugins: [
@@ -35,9 +39,7 @@ export default defineConfig(({ mode }) => {
       open: true,
       proxy: {
         '/api': {
-          target: isDevelopment
-            ? 'http://localhost:5000' // Development backend
-            : import.meta.env.VITE_API_URL, // Production backend
+          target: isDevelopment ? 'http://localhost:5000' : apiUrl,
           changeOrigin: true,
           secure: false,
         },
