@@ -37,7 +37,7 @@ export default defineConfig(({ mode }) => {
         '/api': {
           target: isDevelopment
             ? 'http://localhost:5000' // Development backend
-            : VITE_API_URL, // Production backend
+            : import.meta.env.VITE_API_URL, // Production backend
           changeOrigin: true,
           secure: false,
         },
