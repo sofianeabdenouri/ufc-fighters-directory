@@ -2,7 +2,7 @@
   "version": 2,
   "functions": {
     "api/server.js": {
-      "runtime": "@vercel/node20",
+      "runtime": "@vercel/node20@3.0.0",
       "maxDuration": 30
     }
   },
