@@ -31,6 +31,8 @@ export default defineConfig(({ mode }) => {
         input: './index.html',
         output: {
           assetFileNames: 'assets/[name]-[hash][extname]',
+          entryFileNames: 'assets/[name]-[hash].js',
+          chunkFileNames: 'assets/[name]-[hash].js',
         },
       },
     },
