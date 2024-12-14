@@ -16,11 +16,11 @@ export default defineConfig(({ mode }) => {
         targets: [
           {
             src: 'src/common/images/**/*',
-            dest: 'common/images',
+            dest: 'assets/images',
           },
           {
             src: 'src/common/fonts/**/*',
-            dest: 'common/fonts',
+            dest: 'assets/fonts',
           },
         ],
       }),
