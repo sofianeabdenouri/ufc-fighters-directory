@@ -115,7 +115,7 @@ const FighterProfile = ({ favorites, toggleFavorite }) => {
         return `${sanitizeNameForImage(fighter.FirstName, fighter.LastName, fighter.Nickname, fighter.isDuplicate)}.png`;
     };
     
-    const imageUrl = `/common/images/${getImageName()}`;
+    const imageUrl = `/assets/images/${getImageName()}`;
     
     const calculateAge = (birthDate) => {
         if (!birthDate) return 'N/A';
@@ -199,8 +199,8 @@ const FighterProfile = ({ favorites, toggleFavorite }) => {
     alt={`${fighter.FirstName || 'Unknown'} ${fighter.LastName || ''}`}
     onError={(e) => {
         e.target.src = fighter.WeightClass?.startsWith("Women's")
-            ? '/common/images/default_f.png'
-            : '/common/images/default.png';
+            ? '/assets/images/default_f.png'
+            : '/assets/images/default.png';
     }}
 />
 
@@ -208,7 +208,7 @@ const FighterProfile = ({ favorites, toggleFavorite }) => {
 
             <button onClick={() => toggleFavorite(fighter.FighterId)} className="profile-star-button">
     <img
-        src={isFavorite ? '/common/images/star.png' : '/common/images/star_gray.png'}
+        src={isFavorite ? '/assets/images/star.png' : '/assets/images/star_gray.png'}
         alt={isFavorite ? 'Favorited' : 'Not Favorited'}
         className="profile-star-icon"
     />
