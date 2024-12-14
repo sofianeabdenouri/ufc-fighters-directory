@@ -97,8 +97,8 @@ const FighterCard = ({ fighter, isFavorite, toggleFavorite }) => {
                     alt={`${FirstName || 'Unknown'} ${LastName || ''}`}
                     onError={(e) => {
                         e.target.src = WeightClass?.startsWith("Women's")
-                            ? '/common/images/default_f.png'
-                            : '/common/images/default.png';
+                            ? '/assets/images/default_f.png'
+                            : '/assets/images/default.png';
                     }}
                 />
             </div>
