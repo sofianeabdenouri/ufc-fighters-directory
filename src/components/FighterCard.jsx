@@ -3,24 +3,27 @@ import { useNavigate } from 'react-router-dom';
 
 // Utility function to sanitize names for image file paths
 const sanitizeNameForImage = (firstName = '', lastName = '', nickname = '', isDuplicate = false) => {
+    // Capitalize each part of the name
+    const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+
+    // Construct the full name
     const fullName = [firstName, lastName]
         .filter(Boolean)
-        .join(' ')
+        .map(capitalize) // Apply capitalization
+        .join('_') // Join with an underscore
         .normalize('NFD')
         .replace(/[\u0300-\u036f]/g, '') // Remove accents
-        .toLowerCase()
-        .replace(/['-]/g, '')
-        .replace(/[^a-z0-9\s]/g, '')
-        .replace(/\s+/g, '_')
+        .replace(/[^a-zA-Z0-9_]/g, '') // Remove invalid characters
         .trim();
 
+    // If duplicate, append sanitized nickname
     if (isDuplicate && nickname) {
         const sanitizedNickname = nickname
             .normalize('NFD')
             .replace(/[\u0300-\u036f]/g, '')
             .toLowerCase()
             .replace(/['-]/g, '')
-            .replace(/[^a-z0-9\s]/g, '')
+            .replace(/[^a-z0-9]/g, '')
             .replace(/\s+/g, '_')
             .trim();
         return `${fullName}_${sanitizedNickname}`;
@@ -59,12 +62,12 @@ const FighterCard = ({ fighter, isFavorite, toggleFavorite }) => {
         return `${sanitizeNameForImage(FirstName, LastName, Nickname, isDuplicate)}.png`;
     };
 
-    // Update the image path to align with `dist/assets/images`
+    // Correct image path to align with Vercel's file serving structure
     const imageUrl = `/assets/images/${getImageName()}`;
 
     const handleNavigate = () => {
         // Save scroll position
-        sessionStorage.setItem("scrollPosition", window.scrollY);
+        sessionStorage.setItem('scrollPosition', window.scrollY);
 
         // Navigate to FighterProfile
         navigate(`/fighter/${FighterId}`);
