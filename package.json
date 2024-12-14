@@ -12,7 +12,8 @@
     "backend": "node api/server.js",
     "dev": "concurrently \"npm run backend\" \"npm run frontend\"",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "vercel-build": "npm run build"
   },
   "dependencies": {
     "body-parser": "^1.20.3",
