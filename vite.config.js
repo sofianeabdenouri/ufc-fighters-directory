@@ -28,11 +28,11 @@ export default defineConfig(({ mode }) => {
     build: {
       outDir: 'dist',
       rollupOptions: {
-        input: './index.html',
+        input: './index.html', // Set index.html as the build entry point
         output: {
-          assetFileNames: 'assets/[name]-[hash][extname]',
-          entryFileNames: 'assets/[name]-[hash].js',
-          chunkFileNames: 'assets/[name]-[hash].js',
+          assetFileNames: 'assets/[name]-[hash][extname]', // For all assets
+          entryFileNames: 'assets/[name]-[hash].js', // For entry scripts
+          chunkFileNames: 'assets/[name]-[hash].js', // For chunk files
         },
       },
     },
