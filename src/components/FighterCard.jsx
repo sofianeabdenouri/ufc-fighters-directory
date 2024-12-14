@@ -59,7 +59,7 @@ const FighterCard = ({ fighter, isFavorite, toggleFavorite }) => {
         return `${sanitizeNameForImage(FirstName, LastName, Nickname, isDuplicate)}.png`;
     };
 
-    const imageUrl = `/common/images/${getImageName()}`;
+    const imageUrl = `/assets/images/${getImageName()}`;
 
     const handleNavigate = () => {
         // Save scroll position on App.jsx
