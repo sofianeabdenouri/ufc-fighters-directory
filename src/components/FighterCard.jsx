@@ -1,6 +1,34 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
+// Utility function to sanitize names for image file paths
+const sanitizeNameForImage = (firstName = '', lastName = '', nickname = '', isDuplicate = false) => {
+    const fullName = [firstName, lastName]
+        .filter(Boolean)
+        .join(' ')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '') // Remove accents
+        .toLowerCase()
+        .replace(/['-]/g, '')
+        .replace(/[^a-z0-9\s]/g, '')
+        .replace(/\s+/g, '_')
+        .trim();
+
+    if (isDuplicate && nickname) {
+        const sanitizedNickname = nickname
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .replace(/['-]/g, '')
+            .replace(/[^a-z0-9\s]/g, '')
+            .replace(/\s+/g, '_')
+            .trim();
+        return `${fullName}_${sanitizedNickname}`;
+    }
+
+    return fullName;
+};
+
 const FighterCard = ({ fighter, isFavorite, toggleFavorite }) => {
     const {
         FighterId,
@@ -21,35 +49,7 @@ const FighterCard = ({ fighter, isFavorite, toggleFavorite }) => {
 
     const navigate = useNavigate();
 
-    // Function to sanitize names for image file paths
-    const sanitizeNameForImage = (firstName = '', lastName = '', nickname = '', isDuplicate = false) => {
-        const baseName = [firstName, lastName]
-            .filter(Boolean)
-            .join(' ')
-            .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '')
-            .toLowerCase()
-            .replace(/['-]/g, '')
-            .replace(/[^a-z0-9\s]/g, '')
-            .replace(/\s+/g, '_')
-            .trim();
-
-        if (isDuplicate && nickname) {
-            const sanitizedNickname = nickname
-                .normalize('NFD')
-                .replace(/[\u0300-\u036f]/g, '')
-                .toLowerCase()
-                .replace(/['-]/g, '')
-                .replace(/[^a-z0-9\s]/g, '')
-                .replace(/\s+/g, '_')
-                .trim();
-            return `${baseName}_${sanitizedNickname}`;
-        }
-
-        return baseName;
-    };
-
-    // Construct the image path
+    // Construct the image path based on sanitized names
     const getImageName = () => {
         if (!FirstName && !LastName) {
             // Default images for unknown fighters
@@ -59,10 +59,11 @@ const FighterCard = ({ fighter, isFavorite, toggleFavorite }) => {
         return `${sanitizeNameForImage(FirstName, LastName, Nickname, isDuplicate)}.png`;
     };
 
+    // Update the image path to align with `dist/assets/images`
     const imageUrl = `/assets/images/${getImageName()}`;
 
     const handleNavigate = () => {
-        // Save scroll position on App.jsx
+        // Save scroll position
         sessionStorage.setItem("scrollPosition", window.scrollY);
 
         // Navigate to FighterProfile
@@ -80,7 +81,7 @@ const FighterCard = ({ fighter, isFavorite, toggleFavorite }) => {
                 {/* Favorite Star Icon */}
                 <button onClick={() => toggleFavorite(FighterId)} className="star-button">
                     <img
-                        src={isFavorite ? '/common/images/star.png' : '/common/images/star_gray.png'}
+                        src={isFavorite ? '/assets/images/star.png' : '/assets/images/star_gray.png'}
                         alt={isFavorite ? 'Favorited' : 'Not Favorited'}
                         className="star-icon"
                     />
