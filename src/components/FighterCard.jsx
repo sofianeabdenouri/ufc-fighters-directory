@@ -1,32 +1,35 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-// Function to sanitize names for image file paths
+// Utility function to sanitize names for image file paths
 const sanitizeNameForImage = (firstName = '', lastName = '', nickname = '', isDuplicate = false) => {
-    const baseName = [firstName, lastName]
+    // Capitalize each part of the name
+    const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+
+    // Construct the full name
+    const fullName = [firstName, lastName]
         .filter(Boolean)
-        .join(' ')
+        .map(capitalize) // Apply capitalization
+        .join('_') // Join with an underscore
         .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .toLowerCase()
-        .replace(/['-]/g, '')
-        .replace(/[^a-z0-9\s]/g, '')
-        .replace(/\s+/g, '_')
+        .replace(/[\u0300-\u036f]/g, '') // Remove accents
+        .replace(/[^a-zA-Z0-9_]/g, '') // Remove invalid characters
         .trim();
 
+    // If duplicate, append sanitized nickname
     if (isDuplicate && nickname) {
         const sanitizedNickname = nickname
             .normalize('NFD')
             .replace(/[\u0300-\u036f]/g, '')
             .toLowerCase()
             .replace(/['-]/g, '')
-            .replace(/[^a-z0-9\s]/g, '')
+            .replace(/[^a-z0-9]/g, '')
             .replace(/\s+/g, '_')
             .trim();
-        return `${baseName}_${sanitizedNickname}`;
+        return `${fullName}_${sanitizedNickname}`;
     }
 
-    return baseName;
+    return fullName;
 };
 
 const FighterCard = ({ fighter, isFavorite, toggleFavorite }) => {
