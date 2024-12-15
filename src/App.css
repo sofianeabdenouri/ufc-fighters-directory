@@ -6,7 +6,6 @@
   align-items: center; /* Horizontally center */
   justify-content: flex-start; /* Start content at the top, not centered vertically */
   min-height: 100vh; /* Full page height */
-  margin: 0 auto;
   width: 100%; /* Ensure full width */
   overflow-x: hidden; /* Prevent horizontal overflow */
 }
