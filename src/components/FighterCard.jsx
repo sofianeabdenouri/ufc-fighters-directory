@@ -3,35 +3,30 @@ import { useNavigate } from 'react-router-dom';
 
 // Utility function to sanitize names for image file paths
 const sanitizeNameForImage = (firstName = '', lastName = '', nickname = '', isDuplicate = false) => {
-    // Capitalize each part of the name
-    const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-
-    // Sanitize a string: remove accents and invalid characters, then handle special cases
-    const sanitize = (str) => str
+    const baseName = [firstName, lastName]
+        .filter(Boolean)
+        .join(' ')
         .normalize('NFD')
         .replace(/[̀-ͯ]/g, '') // Remove accents
+        .toLowerCase()
         .replace(/['-]/g, '') // Remove hyphens and apostrophes
-        .replace(/[^a-zA-Z0-9_ ]/g, '') // Remove invalid characters
+        .replace(/[^a-z0-9\s]/g, '') // Remove invalid characters
+        .replace(/\s+/g, '_') // Replace spaces with underscores
         .trim();
 
-    // Construct the full name for composed names
-    const fullName = [
-        sanitize(firstName),
-        sanitize(lastName.replace(/ /g, '_')) // Replace spaces in composed last names with underscores
-    ]
-        .filter(Boolean) // Filter out empty strings
-        .map(capitalize) // Apply capitalization
-        .join('_'); // Join with an underscore
-
-    // Handle duplicates by appending sanitized nickname
     if (isDuplicate && nickname) {
-        const sanitizedNickname = sanitize(nickname)
+        const sanitizedNickname = nickname
+            .normalize('NFD')
+            .replace(/[̀-ͯ]/g, '') // Remove accents
             .toLowerCase()
-            .replace(/\s+/g, '_'); // Replace spaces with underscores
-        return `${fullName}_${sanitizedNickname}`;
+            .replace(/['-]/g, '') // Remove hyphens and apostrophes
+            .replace(/[^a-z0-9\s]/g, '') // Remove invalid characters
+            .replace(/\s+/g, '_') // Replace spaces with underscores
+            .trim();
+        return `${baseName}_${sanitizedNickname}`;
     }
 
-    return fullName;
+    return baseName;
 };
 
 const FighterCard = ({ fighter, isFavorite, toggleFavorite }) => {
