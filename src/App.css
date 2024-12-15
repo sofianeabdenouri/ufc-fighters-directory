@@ -1,6 +1,7 @@
 /* Wrapper for the whole app to center content */
 .app {
   display: flex;
+  background-color: #1d1d1d;
   flex-direction: column;
   align-items: center; /* Horizontally center */
   justify-content: flex-start; /* Start content at the top, not centered vertically */
