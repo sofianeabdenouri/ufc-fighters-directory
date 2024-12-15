@@ -9,7 +9,6 @@
   margin: 0 auto;
   width: 100%; /* Ensure full width */
   overflow-x: hidden; /* Prevent horizontal overflow */
-  box-sizing: border-box; /* Include padding and border in width calculations */
 }
 
 h1 {
