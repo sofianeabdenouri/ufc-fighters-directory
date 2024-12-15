@@ -3,24 +3,25 @@ import { useNavigate } from 'react-router-dom';
 
 // Utility function to sanitize names for image file paths
 const sanitizeNameForImage = (firstName = '', lastName = '', nickname = '', isDuplicate = false) => {
-    const baseName = [firstName, lastName]
-        .filter(Boolean)
-        .join(' ')
+    // Helper to clean and format parts of the name
+    const cleanString = (str) => str
         .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '') // Remove accents
+        .replace(/[̀-ͯ]/g, '') // Remove accents
         .replace(/[-']/g, '') // Remove hyphens and apostrophes
-        .replace(/[^a-zA-Z0-9]/g, '') // Remove non-alphanumeric characters
-        .replace(/\s+/g, '_') // Replace spaces with underscores
-        .trim();
+        .replace(/[^a-zA-Z0-9\s]/g, '') // Remove special characters
+        .trim()
+        .replace(/\s+/g, '_'); // Replace spaces with underscores
 
+    // Sanitize first and last name
+    const sanitizedFirst = cleanString(firstName);
+    const sanitizedLast = cleanString(lastName);
+
+    // Combine names
+    const baseName = [sanitizedFirst, sanitizedLast].filter(Boolean).join('_');
+
+    // Handle duplicates by appending nickname
     if (isDuplicate && nickname) {
-        const sanitizedNickname = nickname
-            .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '') // Remove accents
-            .replace(/[-']/g, '')
-            .replace(/[^a-zA-Z0-9]/g, '')
-            .replace(/\s+/g, '_')
-            .trim();
+        const sanitizedNickname = cleanString(nickname);
         return `${baseName}_${sanitizedNickname}`;
     }
 
