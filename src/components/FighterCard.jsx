@@ -6,26 +6,28 @@ const sanitizeNameForImage = (firstName = '', lastName = '', nickname = '', isDu
     // Capitalize each part of the name
     const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 
-    // Construct the full name
-    const fullName = [firstName, lastName]
-        .filter(Boolean)
-        .map(capitalize) // Apply capitalization
-        .join('_') // Join with an underscore
+    // Sanitize a string: remove accents and invalid characters, then handle special cases
+    const sanitize = (str) => str
         .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '') // Remove accents
-        .replace(/[^a-zA-Z0-9_]/g, '') // Remove invalid characters
+        .replace(/[̀-ͯ]/g, '') // Remove accents
+        .replace(/['-]/g, '') // Remove hyphens and apostrophes
+        .replace(/[^a-zA-Z0-9_ ]/g, '') // Remove invalid characters
         .trim();
 
-    // If duplicate, append sanitized nickname
+    // Construct the full name for composed names
+    const fullName = [
+        sanitize(firstName),
+        sanitize(lastName.replace(/ /g, '_')) // Replace spaces in composed last names with underscores
+    ]
+        .filter(Boolean) // Filter out empty strings
+        .map(capitalize) // Apply capitalization
+        .join('_'); // Join with an underscore
+
+    // Handle duplicates by appending sanitized nickname
     if (isDuplicate && nickname) {
-        const sanitizedNickname = nickname
-            .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '')
+        const sanitizedNickname = sanitize(nickname)
             .toLowerCase()
-            .replace(/['-]/g, '')
-            .replace(/[^a-z0-9]/g, '')
-            .replace(/\s+/g, '_')
-            .trim();
+            .replace(/\s+/g, '_'); // Replace spaces with underscores
         return `${fullName}_${sanitizedNickname}`;
     }
 
