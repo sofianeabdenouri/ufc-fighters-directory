@@ -6,18 +6,18 @@ const sanitizeNameForImage = (firstName = '', lastName = '', nickname = '', isDu
     // Helper to clean and format parts of the name
     const cleanString = (str) => str
         .normalize('NFD')
-        .replace(/[̀-ͯ]/g, '') // Remove accents
+        .replace(/[\u0300-\u036f]/g, '') // Remove accents
         .replace(/[-']/g, '') // Remove hyphens and apostrophes
         .replace(/\s+/g, '_') // Replace spaces with underscores
         .trim();
 
-    // Capitalize first and last name, removing special characters
+    // Capitalize first and last name
     const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 
     const sanitizedFirst = cleanString(capitalize(firstName));
     const sanitizedLast = cleanString(capitalize(lastName));
 
-    // Combine names, ensuring hyphens are handled
+    // Combine names, removing hyphens and accents
     const baseName = [sanitizedFirst, sanitizedLast].filter(Boolean).join('_');
 
     // Handle duplicates by appending nickname
