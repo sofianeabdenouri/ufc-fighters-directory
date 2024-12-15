@@ -323,7 +323,9 @@ label input[type="checkbox"] {
 }
 
 
-
+.result-count {
+  color: #8b0000  ;
+}
 
 
 
