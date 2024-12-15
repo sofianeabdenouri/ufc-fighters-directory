@@ -3,29 +3,33 @@ import { useNavigate } from 'react-router-dom';
 
 // Utility function to sanitize names for image file paths
 const sanitizeNameForImage = (firstName = '', lastName = '', nickname = '', isDuplicate = false) => {
-    // Helper to clean and format parts of the name
-    const cleanString = (str) => str
+    // Capitalize each part of the name
+    const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+
+    // Construct the full name
+    const fullName = [firstName, lastName]
+        .filter(Boolean)
+        .map(capitalize) // Apply capitalization
+        .join('_') // Join with an underscore
         .normalize('NFD')
-        .replace(/[̀-ͯ]/g, '') // Remove accents
-        .replace(/[-']/g, '') // Remove hyphens and apostrophes
-        .replace(/[^a-zA-Z0-9\s]/g, '') // Remove special characters
-        .trim()
-        .replace(/\s+/g, '_'); // Replace spaces with underscores
+        .replace(/[\u0300-\u036f]/g, '') // Remove accents
+        .replace(/[^a-zA-Z0-9_]/g, '') // Remove invalid characters
+        .trim();
 
-    // Sanitize first and last name
-    const sanitizedFirst = cleanString(firstName);
-    const sanitizedLast = cleanString(lastName);
-
-    // Combine names
-    const baseName = [sanitizedFirst, sanitizedLast].filter(Boolean).join('_');
-
-    // Handle duplicates by appending nickname
+    // If duplicate, append sanitized nickname
     if (isDuplicate && nickname) {
-        const sanitizedNickname = cleanString(nickname);
-        return `${baseName}_${sanitizedNickname}`;
+        const sanitizedNickname = nickname
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .replace(/['-]/g, '')
+            .replace(/[^a-z0-9]/g, '')
+            .replace(/\s+/g, '_')
+            .trim();
+        return `${fullName}_${sanitizedNickname}`;
     }
 
-    return baseName;
+    return fullName;
 };
 
 const FighterCard = ({ fighter, isFavorite, toggleFavorite }) => {
