@@ -52,6 +52,7 @@ input {
   max-width: 1700px; /* 5 * 330px + 4 * 10px (gaps) = 1700px */
   margin: 0 auto; /* Centers .fighter-list within the page */
   padding: 0;
+  color: white;
   box-sizing: border-box;
 }
 
@@ -320,9 +321,13 @@ label input[type="checkbox"] {
   text-align: right;
 }
 
-
 .result-count {
-  color: #8b0000  ;
+  color: #8b0000; /* Main text color (deep red) */
+  text-shadow: 
+    1px 1px 0px #000, /* Black shadow to mimic bold depth */
+    2px 2px 2px rgba(0, 0, 0, 0.8); /* Subtle black blur for extra pop */
+  font-weight: bold; /* Bold text */
+  font-size: 1rem; /* Slightly larger font size for impact */
 }
 
 

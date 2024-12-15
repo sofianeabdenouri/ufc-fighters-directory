@@ -24,7 +24,7 @@ const Header: React.FC<HeaderProps> = ({ scrollToFighters, conditionalRender = t
             <div className={classes.Content}>
                 <div className={classes.SubContent}>
                     <h1>Welcome to the Ultimate Fighting Championship</h1>
-                    <p>A World Where Martial Arts Legends Are Born</p>
+                    <p>The World of New Age Gladiators</p>
                     <button type="button" className="btn btn-outline-dark" onClick={scrollToFighters}>
                         View UFC fighters
                     </button>
