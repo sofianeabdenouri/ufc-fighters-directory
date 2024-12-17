@@ -9,31 +9,26 @@ import './App.css';
 const sanitizeNameForImage = (firstName = '', lastName = '', nickname = '', isDuplicate = false) => {
     const fullName = [firstName, lastName]
         .filter(Boolean)
-        .join(' ')
+        .join('_') // Use underscores directly to match filename format
         .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .toLowerCase()
-        .replace(/['-]/g, '')
-        .replace(/[^a-z0-9\s]/g, '')
-        .replace(/\s+/g, '_')
+        .replace(/[\u0300-\u036f]/g, '') // Remove accents
+        .replace(/['-]/g, '')           // Remove certain symbols
+        .replace(/[^a-zA-Z0-9_]/g, '')  // Allow letters, numbers, and underscores
         .trim();
 
     if (isDuplicate && nickname) {
         const sanitizedNickname = nickname
             .normalize('NFD')
             .replace(/[\u0300-\u036f]/g, '')
-            .toLowerCase()
             .replace(/['-]/g, '')
-            .replace(/[^a-z0-9\s]/g, '')
+            .replace(/[^a-zA-Z0-9\s]/g, '')
             .replace(/\s+/g, '_')
             .trim();
-            return `${fullName}_${sanitizedNickname}`;
-        }
+        return `${fullName}_${sanitizedNickname}`;
+    }
 
     return fullName;
 };
-
-
 
 
 // Utility function to remove accents from strings
