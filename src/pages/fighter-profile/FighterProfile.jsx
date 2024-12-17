@@ -14,35 +14,23 @@ const FighterProfile = ({ favorites, toggleFavorite }) => {
 
     // Fetch fighter data if it's not available in the state
     useEffect(() => {
-        if (!fighter) {
-            console.log('Fetching fighter data for Fighter ID:', id); // Log the Fighter ID
-            setLoading(true);
-            // Fix API URL with proper handling of trailing slash
-            const apiUrl = `${import.meta.env.VITE_API_URL.trim().replace(/\/+$/, '')}/fighters`;
-            fetch(apiUrl)            
-            .then((response) => {
-                    if (!response.ok) {
-                        throw new Error('Failed to fetch fighter data');
-                    }
-                    return response.json();
-                })
-                .then((data) => {
-                    console.log('Fetched Fighter Data:', data); // Log the full fighter data response
-                    if (data && data.FighterId) {
-                        setFighter(data);
-                    } else {
-                        throw new Error('Fighter not found');
-                    }
-                })
-                .catch((err) => {
-                    console.error('Error fetching fighter data:', err); // Log the error
-                    setError(err.message || 'An error occurred while fetching fighter data');
-                })
-                .finally(() => {
-                    setLoading(false);
-                });
-        }
-    }, [id, fighter]);
+        const fetchFighter = async () => {
+            try {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/fighters/${id}`);
+                if (!response.ok) {
+                    throw new Error(`Fighter not found for ID: ${id}`);
+                }
+                const data = await response.json();
+                setFighter(data);
+            } catch (err) {
+                setError(err.message);
+                navigate('/'); // Redirect back to home on error
+            }
+        };
+    
+        fetchFighter();
+    }, [id, navigate]);
+    
 
     if (loading) {
         return <div className="fighter-profile-container">Loading...</div>;
