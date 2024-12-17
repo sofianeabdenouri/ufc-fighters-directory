@@ -18,7 +18,7 @@ const FighterProfile = ({ favorites, toggleFavorite }) => {
             console.log('Fetching fighter data for Fighter ID:', id); // Log the Fighter ID
             setLoading(true);
             // Fix API URL with proper handling of trailing slash
-            const apiUrl = `${import.meta.env.VITE_API_URL.trim().replace(/\/+$/, '')}/fighters/${id}`;
+            const apiUrl = `${import.meta.env.VITE_API_URL.replace(/\/+$/, '')}/fighters/${id}`;
             fetch(apiUrl)            
             .then((response) => {
                     if (!response.ok) {
