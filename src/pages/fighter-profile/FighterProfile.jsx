@@ -14,35 +14,28 @@ const FighterProfile = ({ favorites, toggleFavorite }) => {
 
     // Fetch fighter data if it's not available in the state
     useEffect(() => {
-        if (!fighter) {
-            console.log('Fetching fighter data for Fighter ID:', id); // Log the Fighter ID
+        if (!fighter) { // Only fetch if state does not have fighter data
+            console.log('Fetching fighter data for Fighter ID:', id);
             setLoading(true);
-            // Fix API URL with proper handling of trailing slash
             const apiUrl = `${import.meta.env.VITE_API_URL.replace(/\/+$/, '')}/fighters/${id}`;
-            fetch(apiUrl)            
-            .then((response) => {
-                    if (!response.ok) {
-                        throw new Error('Failed to fetch fighter data');
-                    }
+            
+            fetch(apiUrl)
+                .then((response) => {
+                    if (!response.ok) throw new Error('Failed to fetch fighter data');
                     return response.json();
                 })
                 .then((data) => {
-                    console.log('Fetched Fighter Data:', data); // Log the full fighter data response
-                    if (data && data.FighterId) {
-                        setFighter(data);
-                    } else {
-                        throw new Error('Fighter not found');
-                    }
+                    console.log('Fetched Fighter Data:', data);
+                    setFighter(data);
                 })
                 .catch((err) => {
-                    console.error('Error fetching fighter data:', err); // Log the error
-                    setError(err.message || 'An error occurred while fetching fighter data');
+                    console.error('Error fetching fighter data:', err);
+                    setError('Fighter not found');
                 })
-                .finally(() => {
-                    setLoading(false);
-                });
+                .finally(() => setLoading(false));
         }
     }, [id, fighter]);
+    
 
     if (loading) {
         return <div className="fighter-profile-container">Loading...</div>;
@@ -115,7 +108,7 @@ const FighterProfile = ({ favorites, toggleFavorite }) => {
         return `${sanitizeNameForImage(fighter.FirstName, fighter.LastName, fighter.Nickname, fighter.isDuplicate)}.png`;
     };
     
-    const imageUrl = `/assets/images/${getImageName()}`;
+    const imageUrl = `/assets/images/${sanitizeNameForImage(FirstName, LastName, Nickname, isDuplicate)}.png`;
     
     const calculateAge = (birthDate) => {
         if (!birthDate) return 'N/A';

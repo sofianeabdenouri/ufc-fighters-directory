@@ -67,7 +67,7 @@ const FighterCard = ({ fighter, isFavorite, toggleFavorite }) => {
         sessionStorage.setItem('scrollPosition', window.scrollY);
 
         // Navigate to FighterProfile
-        navigate(`/fighter/${FighterId}`);
+        navigate(`/fighter/${FighterId}`, { state: { fighter } });
     };
 
     return (
