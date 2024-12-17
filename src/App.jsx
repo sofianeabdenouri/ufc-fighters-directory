@@ -487,7 +487,7 @@ useEffect(() => {
     </button>
 
     <button onClick={toggleAdvancedSearch} style={{ marginLeft: '10px' }}>
-        {showAdvancedSearch ? 'Hide Advanced Search' : 'Advanced Search'}
+        {showAdvancedSearch ? 'Hide Advanced Filters' : 'Advanced Filters'}
     </button>
 </div>
 
