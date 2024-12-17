@@ -9,19 +9,25 @@ import './App.css';
 const sanitizeNameForImage = (firstName = '', lastName = '', nickname = '', isDuplicate = false) => {
     const fullName = [firstName, lastName]
         .filter(Boolean)
-        .join('_') // Use underscores directly to match filename format
+        .join('_') // Join with underscores for composed names
         .normalize('NFD')
         .replace(/[\u0300-\u036f]/g, '') // Remove accents
-        .replace(/['-]/g, '')           // Remove certain symbols
-        .replace(/[^a-zA-Z0-9_]/g, '')  // Allow letters, numbers, and underscores
+        .replace(/['-]/g, '')           // Remove quotes and dashes
+        .replace(/[^a-zA-Z0-9_]/g, '')  // Allow only letters, numbers, and underscores
         .trim();
+
+    // Handle exceptions for composed names manually
+    if (lastName.includes(' ')) {
+        const adjustedLastName = lastName.replace(/\s+/g, '_');
+        return `${firstName}_${adjustedLastName}`;
+    }
 
     if (isDuplicate && nickname) {
         const sanitizedNickname = nickname
             .normalize('NFD')
             .replace(/[\u0300-\u036f]/g, '')
             .replace(/['-]/g, '')
-            .replace(/[^a-zA-Z0-9\s]/g, '')
+            .replace(/[^a-zA-Z0-9]/g, '')
             .replace(/\s+/g, '_')
             .trim();
         return `${fullName}_${sanitizedNickname}`;
@@ -29,7 +35,6 @@ const sanitizeNameForImage = (firstName = '', lastName = '', nickname = '', isDu
 
     return fullName;
 };
-
 
 // Utility function to remove accents from strings
 const removeAccents = (str) => {
