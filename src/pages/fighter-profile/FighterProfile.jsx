@@ -108,8 +108,9 @@ const FighterProfile = ({ favorites, toggleFavorite }) => {
         return `${sanitizeNameForImage(fighter.FirstName, fighter.LastName, fighter.Nickname, fighter.isDuplicate)}.png`;
     };
     
+    const isDuplicate = fighter?.isDuplicate || false; // Default to false if not provided
     const imageUrl = `/assets/images/${sanitizeNameForImage(FirstName, LastName, Nickname, isDuplicate)}.png`;
-    
+        
     const calculateAge = (birthDate) => {
         if (!birthDate) return 'N/A';
         const today = new Date();
