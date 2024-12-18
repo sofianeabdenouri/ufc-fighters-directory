@@ -14,11 +14,10 @@ const FighterProfile = ({ favorites, toggleFavorite }) => {
 
     // Fetch fighter data if it's not available in the state
     useEffect(() => {
-        if (!fighter) { // Only fetch if state does not have fighter data
+        if (!fighter) {
             console.log('Fetching fighter data for Fighter ID:', id);
             setLoading(true);
             const apiUrl = `${import.meta.env.VITE_API_URL.replace(/\/+$/, '')}/fighters/${id}`;
-            
             fetch(apiUrl)
                 .then((response) => {
                     if (!response.ok) throw new Error('Failed to fetch fighter data');
@@ -35,11 +34,8 @@ const FighterProfile = ({ favorites, toggleFavorite }) => {
                 .finally(() => setLoading(false));
         }
     }, [id, fighter]);
-    
 
-    if (loading) {
-        return <div className="fighter-profile-container">Loading...</div>;
-    }
+    if (loading) return <div className="fighter-profile-container">Loading...</div>;
 
     if (error) {
         return (
@@ -70,47 +66,40 @@ const FighterProfile = ({ favorites, toggleFavorite }) => {
         BirthDate,
     } = fighter;
 
+    // Function to sanitize and format names to match image filenames
     const sanitizeNameForImage = (firstName = '', lastName = '', nickname = '', isDuplicate = false) => {
-        const baseName = [firstName, lastName]
-            .filter(Boolean)
-            .join(' ')
+        const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+
+        const cleanedFirst = firstName
             .normalize('NFD')
             .replace(/[\u0300-\u036f]/g, '')
-            .toLowerCase()
-            .replace(/['-]/g, '')
-            .replace(/[^a-z0-9\s]/g, '')
-            .replace(/\s+/g, '_')
+            .replace(/[^a-zA-Z0-9]/g, '')
             .trim();
-    
+
+        const cleanedLast = lastName
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/[^a-zA-Z0-9]/g, '')
+            .trim();
+
+        const baseName = [capitalize(cleanedFirst), capitalize(cleanedLast)].filter(Boolean).join('_');
+
         if (isDuplicate && nickname) {
-            const sanitizedNickname = nickname
+            const cleanedNickname = nickname
                 .normalize('NFD')
                 .replace(/[\u0300-\u036f]/g, '')
-                .toLowerCase()
-                .replace(/['-]/g, '')
-                .replace(/[^a-z0-9\s]/g, '')
-                .replace(/\s+/g, '_')
+                .replace(/[^a-zA-Z0-9]/g, '')
                 .trim();
-            return `${baseName}_${sanitizedNickname}`;
+            return `${baseName}_${cleanedNickname.toLowerCase()}`;
         }
-    
+
         return baseName;
     };
-    
 
-    const imageName = sanitizeNameForImage(FirstName, LastName);
-    const getImageName = () => {
-        if (!fighter.FirstName && !fighter.LastName) {
-            // Default images for unknown fighters
-            const isFemale = fighter.WeightClass?.startsWith("Women's");
-            return isFemale ? 'default_f.png' : 'default.png';
-        }
-        return `${sanitizeNameForImage(fighter.FirstName, fighter.LastName, fighter.Nickname, fighter.isDuplicate)}.png`;
-    };
-    
+    // Construct image path
     const isDuplicate = fighter?.isDuplicate || false; // Default to false if not provided
     const imageUrl = `/assets/images/${sanitizeNameForImage(FirstName, LastName, Nickname, isDuplicate)}.png`;
-        
+
     const calculateAge = (birthDate) => {
         if (!birthDate) return 'N/A';
         const today = new Date();
@@ -128,8 +117,8 @@ const FighterProfile = ({ favorites, toggleFavorite }) => {
     const formatHeight = (heightInInches) => {
         if (!heightInInches || heightInInches <= 0) return 'N/A';
         const feet = Math.floor(heightInInches / 12);
-        const inches = Math.round(heightInInches % 12); // Round inches
-        const cm = Math.round(heightInInches * 2.54); // Round cm
+        const inches = Math.round(heightInInches % 12);
+        const cm = Math.round(heightInInches * 2.54);
         return `${feet}′ ${inches}″ / ${cm}cm`;
     };
 
@@ -154,7 +143,7 @@ const FighterProfile = ({ favorites, toggleFavorite }) => {
                 <p><b>Age:</b> {calculateAge(BirthDate)}</p>
                 <p><b>Nickname:</b> {Nickname || 'N/A'}</p>
                 <p>
-                    <b>Sex:</b> 
+                    <b>Sex:</b>
                     <span>
                         {WeightClass?.includes("Women's") ? (
                             <>
@@ -177,37 +166,30 @@ const FighterProfile = ({ favorites, toggleFavorite }) => {
                 <p><b>Knockouts:</b> {TechnicalKnockouts || 0}</p>
                 <p><b>Submissions:</b> {Submissions || 0}</p>
 
-                <button
-                    className="fighter-profile-back-btn"
-                    onClick={() => {
-                        navigate('/'); // Navigate back
-                    }}
-                >
+                <button className="fighter-profile-back-btn" onClick={() => navigate('/')}>
                     Back to Directory
                 </button>
             </div>
 
             <div className="fighter-profile-image">
-            <img
-    src={imageUrl}
-    alt={`${fighter.FirstName || 'Unknown'} ${fighter.LastName || ''}`}
-    onError={(e) => {
-        e.target.src = fighter.WeightClass?.startsWith("Women's")
-            ? '/assets/images/default_f.png'
-            : '/assets/images/default.png';
-    }}
-/>
-
+                <img
+                    src={imageUrl}
+                    alt={`${FirstName || 'Unknown'} ${LastName || ''}`}
+                    onError={(e) => {
+                        e.target.src = WeightClass?.startsWith("Women's")
+                            ? '/assets/images/default_f.png'
+                            : '/assets/images/default.png';
+                    }}
+                />
             </div>
 
             <button onClick={() => toggleFavorite(fighter.FighterId)} className="profile-star-button">
-    <img
-        src={isFavorite ? '/assets/images/star.png' : '/assets/images/star_gray.png'}
-        alt={isFavorite ? 'Favorited' : 'Not Favorited'}
-        className="profile-star-icon"
-    />
-</button>
-
+                <img
+                    src={isFavorite ? '/assets/images/star.png' : '/assets/images/star_gray.png'}
+                    alt={isFavorite ? 'Favorited' : 'Not Favorited'}
+                    className="profile-star-icon"
+                />
+            </button>
         </div>
     );
 };
