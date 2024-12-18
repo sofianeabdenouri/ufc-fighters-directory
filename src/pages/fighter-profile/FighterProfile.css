@@ -151,3 +151,7 @@ html, body {
     color: black;
     scroll-behavior: smooth;
   }
+  #root, .app { /* Ensure React root and app container spans full height */
+    height: 100%;
+    background-color: #000;
+}
