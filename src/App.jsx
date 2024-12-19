@@ -257,7 +257,7 @@ useEffect(() => {
                             FirstName: fighter.FirstName || "",
                             LastName: fighter.LastName || "",
                             Nickname: fighter.Nickname || "",
-                            WeightClass: fighter.WeightClass || "N/A",
+                            WeightClass: fighter.WeightClass || "Unknown",
                             Wins: fighter.Wins ?? 0,
                             Losses: fighter.Losses ?? 0,
                             Draws: fighter.Draws ?? 0,

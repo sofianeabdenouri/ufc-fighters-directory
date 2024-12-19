@@ -54,7 +54,7 @@ const FighterProfile = ({ favorites, toggleFavorite }) => {
         FirstName = "",
         LastName = "",
         Nickname = "",
-        WeightClass = "N/A",
+        WeightClass = "Unknown",
         Wins = 0,
         Losses = 0,
         Draws = 0,
