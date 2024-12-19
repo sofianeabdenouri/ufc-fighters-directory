@@ -252,9 +252,9 @@ useEffect(() => {
             .then((data) => {
     const fightersWithDefaults = data.map(fighter => ({
         ...fighter,
-        FirstName: fighter.FirstName || "N/A",
-        LastName: fighter.LastName || "N/A",
-        Nickname: fighter.Nickname || "N/A",
+        FirstName: fighter.FirstName || "",
+        LastName: fighter.LastName || "",
+        Nickname: fighter.Nickname || "",
         WeightClass: fighter.WeightClass || "N/A",
         Wins: fighter.Wins ?? 0,
         Losses: fighter.Losses ?? 0,
