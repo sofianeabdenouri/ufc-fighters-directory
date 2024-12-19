@@ -250,47 +250,26 @@ useEffect(() => {
                 return response.json();
             })
             .then((data) => {
-                // Filter out fighters with no fights (Wins, Losses, or Draws must be > 0)
-                const fightersWithFights = data.filter((fighter) => {
-                    const totalFights = (fighter.Wins || 0) + (fighter.Losses || 0) + (fighter.Draws || 0);
-                    return totalFights > 0;
-                });
-    
-                // Group fighters by full name
-                const groupedFighters = fightersWithFights.reduce((acc, fighter) => {
-                    const fullName = `${fighter.FirstName} ${fighter.LastName}`.trim();
-                    if (!acc[fullName]) acc[fullName] = [];
-                    acc[fullName].push(fighter);
-                    return acc;
-                }, {});
-    
-                // Flatten groups while removing duplicates with identical records
-                const selectedFighters = Object.values(groupedFighters).flatMap((group) => {
-                    if (group.length === 1) return group; // No duplicates, keep the single fighter
-    
-                    // Deduplicate fighters with identical records
-                    const uniqueFighters = group.reduce((unique, currentFighter) => {
-                        const isDuplicate = unique.some((fighter) =>
-                            fighter.Wins === currentFighter.Wins &&
-                            fighter.Losses === currentFighter.Losses &&
-                            fighter.Draws === currentFighter.Draws &&
-                            fighter.Nickname === currentFighter.Nickname
-                        );
-                        if (!isDuplicate) unique.push(currentFighter);
-                        return unique;
-                    }, []);
-    
-                    // Mark duplicates
-                    return uniqueFighters.map((fighter) => ({
-                        ...fighter,
-                        isDuplicate: uniqueFighters.length > 1, // Mark as duplicate only if more than one remains
-                    }));
-                });
-    
-                // Update the state with filtered fighters
-                setFighters(selectedFighters);
-                setFilteredFighters(selectedFighters);
-            })
+    const fightersWithDefaults = data.map(fighter => ({
+        ...fighter,
+        FirstName: fighter.FirstName || "N/A",
+        LastName: fighter.LastName || "N/A",
+        Nickname: fighter.Nickname || "N/A",
+        WeightClass: fighter.WeightClass || "N/A",
+        Wins: fighter.Wins ?? 0,
+        Losses: fighter.Losses ?? 0,
+        Draws: fighter.Draws ?? 0,
+        TechnicalKnockouts: fighter.TechnicalKnockouts ?? 0,
+        Submissions: fighter.Submissions ?? 0,
+        Height: fighter.Height ?? "N/A",
+        Weight: fighter.Weight ?? "N/A",
+        Reach: fighter.Reach ?? "N/A",
+        BirthDate: fighter.BirthDate || "N/A",
+    }));
+
+    setFighters(fightersWithDefaults);
+    setFilteredFighters(fightersWithDefaults);
+})
             .catch((error) => console.error('Error fetching data:', error));
     }, []);
     

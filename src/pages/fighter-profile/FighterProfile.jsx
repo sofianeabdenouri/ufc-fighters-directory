@@ -51,20 +51,21 @@ const FighterProfile = ({ favorites, toggleFavorite }) => {
     }
 
     const {
-        FirstName,
-        LastName,
-        Nickname,
-        WeightClass,
-        Wins,
-        Losses,
-        Draws,
-        TechnicalKnockouts,
-        Submissions,
-        Height,
-        Weight,
-        Reach,
-        BirthDate,
+        FirstName = "N/A",
+        LastName = "N/A",
+        Nickname = "N/A",
+        WeightClass = "N/A",
+        Wins = 0,
+        Losses = 0,
+        Draws = 0,
+        TechnicalKnockouts = 0,
+        Submissions = 0,
+        Height = "N/A",
+        Weight = "N/A",
+        Reach = "N/A",
+        BirthDate = "N/A",
     } = fighter;
+    
 
     // Function to sanitize and format names to match image filenames
     const sanitizeNameForImage = (firstName = '', lastName = '', nickname = '', isDuplicate = false) => {
