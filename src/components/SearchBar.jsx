@@ -1,47 +1,50 @@
-import React, { useState, useEffect, useMemo, useDeferredValue } from 'react';
+import React, { useState, useMemo, useDeferredValue, useEffect } from 'react';
 import './SearchBar.css';
 
-const sanitizeName = (firstName = '', lastName = '') => {
-    const fullName = [firstName, lastName]
-        .filter(Boolean)               // Remove empty or undefined names
-        .join(' ')                     // Join with space if both names are present
-        .normalize('NFD')              // Normalize to decompose accented characters
+// Simple sanitization to remove accents and special characters
+const sanitizeName = (name = '') => {
+    return name
+        .normalize('NFD') // Decompose accented characters
         .replace(/[\u0300-\u036f]/g, '') // Remove accents
-        .toLowerCase()                 // Convert to lowercase
-        .replace(/['-]/g, '')          // Remove apostrophes and hyphens
-        .replace(/[^a-z0-9\s]/g, '')   // Remove non-alphanumeric characters
-        .replace(/\s+/g, '_')          // Replace spaces with underscores
-        .trim();                       // Remove leading/trailing spaces
-    
-    return fullName;
+        .replace(/['-]/g, '') // Remove apostrophes and hyphens
+        .replace(/[^a-zA-Z0-9\s]/g, '') // Remove non-alphanumeric characters
+        .toLowerCase() // Convert to lowercase
+        .trim(); // Remove leading/trailing spaces
 };
-
 
 function SearchBar({ fighters, setFilteredFighters }) {
     const [searchTerm, setSearchTerm] = useState('');
-    const deferredSearchTerm = useDeferredValue(searchTerm); // Defer the search term
+    const deferredSearchTerm = useDeferredValue(searchTerm); // Defer the search term for smoother UX
     const [scrolled, setScrolled] = useState(false);
 
-    const filteredResults = useMemo(() => {
-        const sanitizedTerm = sanitizeName(deferredSearchTerm);
-        if (sanitizedTerm === '') return fighters;
-        return fighters.filter(fighter => {
-            const fullName = sanitizeName(fighter.FirstName, fighter.LastName);
-            return fullName.includes(sanitizedTerm);
-        });
-    }, [deferredSearchTerm, fighters]);
-    
-    useEffect(() => {
-        setFilteredFighters(filteredResults);
-    }, [filteredResults, setFilteredFighters]);
-
+    // Handle scroll to apply styles or animations when scrolling
     useEffect(() => {
         const handleScroll = () => {
             setScrolled(window.scrollY > 100);
         };
+
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
+
+    // Updated filtering logic for progressive search
+    const filteredResults = useMemo(() => {
+        const sanitizedTerm = sanitizeName(deferredSearchTerm);
+        if (sanitizedTerm === '') return fighters;
+
+        return fighters.filter((fighter) => {
+            const firstName = (fighter.FirstName || "").toLowerCase();
+            const lastName = (fighter.LastName || "").toLowerCase();
+
+            // Match if the search term appears anywhere in the first or last name
+            return firstName.includes(sanitizedTerm) || lastName.includes(sanitizedTerm);
+        });
+    }, [deferredSearchTerm, fighters]);
+
+    // Update filteredFighters when the filtered results change
+    useEffect(() => {
+        setFilteredFighters(filteredResults);
+    }, [filteredResults, setFilteredFighters]);
 
     return (
         <div className={`search-container ${scrolled ? 'scrolled' : ''}`}>
