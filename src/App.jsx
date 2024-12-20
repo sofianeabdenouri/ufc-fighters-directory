@@ -358,17 +358,17 @@ useEffect(() => {
     
         if (normalizedSearchTerm) {
             results = fighters.filter((fighter) => {
-                const sanitizedFirstName = sanitizeNameForImage(fighter.FirstName || '');
-                const sanitizedLastName = sanitizeNameForImage(fighter.LastName || '');
-                const sanitizedNickname = sanitizeNameForImage(fighter.Nickname || '');
+                const firstName = fighter.FirstName?.toLowerCase() || '';
+                const lastName = fighter.LastName?.toLowerCase() || '';
         
                 return (
-                    sanitizedFirstName.includes(normalizedSearchTerm) ||
-                    sanitizedLastName.includes(normalizedSearchTerm) ||
-                    sanitizedNickname.includes(normalizedSearchTerm)
+                    firstName.includes(normalizedSearchTerm) ||
+                    lastName.includes(normalizedSearchTerm)
                 );
             });
         }
+        
+        
         
         if (selectedWeightClasses.length > 0) {
             results = results.filter(fighter =>
