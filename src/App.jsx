@@ -360,13 +360,16 @@ useEffect(() => {
             results = fighters.filter((fighter) => {
                 const firstName = fighter.FirstName?.toLowerCase() || '';
                 const lastName = fighter.LastName?.toLowerCase() || '';
+                const fullName = `${firstName} ${lastName}`.trim(); // Combine for full name match
         
                 return (
                     firstName.includes(normalizedSearchTerm) ||
-                    lastName.includes(normalizedSearchTerm)
+                    lastName.includes(normalizedSearchTerm) ||
+                    fullName.includes(normalizedSearchTerm) // Match full name
                 );
             });
         }
+        
         
         
         
