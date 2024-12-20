@@ -358,14 +358,18 @@ useEffect(() => {
     
         if (normalizedSearchTerm) {
             results = fighters.filter((fighter) => {
-                const firstName = fighter.FirstName?.toLowerCase() || '';
-                const lastName = fighter.LastName?.toLowerCase() || '';
-                const fullName = `${firstName} ${lastName}`.trim(); // Combine for full name match
+                const firstName = (fighter.FirstName || '').toLowerCase().trim();
+                const lastName = (fighter.LastName || '').toLowerCase().trim();
+                const fullName = `${firstName} ${lastName}`; // Combine for full name
+        
+                const normalizedFirstName = firstName.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+                const normalizedLastName = lastName.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+                const normalizedFullName = fullName.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
         
                 return (
-                    firstName.includes(normalizedSearchTerm) ||
-                    lastName.includes(normalizedSearchTerm) ||
-                    fullName.includes(normalizedSearchTerm) // Match full name
+                    normalizedFirstName.includes(normalizedSearchTerm) ||
+                    normalizedLastName.includes(normalizedSearchTerm) ||
+                    normalizedFullName.includes(normalizedSearchTerm) // Match full name
                 );
             });
         }
