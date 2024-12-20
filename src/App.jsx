@@ -356,20 +356,29 @@ useEffect(() => {
         let results = fighters;
         const normalizedSearchTerm = sanitizeNameForImage(searchTerm.trim());
     
-        if (normalizedSearchTerm) {
-            results = fighters.filter((fighter) => {
-                const firstName = (fighter.FirstName || '').toLowerCase().trim();
-                const lastName = (fighter.LastName || '').toLowerCase().trim();
-                const fullName = `${firstName} ${lastName}`; // Combine for full name
+        if (searchTerm.trim()) {
+            const normalizedSearchTerm = searchTerm
+                .toLowerCase() // Normalize to lowercase
+                .normalize('NFD') // Decompose accented characters
+                .replace(/[\u0300-\u036f]/g, ''); // Remove accents
         
-                const normalizedFirstName = firstName.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-                const normalizedLastName = lastName.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-                const normalizedFullName = fullName.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+            results = fighters.filter((fighter) => {
+                const firstName = (fighter.FirstName || '')
+                    .toLowerCase() // Normalize to lowercase
+                    .normalize('NFD')
+                    .replace(/[\u0300-\u036f]/g, '');
+        
+                const lastName = (fighter.LastName || '')
+                    .toLowerCase()
+                    .normalize('NFD')
+                    .replace(/[\u0300-\u036f]/g, '');
+        
+                const fullName = `${firstName} ${lastName}`; // Combine first and last names
         
                 return (
-                    normalizedFirstName.includes(normalizedSearchTerm) ||
-                    normalizedLastName.includes(normalizedSearchTerm) ||
-                    normalizedFullName.includes(normalizedSearchTerm) // Match full name
+                    firstName.includes(normalizedSearchTerm) ||
+                    lastName.includes(normalizedSearchTerm) ||
+                    fullName.includes(normalizedSearchTerm) // Match full name
                 );
             });
         }
