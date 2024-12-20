@@ -167,9 +167,13 @@ const FighterProfile = ({ favorites, toggleFavorite }) => {
                 <p><b>Knockouts:</b> {TechnicalKnockouts || 0}</p>
                 <p><b>Submissions:</b> {Submissions || 0}</p>
 
-                <button className="fighter-profile-back-btn" onClick={() => navigate('/')}>
+                <button className="fighter-profile-back-btn" onClick={() => { 
+                    sessionStorage.setItem('scrollPosition', window.scrollY);
+                navigate(-1);
+                    }}>
                     Back to Directory
                 </button>
+
             </div>
 
             <div className="fighter-profile-image">
