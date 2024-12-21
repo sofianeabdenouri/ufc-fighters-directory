@@ -1,35 +1,35 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-// Utility function to sanitize names for image file paths
+// Function to sanitize and format names to match image filenames
 const sanitizeNameForImage = (firstName = '', lastName = '', nickname = '', isDuplicate = false) => {
-    // Helper to clean and format parts of the name
-    const cleanString = (str) => str
+    const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+
+    const cleanedFirst = firstName
         .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '') // Remove accents
-        .replace(/[-']/g, '') // Remove hyphens and apostrophes
-        .replace(/ Jr/g, '_Jr') // Handle "Jr." suffix
-        .replace(/\s+/g, '_') // Replace spaces with underscores
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-zA-Z0-9]/g, '')
         .trim();
 
-    // Capitalize each part of the name
-    const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
+    const cleanedLast = lastName
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-zA-Z0-9]/g, '')
+        .trim();
 
-    const sanitizedFirst = cleanString(capitalize(firstName));
-    const sanitizedLast = cleanString(capitalize(lastName));
+    const baseName = [capitalize(cleanedFirst), capitalize(cleanedLast)].filter(Boolean).join('_');
 
-    // Combine names
-    const baseName = [sanitizedFirst, sanitizedLast].filter(Boolean).join('_');
-
-    // Handle duplicates by appending nickname
     if (isDuplicate && nickname) {
-        const sanitizedNickname = cleanString(nickname.toLowerCase());
-        return `${baseName}_${sanitizedNickname}`;
+        const cleanedNickname = nickname
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/[^a-zA-Z0-9]/g, '')
+            .trim();
+        return `${baseName}_${cleanedNickname.toLowerCase()}`;
     }
 
     return baseName;
 };
-
 
 const FighterCard = ({ fighter, isFavorite, toggleFavorite }) => {
     const {
