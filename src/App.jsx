@@ -166,48 +166,52 @@ const getPaginationNumbers = () => {
     }
     return pages;
 };
-const scrollPositionRef = useRef({});
-const location = useLocation();
 
-// Save scroll position when leaving the home page
 useEffect(() => {
-    const handleSavePosition = () => {
-        if (location.pathname === '/') {
-            scrollPositionRef.current = {
-                position: window.scrollY,
-                timestamp: Date.now()
-            };
+    const saveScrollPosition = () => {
+        if (location.pathname === "/") {
+            sessionStorage.setItem('scrollPosition', window.scrollY);
         }
     };
 
-    // Save position before user navigates away
-    window.addEventListener('scroll', handleSavePosition);
-    return () => window.removeEventListener('scroll', handleSavePosition);
+    const savedScrollPosition = sessionStorage.getItem('scrollPosition');
+    if (savedScrollPosition && location.pathname === "/") {
+        window.scrollTo(0, parseInt(savedScrollPosition, 10));
+    }
+
+    window.addEventListener("beforeunload", saveScrollPosition);
+
+    return () => {
+        saveScrollPosition();
+        window.removeEventListener("beforeunload", saveScrollPosition);
+    };
 }, [location]);
 
-// Restore scroll position when returning to home page
 useEffect(() => {
-    if (location.pathname === '/') {
-        const restorePosition = () => {
-            const savedPosition = scrollPositionRef.current;
-            if (savedPosition?.position && (Date.now() - savedPosition.timestamp) < 300000) { // 5 minute expiry
-                // Small delay to ensure content is rendered
-                setTimeout(() => {
-                    window.scrollTo({
-                        top: savedPosition.position,
-                        behavior: 'instant'
-                    });
-                }, 100);
-            }
-        };
+    // Save scroll position before navigating
+    const saveScrollPosition = () => {
+        sessionStorage.setItem('scrollPosition', window.scrollY);
+    };
 
-        // Try to restore immediately and after a delay
-        restorePosition();
-        // Backup restore in case content takes longer to load
-        const timeoutId = setTimeout(restorePosition, 500);
-        return () => clearTimeout(timeoutId);
-    }
-}, [location.pathname, filteredFighters]);
+    // Restore scroll position after navigating
+    const restoreScrollPosition = () => {
+        const savedPosition = sessionStorage.getItem('scrollPosition');
+        if (savedPosition) {
+            window.scrollTo(0, parseInt(savedPosition, 10));
+        }
+    };
+
+    // Add event listener for saving scroll position
+    window.addEventListener('beforeunload', saveScrollPosition);
+
+    // Restore scroll position on route change
+    restoreScrollPosition();
+
+    // Cleanup listener on component unmount
+    return () => {
+        window.removeEventListener('beforeunload', saveScrollPosition);
+    };
+}, [location]);
 
     
 // Dynamically set fighters per page to 5 fighters per row and 3 rows
