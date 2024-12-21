@@ -7,32 +7,25 @@ import Header from './header/Header';
 import './App.css';
 
 const sanitizeNameForImage = (firstName = '', lastName = '', nickname = '', isDuplicate = false) => {
-    const formatNamePart = (str) =>
+    const normalizeString = (str) =>
         str
-            .normalize('NFD') // Normalize Unicode characters
-            .replace(/[\u0300-\u036f]/g, '') // Remove accents
+            .toLowerCase()
+            .normalize('NFD') // Remove accents
+            .replace(/[\u0300-\u036f]/g, '') // Strip diacritics
             .replace(/['-]/g, '') // Remove apostrophes and hyphens
             .replace(/\s+/g, '_') // Replace spaces with underscores
             .trim();
 
-    // Combine the first and last name into the full name
-    let fullName = [firstName, lastName]
-        .filter(Boolean)
-        .map(formatNamePart)
-        .join('_');
+    // Combine first and last names
+    const fullName = `${normalizeString(firstName)}_${normalizeString(lastName)}`.trim();
 
-    // Adjust capitalization inconsistencies to match inconsistent filenames
-    fullName = fullName.split('_')
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize first letter of each part
-        .join('_');
-
-    // Handle duplicates with nicknames appended
+    // Append nickname if duplicate
     if (isDuplicate && nickname) {
-        const sanitizedNickname = formatNamePart(nickname);
-        fullName = `${fullName}_${sanitizedNickname}`;
+        const sanitizedNickname = normalizeString(nickname);
+        return `${fullName}_${sanitizedNickname}.png`;
     }
 
-    return fullName;
+    return `${fullName}.png`;
 };
 
 
