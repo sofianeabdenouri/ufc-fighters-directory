@@ -6,29 +6,44 @@ import FighterProfile from './pages/fighter-profile/FighterProfile';
 import Header from './header/Header';
 import './App.css';
 
-const sanitizeNameForImage = (firstName = '', lastName = '', nickname = '', isDuplicate = false) => {
-    const normalizeString = (str) =>
-        str
-            .toLowerCase()
-            .normalize('NFD') // Remove accents
-            .replace(/[\u0300-\u036f]/g, '') // Strip diacritics
-            .replace(/['-]/g, '') // Remove apostrophes and hyphens
-            .replace(/\s+/g, '_') // Replace spaces with underscores
-            .trim();
-
-    // Combine first and last names
-    const fullName = `${normalizeString(firstName)}_${normalizeString(lastName)}`.trim();
-
-    // Append nickname if duplicate
-    if (isDuplicate && nickname) {
-        const sanitizedNickname = normalizeString(nickname);
-        return `${fullName}_${sanitizedNickname}.png`;
-    }
-
-    return `${fullName}.png`;
+const normalizeString = (str) => {
+    return str
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '') // Remove diacritics
+        .replace(/['-]/g, '') // Remove apostrophes and hyphens
+        .trim();
 };
 
+const normalizeForComparison = (name) => {
+    // Remove file extension if present
+    const nameWithoutExtension = name.replace(/\.[^/.]+$/, '');
+    
+    // Replace both spaces and underscores with a common delimiter
+    return normalizeString(nameWithoutExtension)
+        .replace(/[\s_]+/g, ' ');
+};
 
+const matchNameToImage = (apiName, filename) => {
+    const normalizedApiName = normalizeForComparison(apiName);
+    const normalizedFilename = normalizeForComparison(filename);
+    
+    return normalizedApiName === normalizedFilename;
+};
+
+const sanitizeNameForImage = (firstName = '', lastName = '', nickname = '', isDuplicate = false) => {
+    const fullName = `${firstName} ${lastName}`.trim();
+    const normalizedName = normalizeForComparison(fullName)
+        .replace(/\s+/g, '_'); // Convert spaces to underscores for filename
+
+    if (isDuplicate && nickname) {
+        const sanitizedNickname = normalizeForComparison(nickname)
+            .replace(/\s+/g, '_');
+        return `${normalizedName}_${sanitizedNickname}.png`;
+    }
+
+    return `${normalizedName}.png`;
+};
 
 // Utility function to remove accents from strings
 const removeAccents = (str) => {
