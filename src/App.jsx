@@ -6,34 +6,40 @@ import FighterProfile from './pages/fighter-profile/FighterProfile';
 import Header from './header/Header';
 import './App.css';
 
-// Utility function to sanitize fighter names for use in image paths
 const sanitizeNameForImage = (firstName = '', lastName = '', nickname = '', isDuplicate = false) => {
-    const fullName = [firstName, lastName]
-        .filter(Boolean)
-        .join(' ')
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .toLowerCase()
-        .replace(/['-]/g, '')
-        .replace(/[^a-z0-9\s]/g, '')
-        .replace(/\s+/g, '_')
-        .trim();
-
-    if (isDuplicate && nickname) {
-        const sanitizedNickname = nickname
-            .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '')
-            .toLowerCase()
-            .replace(/['-]/g, '')
-            .replace(/[^a-z0-9\s]/g, '')
-            .replace(/\s+/g, '_')
+    const cleanString = (str) =>
+        str
+            .normalize('NFD') // Remove accents
+            .replace(/[\u0300-\u036f]/g, '') // Strip diacritics
+            .toLowerCase() // Convert to lowercase
+            .replace(/['-]/g, '') // Remove apostrophes and hyphens
+            .replace(/[^a-z0-9\s]/g, '') // Remove non-alphanumeric characters except spaces
+            .replace(/\s+/g, '_') // Replace spaces with underscores
             .trim();
-            return `${fullName}_${sanitizedNickname}`;
-        }
 
-    return fullName;
+    const capitalize = (str) =>
+        str
+            .split('_') // Split by underscores
+            .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize each word
+            .join('_'); // Join back with underscores
+
+    const sanitizedFirst = cleanString(firstName);
+    const sanitizedLast = cleanString(lastName);
+
+    // Combine first and last names
+    const baseName = [sanitizedFirst, sanitizedLast].filter(Boolean).join('_');
+
+    // Restore capitalization for the combined name
+    const capitalizedBaseName = capitalize(baseName);
+
+    // Handle duplicate names by appending sanitized nickname
+    if (isDuplicate && nickname) {
+        const sanitizedNickname = cleanString(nickname);
+        return `${capitalizedBaseName}_${capitalize(sanitizedNickname)}`;
+    }
+
+    return capitalizedBaseName;
 };
-
 
 
 
