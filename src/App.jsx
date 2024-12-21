@@ -20,12 +20,14 @@ const sanitizeNameForImage = (firstName = '', lastName = '', nickname = '', isDu
         .map(formatNamePart) // Sanitize each part of the name
         .join('_'); // Join with underscores
 
+    const consistentCaseFullName = fullName.charAt(0).toUpperCase() + fullName.slice(1); // Force capitalization on the first letter.
+
     if (isDuplicate && nickname) {
         const sanitizedNickname = formatNamePart(nickname);
-        return `${fullName}_${sanitizedNickname}`;
+        return `${consistentCaseFullName}_${sanitizedNickname}`;
     }
 
-    return fullName;
+    return consistentCaseFullName;
 };
 
 
