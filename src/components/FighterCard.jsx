@@ -8,16 +8,17 @@ const sanitizeNameForImage = (firstName = '', lastName = '', nickname = '', isDu
         .normalize('NFD')
         .replace(/[\u0300-\u036f]/g, '') // Remove accents
         .replace(/[-']/g, '') // Remove hyphens and apostrophes
+        .replace(/ Jr/g, '_Jr') // Handle "Jr." suffix
         .replace(/\s+/g, '_') // Replace spaces with underscores
         .trim();
 
-    // Capitalize first and last name
-    const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+    // Capitalize each part of the name
+    const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
 
     const sanitizedFirst = cleanString(capitalize(firstName));
     const sanitizedLast = cleanString(capitalize(lastName));
 
-    // Combine names, removing hyphens and accents
+    // Combine names
     const baseName = [sanitizedFirst, sanitizedLast].filter(Boolean).join('_');
 
     // Handle duplicates by appending nickname
@@ -28,6 +29,7 @@ const sanitizeNameForImage = (firstName = '', lastName = '', nickname = '', isDu
 
     return baseName;
 };
+
 
 const FighterCard = ({ fighter, isFavorite, toggleFavorite }) => {
     const {
