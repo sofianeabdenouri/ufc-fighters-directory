@@ -1,7 +1,49 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
+const normalizeString = (str) => {
+    return str
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '') // Remove diacritics
+        .replace(/['-]/g, '') // Remove apostrophes and hyphens
+        .trim();
+};
 
+const normalizeForComparison = (name) => {
+    // Remove file extension if present
+    const nameWithoutExtension = name.replace(/\.[^/.]+$/, '');
+    
+    // Replace both spaces and underscores with a common delimiter
+    return normalizeString(nameWithoutExtension)
+        .replace(/[\s_]+/g, ' ');
+};
+
+const matchNameToImage = (apiName, filename) => {
+    const normalizedApiName = normalizeForComparison(apiName);
+    const normalizedFilename = normalizeForComparison(filename);
+    
+    return normalizedApiName === normalizedFilename;
+};
+
+const sanitizeNameForImage = (firstName = '', lastName = '', nickname = '', isDuplicate = false) => {
+    const fullName = `${firstName} ${lastName}`.trim();
+    const normalizedName = normalizeForComparison(fullName)
+        .replace(/\s+/g, '_'); // Convert spaces to underscores for filename
+
+    if (isDuplicate && nickname) {
+        const sanitizedNickname = normalizeForComparison(nickname)
+            .replace(/\s+/g, '_');
+        return `${normalizedName}_${sanitizedNickname}.png`;
+    }
+
+    return `${normalizedName}.png`;
+};
+
+// Utility function to remove accents from strings
+const removeAccents = (str) => {
+    return str.normalize('NFD').replace(/[\u0300-\u036f]/g, ''); // Removes accents from characters
+};
 
 const FighterCard = ({ fighter, isFavorite, toggleFavorite }) => {
     const {
