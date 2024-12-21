@@ -166,31 +166,21 @@ const getPaginationNumbers = () => {
     }
     return pages;
 };
-
+const location = useLocation();
 
 useEffect(() => {
-    // Save scroll position before navigating
-    const saveScrollPosition = () => {
-        sessionStorage.setItem('scrollPosition', window.scrollY);
-    };
+    // Restore scroll position after navigating to a new route
+    const savedPosition = sessionStorage.getItem('scrollPosition');
+    if (savedPosition) {
+        window.scrollTo(0, parseInt(savedPosition, 10));
+    } else {
+        // Scroll to top if no saved position exists
+        window.scrollTo(0, 0);
+    }
 
-    // Restore scroll position after navigating
-    const restoreScrollPosition = () => {
-        const savedPosition = sessionStorage.getItem('scrollPosition');
-        if (savedPosition) {
-            window.scrollTo(0, parseInt(savedPosition, 10));
-        }
-    };
-
-    // Add event listener for saving scroll position
-    window.addEventListener('beforeunload', saveScrollPosition);
-
-    // Restore scroll position on route change
-    restoreScrollPosition();
-
-    // Cleanup listener on component unmount
+    // Save the current scroll position before navigating away
     return () => {
-        window.removeEventListener('beforeunload', saveScrollPosition);
+        sessionStorage.setItem('scrollPosition', window.scrollY);
     };
 }, [location]);
 
