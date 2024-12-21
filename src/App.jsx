@@ -9,25 +9,30 @@ import './App.css';
 const sanitizeNameForImage = (firstName = '', lastName = '', nickname = '', isDuplicate = false) => {
     const formatNamePart = (str) =>
         str
-            .normalize('NFD')
+            .normalize('NFD') // Normalize Unicode characters
             .replace(/[\u0300-\u036f]/g, '') // Remove accents
             .replace(/['-]/g, '') // Remove apostrophes and hyphens
             .replace(/\s+/g, '_') // Replace spaces with underscores
             .trim();
 
-    const fullName = [firstName, lastName]
+    // Combine the first and last name into the full name
+    let fullName = [firstName, lastName]
         .filter(Boolean)
-        .map(formatNamePart) // Sanitize each part of the name
-        .join('_'); // Join with underscores
+        .map(formatNamePart)
+        .join('_');
 
-    const consistentCaseFullName = fullName.charAt(0).toUpperCase() + fullName.slice(1); // Force capitalization on the first letter.
+    // Adjust capitalization inconsistencies to match inconsistent filenames
+    fullName = fullName.split('_')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize first letter of each part
+        .join('_');
 
+    // Handle duplicates with nicknames appended
     if (isDuplicate && nickname) {
         const sanitizedNickname = formatNamePart(nickname);
-        return `${consistentCaseFullName}_${sanitizedNickname}`;
+        fullName = `${fullName}_${sanitizedNickname}`;
     }
 
-    return consistentCaseFullName;
+    return fullName;
 };
 
 
