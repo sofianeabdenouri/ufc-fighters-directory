@@ -8,32 +8,32 @@ import './App.css';
 
 // Utility function to sanitize fighter names for use in image paths
 const sanitizeNameForImage = (firstName = '', lastName = '', nickname = '', isDuplicate = false) => {
-    // Helper to clean and format parts of the name
-    const cleanString = (str) => str
+    const fullName = [firstName, lastName]
+        .filter(Boolean)
+        .join(' ')
         .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '') // Remove accents
-        .replace(/[-']/g, '')           // Remove hyphens and apostrophes
-        .replace(/ Jr/g, '_Jr')         // Handle "Jr." suffix
-        .replace(/\s+/g, '_')           // Replace spaces with underscores
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .replace(/['-]/g, '')
+        .replace(/[^a-z0-9\s]/g, '')
+        .replace(/\s+/g, '_')
         .trim();
 
-    // Capitalize each part of the name
-    const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
-
-    const sanitizedFirst = cleanString(capitalize(firstName));
-    const sanitizedLast = cleanString(capitalize(lastName));
-
-    // Combine names
-    const baseName = [sanitizedFirst, sanitizedLast].filter(Boolean).join('_');
-
-    // Handle duplicates by appending nickname
     if (isDuplicate && nickname) {
-        const sanitizedNickname = cleanString(nickname.toLowerCase());
-        return `${baseName}_${sanitizedNickname}`;
-    }
+        const sanitizedNickname = nickname
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .replace(/['-]/g, '')
+            .replace(/[^a-z0-9\s]/g, '')
+            .replace(/\s+/g, '_')
+            .trim();
+            return `${fullName}_${sanitizedNickname}`;
+        }
 
-    return baseName;
+    return fullName;
 };
+
 
 
 
