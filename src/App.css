@@ -371,10 +371,11 @@ button:hover {
 }
 
 .visit-profile-btn:hover {
-  background-color: #000000; /* Darker background on hover */
-  color: white;
+  background-color: #333; /* Dark gray to show a clear change */
+  color: #f0f0f0; /* Slightly lighter text */
+  border: 2px solid #697ce7; /* Blue border on hover */
+  transform: scale(1.05); /* Adds a subtle zoom effect */
 }
-
 .advanced-search-button-container {
   display: flex;
   justify-content: center;
