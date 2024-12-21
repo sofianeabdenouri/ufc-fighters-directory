@@ -166,23 +166,48 @@ const getPaginationNumbers = () => {
     }
     return pages;
 };
+const scrollPositionRef = useRef({});
 const location = useLocation();
 
+// Save scroll position when leaving the home page
 useEffect(() => {
-    // Restore scroll position after navigating to a new route
-    const savedPosition = sessionStorage.getItem('scrollPosition');
-    if (savedPosition) {
-        window.scrollTo(0, parseInt(savedPosition, 10));
-    } else {
-        // Scroll to top if no saved position exists
-        window.scrollTo(0, 0);
-    }
-
-    // Save the current scroll position before navigating away
-    return () => {
-        sessionStorage.setItem('scrollPosition', window.scrollY);
+    const handleSavePosition = () => {
+        if (location.pathname === '/') {
+            scrollPositionRef.current = {
+                position: window.scrollY,
+                timestamp: Date.now()
+            };
+        }
     };
+
+    // Save position before user navigates away
+    window.addEventListener('scroll', handleSavePosition);
+    return () => window.removeEventListener('scroll', handleSavePosition);
 }, [location]);
+
+// Restore scroll position when returning to home page
+useEffect(() => {
+    if (location.pathname === '/') {
+        const restorePosition = () => {
+            const savedPosition = scrollPositionRef.current;
+            if (savedPosition?.position && (Date.now() - savedPosition.timestamp) < 300000) { // 5 minute expiry
+                // Small delay to ensure content is rendered
+                setTimeout(() => {
+                    window.scrollTo({
+                        top: savedPosition.position,
+                        behavior: 'instant'
+                    });
+                }, 100);
+            }
+        };
+
+        // Try to restore immediately and after a delay
+        restorePosition();
+        // Backup restore in case content takes longer to load
+        const timeoutId = setTimeout(restorePosition, 500);
+        return () => clearTimeout(timeoutId);
+    }
+}, [location.pathname, filteredFighters]);
 
     
 // Dynamically set fighters per page to 5 fighters per row and 3 rows
