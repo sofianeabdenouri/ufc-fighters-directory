@@ -7,38 +7,25 @@ import Header from './header/Header';
 import './App.css';
 
 const sanitizeNameForImage = (firstName = '', lastName = '', nickname = '', isDuplicate = false) => {
-    const cleanString = (str) =>
+    const formatNamePart = (str) =>
         str
-            .normalize('NFD') // Remove accents
-            .replace(/[\u0300-\u036f]/g, '') // Strip diacritics
-            .toLowerCase() // Convert to lowercase
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '') // Remove accents
             .replace(/['-]/g, '') // Remove apostrophes and hyphens
-            .replace(/[^a-z0-9\s]/g, '') // Remove non-alphanumeric characters except spaces
             .replace(/\s+/g, '_') // Replace spaces with underscores
             .trim();
 
-    const capitalize = (str) =>
-        str
-            .split('_') // Split by underscores
-            .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize each word
-            .join('_'); // Join back with underscores
+    const fullName = [firstName, lastName]
+        .filter(Boolean)
+        .map(formatNamePart) // Sanitize each part of the name
+        .join('_'); // Join with underscores
 
-    const sanitizedFirst = cleanString(firstName);
-    const sanitizedLast = cleanString(lastName);
-
-    // Combine first and last names
-    const baseName = [sanitizedFirst, sanitizedLast].filter(Boolean).join('_');
-
-    // Restore capitalization for the combined name
-    const capitalizedBaseName = capitalize(baseName);
-
-    // Handle duplicate names by appending sanitized nickname
     if (isDuplicate && nickname) {
-        const sanitizedNickname = cleanString(nickname);
-        return `${capitalizedBaseName}_${capitalize(sanitizedNickname)}`;
+        const sanitizedNickname = formatNamePart(nickname);
+        return `${fullName}_${sanitizedNickname}`;
     }
 
-    return capitalizedBaseName;
+    return fullName;
 };
 
 
