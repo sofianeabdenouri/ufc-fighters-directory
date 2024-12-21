@@ -1,34 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-// Utility function to sanitize names for image file paths
-const sanitizeNameForImage = (firstName = '', lastName = '', nickname = '', isDuplicate = false) => {
-    // Helper to clean and format parts of the name
-    const cleanString = (str) => str
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '') // Remove accents
-        .replace(/[-']/g, '') // Remove hyphens and apostrophes
-        .replace(/ Jr/g, '_Jr') // Handle "Jr." suffix
-        .replace(/\s+/g, '_') // Replace spaces with underscores
-        .trim();
-
-    // Capitalize each part of the name
-    const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
-
-    const sanitizedFirst = cleanString(capitalize(firstName));
-    const sanitizedLast = cleanString(capitalize(lastName));
-
-    // Combine names
-    const baseName = [sanitizedFirst, sanitizedLast].filter(Boolean).join('_');
-
-    // Handle duplicates by appending nickname
-    if (isDuplicate && nickname) {
-        const sanitizedNickname = cleanString(nickname.toLowerCase());
-        return `${baseName}_${sanitizedNickname}`;
-    }
-
-    return baseName;
-};
 
 
 const FighterCard = ({ fighter, isFavorite, toggleFavorite }) => {
