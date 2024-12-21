@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import FighterCard from './components/FighterCard';
 import FighterProfile from './pages/fighter-profile/FighterProfile';
 import Header from './header/Header';
@@ -166,27 +167,32 @@ const getPaginationNumbers = () => {
     return pages;
 };
 
+
 useEffect(() => {
+    // Save scroll position before navigating
     const saveScrollPosition = () => {
-        if (location.pathname === "/") {
-            sessionStorage.setItem('scrollPosition', window.scrollY);
+        sessionStorage.setItem('scrollPosition', window.scrollY);
+    };
+
+    // Restore scroll position after navigating
+    const restoreScrollPosition = () => {
+        const savedPosition = sessionStorage.getItem('scrollPosition');
+        if (savedPosition) {
+            window.scrollTo(0, parseInt(savedPosition, 10));
         }
     };
 
-    const savedScrollPosition = sessionStorage.getItem('scrollPosition');
-    if (savedScrollPosition && location.pathname === "/") {
-        window.scrollTo(0, parseInt(savedScrollPosition, 10));
-    }
+    // Add event listener for saving scroll position
+    window.addEventListener('beforeunload', saveScrollPosition);
 
-    window.addEventListener("beforeunload", saveScrollPosition);
+    // Restore scroll position on route change
+    restoreScrollPosition();
 
+    // Cleanup listener on component unmount
     return () => {
-        saveScrollPosition();
-        window.removeEventListener("beforeunload", saveScrollPosition);
+        window.removeEventListener('beforeunload', saveScrollPosition);
     };
 }, [location]);
-
-
 
     
 // Dynamically set fighters per page to 5 fighters per row and 3 rows
