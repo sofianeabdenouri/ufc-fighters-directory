@@ -74,15 +74,15 @@ const FighterProfile = ({ favorites, toggleFavorite }) => {
         const cleanedFirst = firstName
             .normalize('NFD')
             .replace(/[\u0300-\u036f]/g, '')
+            .replace(/['-]/g, '') // Remove apostrophes and hyphens
             .replace(/[^a-zA-Z0-9]/g, '')
-            .replace(/[-']/g, '') // Remove hyphens and apostrophes
             .trim();
 
         const cleanedLast = lastName
             .normalize('NFD')
             .replace(/[\u0300-\u036f]/g, '')
+            .replace(/['-]/g, '') // Remove apostrophes and hyphens
             .replace(/[^a-zA-Z0-9]/g, '')
-            .replace(/[-']/g, '') // Remove hyphens and apostrophes
             .trim();
 
         const baseName = [capitalize(cleanedFirst), capitalize(cleanedLast)].filter(Boolean).join('_');
@@ -91,6 +91,7 @@ const FighterProfile = ({ favorites, toggleFavorite }) => {
             const cleanedNickname = nickname
                 .normalize('NFD')
                 .replace(/[\u0300-\u036f]/g, '')
+                .replace(/['-]/g, '') // Remove apostrophes and hyphens
                 .replace(/[^a-zA-Z0-9]/g, '')
                 .trim();
             return `${baseName}_${cleanedNickname.toLowerCase()}`;
