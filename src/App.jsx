@@ -6,44 +6,36 @@ import FighterProfile from './pages/fighter-profile/FighterProfile';
 import Header from './header/Header';
 import './App.css';
 
-const normalizeString = (str) => {
-    return str
-        .toLowerCase()
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '') // Remove diacritics
-        .replace(/['-]/g, '') // Remove apostrophes and hyphens
-        .trim();
-};
-
-const normalizeForComparison = (name) => {
-    // Remove file extension if present
-    const nameWithoutExtension = name.replace(/\.[^/.]+$/, '');
-    
-    // Replace both spaces and underscores with a common delimiter
-    return normalizeString(nameWithoutExtension)
-        .replace(/[\s_]+/g, ' ');
-};
-
-const matchNameToImage = (apiName, filename) => {
-    const normalizedApiName = normalizeForComparison(apiName);
-    const normalizedFilename = normalizeForComparison(filename);
-    
-    return normalizedApiName === normalizedFilename;
-};
-
+// Utility function to sanitize fighter names for use in image paths
 const sanitizeNameForImage = (firstName = '', lastName = '', nickname = '', isDuplicate = false) => {
-    const fullName = `${firstName} ${lastName}`.trim();
-    const normalizedName = normalizeForComparison(fullName)
-        .replace(/\s+/g, '_'); // Convert spaces to underscores for filename
+    const fullName = [firstName, lastName]
+        .filter(Boolean)
+        .join(' ')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .replace(/['-]/g, '')
+        .replace(/[^a-z0-9\s]/g, '')
+        .replace(/\s+/g, '_')
+        .trim();
 
     if (isDuplicate && nickname) {
-        const sanitizedNickname = normalizeForComparison(nickname)
-            .replace(/\s+/g, '_');
-        return `${normalizedName}_${sanitizedNickname}.png`;
-    }
+        const sanitizedNickname = nickname
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .replace(/['-]/g, '')
+            .replace(/[^a-z0-9\s]/g, '')
+            .replace(/\s+/g, '_')
+            .trim();
+            return `${fullName}_${sanitizedNickname}`;
+        }
 
-    return `${normalizedName}.png`;
+    return fullName;
 };
+
+
+
 
 // Utility function to remove accents from strings
 const removeAccents = (str) => {
