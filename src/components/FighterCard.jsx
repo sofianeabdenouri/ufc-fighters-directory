@@ -3,34 +3,42 @@ import { useNavigate } from 'react-router-dom';
 
 // Function to sanitize and format names to match image filenames
 const sanitizeNameForImage = (firstName = '', lastName = '', nickname = '', isDuplicate = false) => {
-    const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-
-    const cleanedFirst = firstName
+    const baseName = [firstName, lastName]
+        .filter(Boolean)
+        .join(' ')
         .normalize('NFD')
         .replace(/[\u0300-\u036f]/g, '')
-        .replace(/[^a-zA-Z0-9]/g, '')
+        .toLowerCase()
+        .replace(/['-]/g, '')
+        .replace(/[^a-z0-9\s]/g, '')
+        .replace(/\s+/g, '_')
         .trim();
-
-    const cleanedLast = lastName
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .replace(/[^a-zA-Z0-9]/g, '')
-        .trim();
-
-    const baseName = [capitalize(cleanedFirst), capitalize(cleanedLast)].filter(Boolean).join('_');
 
     if (isDuplicate && nickname) {
-        const cleanedNickname = nickname
+        const sanitizedNickname = nickname
             .normalize('NFD')
             .replace(/[\u0300-\u036f]/g, '')
-            .replace(/[^a-zA-Z0-9]/g, '')
+            .toLowerCase()
+            .replace(/['-]/g, '')
+            .replace(/[^a-z0-9\s]/g, '')
+            .replace(/\s+/g, '_')
             .trim();
-        return `${baseName}_${cleanedNickname.toLowerCase()}`;
+        return `${baseName}_${sanitizedNickname}`;
     }
 
     return baseName;
 };
 
+
+const imageName = sanitizeNameForImage(FirstName, LastName);
+const getImageName = () => {
+    if (!fighter.FirstName && !fighter.LastName) {
+        // Default images for unknown fighters
+        const isFemale = fighter.WeightClass?.startsWith("Women's");
+        return isFemale ? 'default_f.png' : 'default.png';
+    }
+    return `${sanitizeNameForImage(fighter.FirstName, fighter.LastName, fighter.Nickname, fighter.isDuplicate)}.png`;
+};
 const FighterCard = ({ fighter, isFavorite, toggleFavorite }) => {
     const {
         FighterId,
@@ -50,16 +58,6 @@ const FighterCard = ({ fighter, isFavorite, toggleFavorite }) => {
     } = fighter;
 
     const navigate = useNavigate();
-
-    // Construct the image path based on sanitized names
-    const getImageName = () => {
-        if (!FirstName && !LastName) {
-            // Default images for unknown fighters
-            const isFemale = WeightClass?.startsWith("Women's");
-            return isFemale ? 'default_f.png' : 'default.png';
-        }
-        return `${sanitizeNameForImage(FirstName, LastName, Nickname, isDuplicate)}.png`;
-    };
 
     // Correct image path to align with Vercel's file serving structure
     const imageUrl = `/assets/images/${getImageName()}`;
