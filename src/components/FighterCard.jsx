@@ -1,6 +1,33 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
+const FighterCard = ({ fighter, isFavorite, toggleFavorite }) => {
+    const {
+        FighterId,
+        FirstName,
+        LastName,
+        Nickname,
+        WeightClass,
+        Wins,
+        Losses,
+        Draws,
+        TechnicalKnockouts,
+        TechnicalKnockoutLosses,
+        Submissions,
+        SubmissionLosses,
+        NoContests,
+        isDuplicate, // Passed as part of the fighter object
+    } = fighter;
+
+    const navigate = useNavigate();
+
+    // Correct image path to align with Vercel's file serving structure
+    const imageUrl = `/assets/images/${getImageName()}`;
+
+    const handleNavigate = () => {
+        // Save the current scroll position
+        sessionStorage.setItem('scrollPosition', window.scrollY);
+
 // Function to sanitize and format names to match image filenames
 const sanitizeNameForImage = (firstName = '', lastName = '', nickname = '', isDuplicate = false) => {
     const baseName = [firstName, lastName]
@@ -39,32 +66,6 @@ const getImageName = () => {
     }
     return `${sanitizeNameForImage(fighter.FirstName, fighter.LastName, fighter.Nickname, fighter.isDuplicate)}.png`;
 };
-const FighterCard = ({ fighter, isFavorite, toggleFavorite }) => {
-    const {
-        FighterId,
-        FirstName,
-        LastName,
-        Nickname,
-        WeightClass,
-        Wins,
-        Losses,
-        Draws,
-        TechnicalKnockouts,
-        TechnicalKnockoutLosses,
-        Submissions,
-        SubmissionLosses,
-        NoContests,
-        isDuplicate, // Passed as part of the fighter object
-    } = fighter;
-
-    const navigate = useNavigate();
-
-    // Correct image path to align with Vercel's file serving structure
-    const imageUrl = `/assets/images/${getImageName()}`;
-
-    const handleNavigate = () => {
-        // Save the current scroll position
-        sessionStorage.setItem('scrollPosition', window.scrollY);
 
         // Navigate to FighterProfile
         navigate(`/fighter/${FighterId}`, { state: { fighter } });
