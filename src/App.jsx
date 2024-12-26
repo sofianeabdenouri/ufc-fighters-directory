@@ -193,31 +193,30 @@ useEffect(() => {
 }, [location]);
 
 useEffect(() => {
-    // Save scroll position before navigating
+    // Restore scroll position after navigation
+    const restoreScrollPosition = () => {
+        const savedScrollPosition = sessionStorage.getItem('scrollPosition');
+        if (savedScrollPosition) {
+            window.scrollTo(0, parseInt(savedScrollPosition, 10));
+        }
+    };
+
+    // Save scroll position before navigating away
     const saveScrollPosition = () => {
         sessionStorage.setItem('scrollPosition', window.scrollY);
     };
 
-    // Restore scroll position after navigating
-    const restoreScrollPosition = () => {
-        const savedPosition = sessionStorage.getItem('scrollPosition');
-        if (savedPosition) {
-            window.scrollTo(0, parseInt(savedPosition, 10));
-        }
-    };
-
-    // Add event listener for saving scroll position
-    window.addEventListener('beforeunload', saveScrollPosition);
-
-    // Restore scroll position on route change
+    // Restore position on location change
     restoreScrollPosition();
 
-    // Cleanup listener on component unmount
+    // Save position when leaving
+    window.addEventListener('beforeunload', saveScrollPosition);
+
     return () => {
+        saveScrollPosition(); // Ensure position is saved on component unmount
         window.removeEventListener('beforeunload', saveScrollPosition);
     };
 }, [location]);
-
     
 // Dynamically set fighters per page to 5 fighters per row and 3 rows
 useEffect(() => {
