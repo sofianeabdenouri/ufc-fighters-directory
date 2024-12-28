@@ -7,6 +7,7 @@
   justify-content: flex-start; /* Start content at the top, not centered vertically */
   min-height: 100vh; /* Full page height */
   width: 100%; /* Ensure full width */
+  overflow-y: auto;
   overflow-x: hidden; /* Prevent horizontal overflow */
 }
 html, body {
