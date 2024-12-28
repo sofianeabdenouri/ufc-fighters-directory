@@ -13,9 +13,9 @@ const sanitizeNameForImage = (firstName = '', lastName = '', nickname = '', isDu
 
     const adaptToFilenames = (str) => {
         return str
-            .replace(/\b(TJ|AJ|CJ)\b/g, (match) => match.charAt(0).toUpperCase() + match.slice(1).toLowerCase()) // "TJ" -> "Tj"
-            .replace(/\b(de|da|dos|del|la)\b/g, (match) => match.charAt(0).toUpperCase() + match.slice(1)) // Capitalize prepositions
-            .replace(/\b(Mc)([a-z])/g, (match, p1, p2) => `${p1}${p2.toUpperCase()}`) // "Mcgregor" -> "McGregor"
+            .replace(/\b(TJ|JJ|AJ|CJ)\b/g, (match) => match.charAt(0).toUpperCase() + match.slice(1).toLowerCase()) // "TJ" -> "Tj"
+            .replace(/\b(de|da|dos|del|la)\b/g, (match) => match.toLowerCase()) // Prepositions remain lowercase
+            .replace(/\b(Mc)([a-z])/g, (match, p1, p2) => `${p1}${p2}`) // Keep "Mcgregor" as is
             .replace(/-/g, ''); // Remove hyphens
     };
 
@@ -30,6 +30,7 @@ const sanitizeNameForImage = (firstName = '', lastName = '', nickname = '', isDu
 
     return baseName;
 };
+
 
 
 
