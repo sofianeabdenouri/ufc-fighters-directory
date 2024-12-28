@@ -172,6 +172,12 @@ const getPaginationNumbers = () => {
     return pages;
 };
 useEffect(() => {
+    const saveScrollPosition = () => {
+        if (location.pathname === "/") {
+            sessionStorage.setItem('scrollPosition', window.scrollY);
+        }
+    };
+
     const restoreScrollPosition = () => {
         const savedScrollPosition = sessionStorage.getItem('scrollPosition');
         if (savedScrollPosition && location.pathname === "/") {
@@ -180,9 +186,12 @@ useEffect(() => {
         }
     };
 
-    restoreScrollPosition(); // Restore when App mounts or location changes
-}, [location]);
+    // Restore position on component mount or location change
+    restoreScrollPosition();
 
+    // Save position when navigating away
+    return () => saveScrollPosition();
+}, [location]);
 
     
 // Dynamically set fighters per page to 5 fighters per row and 3 rows
