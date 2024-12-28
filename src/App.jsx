@@ -211,16 +211,25 @@ useEffect(() => {
     // Toggle scroll-to-top button based on scroll position
     useEffect(() => {
         const handleScroll = () => {
-            if (window.pageYOffset > 300) {
+            console.log("Current scroll position:", window.scrollY); // Debug log
+    
+            // Show/Hide Scroll-to-Top Button
+            if (window.scrollY > 300) {
                 setShowScrollButton(true);
             } else {
                 setShowScrollButton(false);
             }
+    
+            // Save scroll position for Page 1
+            if (location.pathname === "/") {
+                sessionStorage.setItem("scrollPosition", window.scrollY);
+            }
         };
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
-
+    
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, [location]);
+    
     const handleScrollToTop = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
