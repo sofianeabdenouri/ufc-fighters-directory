@@ -69,33 +69,40 @@ const FighterProfile = ({ favorites, toggleFavorite }) => {
 
     // Function to sanitize and format names to match image filenames
     const sanitizeNameForImage = (firstName = '', lastName = '', nickname = '', isDuplicate = false) => {
-        const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-
-        const cleanedFirst = firstName
-            .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '')
-            .replace(/[^a-zA-Z0-9]/g, '')
-            .trim();
-
-        const cleanedLast = lastName
-            .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '')
-            .replace(/[^a-zA-Z0-9]/g, '')
-            .trim();
-
-        const baseName = [capitalize(cleanedFirst), capitalize(cleanedLast)].filter(Boolean).join('_');
-
+        const normalizeAndClean = (str) =>
+            str
+                .normalize('NFD') // Remove diacritics
+                .replace(/[\u0300-\u036f]/g, '') // Remove accents
+                .replace(/'/g, '') // Remove apostrophes
+                .replace(/\./g, '') // Remove periods
+                .replace(/\s+/g, '_') // Replace spaces with underscores
+                .replace(/-/g, '') // Remove hyphens 
+                .trim(); // Trim extra whitespace
+    
+        const adaptToFilenames = (str, isLastName = false) => {
+            if (isLastName) {
+                return str
+                    .replace(/\b(de|da|dos|del|la)\b/g, (match) => match.toLowerCase()) // Prepositions lowercase
+                    .replace(/\b(Di|La|Mc|Mac|Al|Van)([A-Za-z]+)/g, (match, p1, p2) => `${p1}${p2.toLowerCase()}`) // "McGregor" -> "Mcgregor"
+                }
+            return str // First names 
+            .replace(/\b(KJ|JC|KB|JP|CB|BJ|CM|TJ|JJ|AJ|CJ)\b/g, (match) => match.charAt(0).toUpperCase() + match.slice(1).toLowerCase()) // "TJ" -> "Tj"
+            .replace(/\b(Sang|Won|Su|Dong|Mar|Chang|Ye|Le|De|Da|Hyun|Jeong|Min|Jun|Seung)([A-Za-z]+)/g, (match, p1, p2) => `${p1}${p2.toLowerCase()}`); 
+    
+        };
+    
+        const cleanedFirst = adaptToFilenames(normalizeAndClean(firstName));
+        const cleanedLast = adaptToFilenames(normalizeAndClean(lastName), true);
+        const baseName = [cleanedFirst, cleanedLast].filter(Boolean).join('_');
+    
         if (isDuplicate && nickname) {
-            const cleanedNickname = nickname
-                .normalize('NFD')
-                .replace(/[\u0300-\u036f]/g, '')
-                .replace(/[^a-zA-Z0-9]/g, '')
-                .trim();
-            return `${baseName}_${cleanedNickname.toLowerCase()}`;
+            const cleanedNickname = normalizeAndClean(nickname);
+            return `${baseName}_${cleanedNickname}`;
         }
-
+    
         return baseName;
     };
+    
 
     // Construct image path
     const isDuplicate = fighter?.isDuplicate || false; // Default to false if not provided
