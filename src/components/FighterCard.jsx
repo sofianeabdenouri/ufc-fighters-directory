@@ -7,24 +7,26 @@ const sanitizeNameForImage = (firstName = '', lastName = '', nickname = '', isDu
         str
             .normalize('NFD') // Remove diacritics
             .replace(/[\u0300-\u036f]/g, '') // Remove accents
+            .replace(/'/g, '') // Remove apostrophes
             .replace(/\./g, '') // Remove periods
             .replace(/\s+/g, '_') // Replace spaces with underscores
             .trim(); // Trim extra whitespace
 
-    const adaptToFilenames = (str) => {
-        return str
-            .replace(/\b(TJ|JJ|AJ|CJ)\b/g, (match) => match.charAt(0).toUpperCase() + match.slice(1).toLowerCase()) // "TJ" -> "Tj"
-            .replace(/\b(de|da|dos|del|la)\b/g, (match) => match.toLowerCase()) // Prepositions remain lowercase
-            .replace(/\b(Mc)([a-z])/g, (match, p1, p2) => `${p1}${p2}`) // Keep "Mcgregor" as is
-            .replace(/-/g, ''); // Remove hyphens
+    const adaptToFilenames = (str, isLastName = false) => {
+        if (isLastName) {
+            return str
+                .replace(/\b(de|da|dos|del|la)\b/g, (match) => match.toLowerCase()) // Prepositions lowercase
+                .replace(/\b(Mc)([A-Za-z]+)/g, (match, p1, p2) => `${p1}${p2.toLowerCase()}`); // "McGregor" -> "Mcgregor"
+        }
+        return str; // First names are unchanged, including case sensitivity
     };
 
     const cleanedFirst = adaptToFilenames(normalizeAndClean(firstName));
-    const cleanedLast = adaptToFilenames(normalizeAndClean(lastName));
+    const cleanedLast = adaptToFilenames(normalizeAndClean(lastName), true);
     const baseName = [cleanedFirst, cleanedLast].filter(Boolean).join('_');
 
     if (isDuplicate && nickname) {
-        const cleanedNickname = adaptToFilenames(normalizeAndClean(nickname));
+        const cleanedNickname = normalizeAndClean(nickname);
         return `${baseName}_${cleanedNickname}`;
     }
 
