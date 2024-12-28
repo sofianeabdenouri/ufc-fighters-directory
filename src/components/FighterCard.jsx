@@ -7,7 +7,7 @@ const sanitizeNameForImage = (firstName = '', lastName = '', nickname = '', isDu
         str
             .normalize('NFD') // Remove diacritics
             .replace(/[\u0300-\u036f]/g, '') // Remove accents
-            .replace(/\s+/g, '_') // Replace spaces with underscores
+            .replace(/\s+/g, '_') // Replace spaces with underscores 
             .trim(); // Trim extra whitespace
 
     const cleanedFirst = normalizeAndClean(firstName);
