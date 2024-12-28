@@ -3,34 +3,24 @@ import { useNavigate } from 'react-router-dom';
 
 // Function to sanitize and format names to match image filenames
 const sanitizeNameForImage = (firstName = '', lastName = '', nickname = '', isDuplicate = false) => {
-    const normalizeAndFormat = (str) =>
+    const normalizeAndClean = (str) =>
         str
             .normalize('NFD') // Remove diacritics
-            .replace(/[\u0300-\u036f]/g, '') // Strip accent marks
+            .replace(/[\u0300-\u036f]/g, '') // Remove accents
             .replace(/\s+/g, '_') // Replace spaces with underscores
-            .trim(); // Trim whitespace
+            .trim(); // Trim extra whitespace
 
-    const formatName = (str) => {
-        const normalized = normalizeAndFormat(str); // Normalize input
-        return normalized.split('_').map((word) => {
-            return word === word.toUpperCase()
-                ? word // Keep all-uppercase words (e.g., "TJ")
-                : word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(); // Capitalize other words
-        }).join('_');
-    };
-
-    const formattedFirst = formatName(firstName);
-    const formattedLast = formatName(lastName);
-    const baseName = [formattedFirst, formattedLast].filter(Boolean).join('_');
+    const cleanedFirst = normalizeAndClean(firstName);
+    const cleanedLast = normalizeAndClean(lastName);
+    const baseName = [cleanedFirst, cleanedLast].filter(Boolean).join('_');
 
     if (isDuplicate && nickname) {
-        const formattedNickname = formatName(nickname);
-        return `${baseName}_${formattedNickname}`;
+        const cleanedNickname = normalizeAndClean(nickname);
+        return `${baseName}_${cleanedNickname}`;
     }
 
     return baseName;
 };
-
 
 
 const FighterCard = ({ fighter, isFavorite, toggleFavorite }) => {
