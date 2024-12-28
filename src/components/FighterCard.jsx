@@ -7,15 +7,22 @@ const sanitizeNameForImage = (firstName = '', lastName = '', nickname = '', isDu
         str
             .normalize('NFD') // Remove diacritics
             .replace(/[\u0300-\u036f]/g, '') // Remove accents
-            .replace(/\s+/g, '_') // Replace spaces with underscores 
+            .replace(/\./g, '') // Remove periods (e.g., "Jr." -> "Jr")
+            .replace(/\s+/g, '_') // Replace spaces with underscores
             .trim(); // Trim extra whitespace
 
-    const cleanedFirst = normalizeAndClean(firstName);
-    const cleanedLast = normalizeAndClean(lastName);
+    const adaptToFilenames = (str) => {
+        return str
+            .replace(/\b(de|da|dos|del|la)\b/g, (match) => match.charAt(0).toUpperCase() + match.slice(1)) // Capitalize prepositions
+            .replace(/-/g, ''); // Remove hyphens for compound names
+    };
+
+    const cleanedFirst = adaptToFilenames(normalizeAndClean(firstName));
+    const cleanedLast = adaptToFilenames(normalizeAndClean(lastName));
     const baseName = [cleanedFirst, cleanedLast].filter(Boolean).join('_');
 
     if (isDuplicate && nickname) {
-        const cleanedNickname = normalizeAndClean(nickname);
+        const cleanedNickname = adaptToFilenames(normalizeAndClean(nickname));
         return `${baseName}_${cleanedNickname}`;
     }
 
