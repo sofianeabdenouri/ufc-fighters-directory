@@ -16,12 +16,12 @@ const sanitizeNameForImage = (firstName = '', lastName = '', nickname = '', isDu
     const adaptToFilenames = (str, isLastName = false) => {
         if (isLastName) {
             return str
-                .replace(/\b(KJ|JC|KB|JP|CB|BJ|CM|TJ|JJ|AJ|CJ)\b/g, (match) => match.charAt(0).toUpperCase() + match.slice(1).toLowerCase()) // "TJ" -> "Tj"
                 .replace(/\b(de|da|dos|del|la)\b/g, (match) => match.toLowerCase()) // Prepositions lowercase
-                .replace(/\b(Mc|Mac|Al|Van)([A-Za-z]+)/g, (match, p1, p2) => `${p1}${p2.toLowerCase()}`) // "McGregor" -> "Mcgregor"
+                .replace(/\b(Di|La|Mc|Mac|Al|Van)([A-Za-z]+)/g, (match, p1, p2) => `${p1}${p2.toLowerCase()}`) // "McGregor" -> "Mcgregor"
             }
         return str // First names 
-        .replace(/\b(Su|Dong|Mar|Chang|Ye|Le|De|Da|Hyun|Jeong|Min|Jun|Seung)([A-Za-z]+)/g, (match, p1, p2) => `${p1}${p2.toLowerCase()}`); 
+        .replace(/\b(KJ|JC|KB|JP|CB|BJ|CM|TJ|JJ|AJ|CJ)\b/g, (match) => match.charAt(0).toUpperCase() + match.slice(1).toLowerCase()) // "TJ" -> "Tj"
+        .replace(/\b(Sang|Won|Su|Dong|Mar|Chang|Ye|Le|De|Da|Hyun|Jeong|Min|Jun|Seung)([A-Za-z]+)/g, (match, p1, p2) => `${p1}${p2.toLowerCase()}`); 
 
     };
 
