@@ -8,17 +8,15 @@ const sanitizeNameForImage = (firstName = '', lastName = '', nickname = '', isDu
             .normalize('NFD') // Remove diacritics
             .replace(/[\u0300-\u036f]/g, '') // Strip accent marks
             .replace(/\s+/g, '_') // Replace spaces with underscores
-            .toLowerCase() // Convert everything to lowercase for consistency
             .trim(); // Trim whitespace
 
-    const capitalizeFirst = (str) =>
-        str.charAt(0).toUpperCase() + str.slice(1).toLowerCase(); // Ensure "Tj" style
-
     const formatName = (str) => {
-        const normalized = normalizeAndFormat(str); // Fully lowercase for comparison
-        return normalized === normalized.toUpperCase()
-            ? normalized.toUpperCase() // If all uppercase, keep it uppercase (e.g., TJ)
-            : capitalizeFirst(normalized); // Otherwise, capitalize like "Tj"
+        const normalized = normalizeAndFormat(str); // Normalize input
+        return normalized.split('_').map((word) => {
+            return word === word.toUpperCase()
+                ? word // Keep all-uppercase words (e.g., "TJ")
+                : word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(); // Capitalize other words
+        }).join('_');
     };
 
     const formattedFirst = formatName(firstName);
@@ -26,12 +24,13 @@ const sanitizeNameForImage = (firstName = '', lastName = '', nickname = '', isDu
     const baseName = [formattedFirst, formattedLast].filter(Boolean).join('_');
 
     if (isDuplicate && nickname) {
-        const formattedNickname = normalizeAndFormat(nickname);
+        const formattedNickname = formatName(nickname);
         return `${baseName}_${formattedNickname}`;
     }
 
     return baseName;
 };
+
 
 
 const FighterCard = ({ fighter, isFavorite, toggleFavorite }) => {
