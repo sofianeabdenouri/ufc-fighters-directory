@@ -176,7 +176,7 @@ const FighterProfile = ({ favorites, toggleFavorite }) => {
 
                 <button className="fighter-profile-back-btn" onClick={() => { 
                     sessionStorage.setItem('scrollPosition', window.scrollY);
-                navigate(-1);
+                    navigate(-1);
                     }}>
                     Back to Directory
                 </button>

@@ -171,52 +171,19 @@ const getPaginationNumbers = () => {
     }
     return pages;
 };
-
 useEffect(() => {
-    const saveScrollPosition = () => {
-        if (location.pathname === "/") {
-            sessionStorage.setItem('scrollPosition', window.scrollY);
-        }
-    };
-
-    const savedScrollPosition = sessionStorage.getItem('scrollPosition');
-    if (savedScrollPosition && location.pathname === "/") {
-        window.scrollTo(0, parseInt(savedScrollPosition, 10));
-    }
-
-    window.addEventListener("beforeunload", saveScrollPosition);
-
-    return () => {
-        saveScrollPosition();
-        window.removeEventListener("beforeunload", saveScrollPosition);
-    };
-}, [location]);
-
-useEffect(() => {
-    // Restore scroll position after navigation
     const restoreScrollPosition = () => {
         const savedScrollPosition = sessionStorage.getItem('scrollPosition');
-        if (savedScrollPosition) {
+        if (savedScrollPosition && location.pathname === "/") {
             window.scrollTo(0, parseInt(savedScrollPosition, 10));
+            sessionStorage.removeItem('scrollPosition'); // Clear after restoring
         }
     };
 
-    // Save scroll position before navigating away
-    const saveScrollPosition = () => {
-        sessionStorage.setItem('scrollPosition', window.scrollY);
-    };
-
-    // Restore position on location change
-    restoreScrollPosition();
-
-    // Save position when leaving
-    window.addEventListener('beforeunload', saveScrollPosition);
-
-    return () => {
-        saveScrollPosition(); // Ensure position is saved on component unmount
-        window.removeEventListener('beforeunload', saveScrollPosition);
-    };
+    restoreScrollPosition(); // Restore when App mounts or location changes
 }, [location]);
+
+
     
 // Dynamically set fighters per page to 5 fighters per row and 3 rows
 useEffect(() => {
