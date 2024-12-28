@@ -172,26 +172,20 @@ const getPaginationNumbers = () => {
     return pages;
 };
 useEffect(() => {
-    const saveScrollPosition = () => {
-        if (location.pathname === "/") {
-            sessionStorage.setItem("scrollPosition", window.scrollY);
-            console.log("Scroll position saved:", window.scrollY); // Debug log
-        }
-    };
+    const scrollingElement = document.querySelector(".app"); // Target the scrollable element
 
     const restoreScrollPosition = () => {
         const savedScrollPosition = sessionStorage.getItem("scrollPosition");
         if (savedScrollPosition && location.pathname === "/") {
-            window.scrollTo(0, parseInt(savedScrollPosition, 10));
-            console.log("Scroll position restored:", savedScrollPosition); // Debug log
-            sessionStorage.removeItem("scrollPosition"); // Clear after restoring
+            const scrollPosition = parseInt(savedScrollPosition, 10);
+            scrollingElement?.scrollTo(0, scrollPosition); // Restore scroll position
+            console.log("Scroll position restored:", scrollPosition); // Debug log
         }
     };
 
-    restoreScrollPosition(); // Restore position on component mount or location change
-
-    return () => saveScrollPosition(); // Save position before unmounting or navigating away
+    restoreScrollPosition();
 }, [location]);
+
 
     
 // Dynamically set fighters per page to 5 fighters per row and 3 rows
@@ -208,31 +202,38 @@ useEffect(() => {
 
 
 
-    // Toggle scroll-to-top button based on scroll position
-    useEffect(() => {
-        const handleScroll = () => {
-            console.log("Current scroll position:", window.scrollY); // Debug log
-    
-            // Show/Hide Scroll-to-Top Button
-            if (window.scrollY > 300) {
-                setShowScrollButton(true);
-            } else {
-                setShowScrollButton(false);
-            }
-    
-            // Save scroll position for Page 1
-            if (location.pathname === "/") {
-                sessionStorage.setItem("scrollPosition", window.scrollY);
-            }
-        };
-    
-        window.addEventListener("scroll", handleScroll);
-        return () => window.removeEventListener("scroll", handleScroll);
-    }, [location]);
-    
-    const handleScrollToTop = () => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+useEffect(() => {
+    const scrollingElement = document.querySelector(".app"); // Target the scrollable element
+
+    const handleScroll = () => {
+        const scrollPosition = scrollingElement?.scrollTop || 0;
+        console.log("Current scroll position:", scrollPosition); // Debug log
+
+        // Show/Hide Scroll-to-Top Button
+        if (scrollPosition > 300) {
+            setShowScrollButton(true);
+        } else {
+            setShowScrollButton(false);
+        }
+
+        // Save scroll position for Page 1
+        if (location.pathname === "/") {
+            sessionStorage.setItem("scrollPosition", scrollPosition);
+        }
     };
+
+    scrollingElement?.addEventListener("scroll", handleScroll);
+    return () => scrollingElement?.removeEventListener("scroll", handleScroll);
+}, [location]);
+
+    
+const handleScrollToTop = () => {
+    const scrollingElement = document.querySelector(".app"); // Target the scrollable element
+    if (scrollingElement) {
+        scrollingElement.scrollTo({ top: 0, behavior: "smooth" });
+    }
+};
+
 
     const handleAdvancedSearch = () => {
         handleSearch(); // Trigger search when doing advanced search
