@@ -174,23 +174,23 @@ const getPaginationNumbers = () => {
 useEffect(() => {
     const saveScrollPosition = () => {
         if (location.pathname === "/") {
-            sessionStorage.setItem('scrollPosition', window.scrollY);
+            sessionStorage.setItem("scrollPosition", window.scrollY);
+            console.log("Scroll position saved:", window.scrollY); // Debug log
         }
     };
 
     const restoreScrollPosition = () => {
-        const savedScrollPosition = sessionStorage.getItem('scrollPosition');
+        const savedScrollPosition = sessionStorage.getItem("scrollPosition");
         if (savedScrollPosition && location.pathname === "/") {
             window.scrollTo(0, parseInt(savedScrollPosition, 10));
-            sessionStorage.removeItem('scrollPosition'); // Clear after restoring
+            console.log("Scroll position restored:", savedScrollPosition); // Debug log
+            sessionStorage.removeItem("scrollPosition"); // Clear after restoring
         }
     };
 
-    // Restore position on component mount or location change
-    restoreScrollPosition();
+    restoreScrollPosition(); // Restore position on component mount or location change
 
-    // Save position when navigating away
-    return () => saveScrollPosition();
+    return () => saveScrollPosition(); // Save position before unmounting or navigating away
 }, [location]);
 
     

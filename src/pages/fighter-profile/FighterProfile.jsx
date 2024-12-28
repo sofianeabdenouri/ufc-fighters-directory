@@ -175,8 +175,9 @@ const FighterProfile = ({ favorites, toggleFavorite }) => {
                 <p><b>Submissions:</b> {Submissions || 0}</p>
 
                 <button className="fighter-profile-back-btn" onClick={() => { 
-                    sessionStorage.setItem('scrollPosition', window.scrollY);
-                    navigate(-1);
+                    sessionStorage.setItem("scrollPosition", window.scrollY); // Save scroll position
+                    console.log("Back button clicked, scroll position saved:", window.scrollY); // Debug log
+                    navigate(-1); // Go back to Page 1
                     }}>
                     Back to Directory
                 </button>
