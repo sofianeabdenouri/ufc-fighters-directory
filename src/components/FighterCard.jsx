@@ -3,20 +3,31 @@ import { useNavigate } from 'react-router-dom';
 
 // Function to sanitize and format names to match image filenames
 const sanitizeNameForImage = (firstName = '', lastName = '', nickname = '', isDuplicate = false) => {
-    const normalizeAndClean = (str) =>
+    const normalizeAndFormat = (str) =>
         str
             .normalize('NFD') // Remove diacritics
-            .replace(/[\u0300-\u036f]/g, '') // Remove accents
+            .replace(/[\u0300-\u036f]/g, '') // Strip accent marks
             .replace(/\s+/g, '_') // Replace spaces with underscores
-            .trim(); // Trim extra whitespace
+            .toLowerCase() // Convert everything to lowercase for consistency
+            .trim(); // Trim whitespace
 
-    const cleanedFirst = normalizeAndClean(firstName);
-    const cleanedLast = normalizeAndClean(lastName);
-    const baseName = [cleanedFirst, cleanedLast].filter(Boolean).join('_');
+    const capitalizeFirst = (str) =>
+        str.charAt(0).toUpperCase() + str.slice(1).toLowerCase(); // Ensure "Tj" style
+
+    const formatName = (str) => {
+        const normalized = normalizeAndFormat(str); // Fully lowercase for comparison
+        return normalized === normalized.toUpperCase()
+            ? normalized.toUpperCase() // If all uppercase, keep it uppercase (e.g., TJ)
+            : capitalizeFirst(normalized); // Otherwise, capitalize like "Tj"
+    };
+
+    const formattedFirst = formatName(firstName);
+    const formattedLast = formatName(lastName);
+    const baseName = [formattedFirst, formattedLast].filter(Boolean).join('_');
 
     if (isDuplicate && nickname) {
-        const cleanedNickname = normalizeAndClean(nickname);
-        return `${baseName}_${cleanedNickname}`;
+        const formattedNickname = normalizeAndFormat(nickname);
+        return `${baseName}_${formattedNickname}`;
     }
 
     return baseName;
