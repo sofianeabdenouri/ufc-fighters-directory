@@ -7,14 +7,16 @@ const sanitizeNameForImage = (firstName = '', lastName = '', nickname = '', isDu
         str
             .normalize('NFD') // Remove diacritics
             .replace(/[\u0300-\u036f]/g, '') // Remove accents
-            .replace(/\./g, '') // Remove periods (e.g., "Jr." -> "Jr")
+            .replace(/\./g, '') // Remove periods
             .replace(/\s+/g, '_') // Replace spaces with underscores
             .trim(); // Trim extra whitespace
 
     const adaptToFilenames = (str) => {
         return str
+            .replace(/\b(TJ|AJ|CJ)\b/g, (match) => match.charAt(0).toUpperCase() + match.slice(1).toLowerCase()) // "TJ" -> "Tj"
             .replace(/\b(de|da|dos|del|la)\b/g, (match) => match.charAt(0).toUpperCase() + match.slice(1)) // Capitalize prepositions
-            .replace(/-/g, ''); // Remove hyphens for compound names
+            .replace(/\b(Mc)([a-z])/g, (match, p1, p2) => `${p1}${p2.toUpperCase()}`) // "Mcgregor" -> "McGregor"
+            .replace(/-/g, ''); // Remove hyphens
     };
 
     const cleanedFirst = adaptToFilenames(normalizeAndClean(firstName));
@@ -28,6 +30,7 @@ const sanitizeNameForImage = (firstName = '', lastName = '', nickname = '', isDu
 
     return baseName;
 };
+
 
 
 const FighterCard = ({ fighter, isFavorite, toggleFavorite }) => {
