@@ -34,7 +34,6 @@ const sanitizeNameForImage = (firstName = '', lastName = '', nickname = '', isDu
     return fullName;
 };
 
-const [loading, setLoading] = useState(true);
 
 
 
@@ -258,10 +257,6 @@ const handleScrollToTop = () => {
     };
     useEffect(() => {
         const apiUrl = `${import.meta.env.VITE_API_URL.trim().replace(/\/+$/, '')}/fighters`;
-
-        setLoading(true); 
-
-
         fetch(apiUrl)
             .then((response) => {
                 if (!response.ok) {
@@ -611,31 +606,31 @@ const handleScrollToTop = () => {
 
   {/* PAGINATION LOGIC HERE */}
   {(() => {
-    const paginatedFighters = filteredFighters.slice(
-        (currentPage - 1) * fightersPerPage.current,
-        currentPage * fightersPerPage.current
-    );
+                            const paginatedFighters = filteredFighters.slice(
+                                (currentPage - 1) * fightersPerPage.current,
+                                currentPage * fightersPerPage.current
+                            );
 
-    return loading ? (
-        <div className="loader"></div> 
-    ) : (
-        <div className="fighter-list" ref={fighterListRef}>
-            {paginatedFighters.length > 0 ? (
-                paginatedFighters.map((fighter) => (
-                    <FighterCard
-                        key={fighter.FighterId}
-                        fighter={fighter}
-                        isFavorite={favorites.includes(fighter.FighterId)}
-                        toggleFavorite={toggleFavorite}
-                    />
-                ))
-            ) : (
-                <p>No fighters found</p>
-            )}
-        </div>
-    );
-})()}
-
+                             return (
+                                <div className="fighter-list" ref={fighterListRef}>
+                                    
+                                    {paginatedFighters.length > 0 ? (
+                                        paginatedFighters.map((fighter) => (
+                                            <FighterCard
+                                                key={fighter.FighterId}
+                                                fighter={fighter}
+                                                isFavorite={favorites.includes(
+                                                    fighter.FighterId
+                                                )}
+                                                toggleFavorite={toggleFavorite}
+                                            />
+                                        ))
+                                    ) : (
+                                        <p>No fighters found</p>
+                                    )}
+                                </div>
+                                     );
+                                    })()}
 {/* Pagination Controls */}
 {totalPages > 1 && (
     <div className="pagination">
