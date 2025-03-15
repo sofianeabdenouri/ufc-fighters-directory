@@ -604,33 +604,30 @@ const handleScrollToTop = () => {
 </div>
 
 
-  {/* PAGINATION LOGIC HERE */}
-  {(() => {
-                            const paginatedFighters = filteredFighters.slice(
-                                (currentPage - 1) * fightersPerPage.current,
-                                currentPage * fightersPerPage.current
-                            );
+{/* PAGINATION LOGIC HERE */}
+<div className="fighter-list-container">
+    {loading ? (
+        <div className="loader-container">
+            <div className="loader"></div> 
+            <p>Loading fighters...</p>
+        </div>
+    ) : (
+        <div className="fighter-list loaded" ref={fighterListRef}>
+            {filteredFighters.slice(
+                (currentPage - 1) * fightersPerPage.current,
+                currentPage * fightersPerPage.current
+            ).map((fighter) => (
+                <FighterCard
+                    key={fighter.FighterId}
+                    fighter={fighter}
+                    isFavorite={favorites.includes(fighter.FighterId)}
+                    toggleFavorite={toggleFavorite}
+                />
+            ))}
+        </div>
+    )}
+</div>
 
-                             return (
-                                <div className="fighter-list" ref={fighterListRef}>
-                                    
-                                    {paginatedFighters.length > 0 ? (
-                                        paginatedFighters.map((fighter) => (
-                                            <FighterCard
-                                                key={fighter.FighterId}
-                                                fighter={fighter}
-                                                isFavorite={favorites.includes(
-                                                    fighter.FighterId
-                                                )}
-                                                toggleFavorite={toggleFavorite}
-                                            />
-                                        ))
-                                    ) : (
-                                        <p>No fighters found</p>
-                                    )}
-                                </div>
-                                     );
-                                    })()}
 {/* Pagination Controls */}
 {totalPages > 1 && (
     <div className="pagination">
