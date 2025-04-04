@@ -1,8 +1,20 @@
-# React + Vite
+# UFC Fighters Directory
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A sleek and responsive web app for browsing and managing UFC fighter data.
 
-Currently, two official plugins are available:
+## 🔍 Features
+- View fighter profiles with images and stats
+- Filter by weight class or search by name
+- Clean, responsive UI built with Tailwind
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## ⚙️ Tech Stack
+- React (with Vite)
+- TypeScript
+- Tailwind CSS
+- ESLint for code linting
+
+## 🚀 Getting Started
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/sofianeabdenouri/ufc-fighters-directory.git
