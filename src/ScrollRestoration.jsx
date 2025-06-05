@@ -5,7 +5,6 @@ const ScrollRestoration = () => {
   const location = useLocation();
   const navigationType = useNavigationType();
 
-  // Restore scroll on back/forward
   useEffect(() => {
     if (navigationType === "POP") {
       const savedY =
@@ -14,25 +13,26 @@ const ScrollRestoration = () => {
 
       if (savedY !== null) {
         requestAnimationFrame(() => {
-          window.scrollTo(0, parseInt(savedY, 10));
+          document.querySelector(".app")?.scrollTo(0, parseInt(savedY, 10));
         });
       }
     }
   }, [location.pathname, navigationType]);
 
-  // Save scroll on scroll and before unmount/navigation
   useEffect(() => {
     const save = () => {
-      sessionStorage.setItem(`scroll-${location.pathname}`, window.scrollY);
+      const y = document.querySelector(".app")?.scrollTop || 0;
+      sessionStorage.setItem(`scroll-${location.pathname}`, y);
     };
 
-    window.addEventListener("scroll", save);
+    const el = document.querySelector(".app");
+    el?.addEventListener("scroll", save);
     window.addEventListener("beforeunload", save);
     window.addEventListener("pagehide", save);
 
     return () => {
-      save(); // ← save one last time when component unmounts
-      window.removeEventListener("scroll", save);
+      save();
+      el?.removeEventListener("scroll", save);
       window.removeEventListener("beforeunload", save);
       window.removeEventListener("pagehide", save);
     };
