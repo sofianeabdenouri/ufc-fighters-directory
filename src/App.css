@@ -72,11 +72,13 @@ input {
 }
 
 .fighter-card {
-  flex: 0 1 330px; /* Fixed width of 330px per card */
+  flex: 1 1 100%;
+  max-width: 330px;
+  width: 100%;
   margin: 1px;
   border: 1px solid #ccc;
   padding: 10px;
-  height: 420px; /* Fixed height */
+  min-height: 420px;
   text-align: center;
   background-color: #2b2b2b;
   color: white;
@@ -87,6 +89,7 @@ input {
   box-sizing: border-box;
   overflow: hidden;
 }
+
 
 /* Wrapper for nickname and star */
 .nickname-wrapper {
@@ -259,13 +262,15 @@ input {
   border-radius: 10px;
   background-color: #333;
   margin-top: 20px;
-  width: 800px; /* Fixed width */
-  height: 500px; /* Increase height to fit content */
+  width: 100%;
+  max-width: 800px;
+  height: auto;
   margin-left: auto;
   margin-right: auto;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  overflow: visible; /* Ensure no scrolling */
+  overflow: visible;
 }
+
 /* Ensure h3 headers have some margin */
 h3 {
   margin-bottom: 10px;
@@ -283,8 +288,10 @@ h3 {
   padding: 10px;
   background-color: #2b2b2b;
   border-radius: 10px;
-  width: 200px; /* Fixed width for consistent layout */
+  width: 100%;
+  max-width: 200px;
 }
+
 
 /* Lock label layout to ensure text and checkbox alignment */
 .male-divisions label, .female-divisions label, .other-divisions label {
@@ -603,4 +610,85 @@ option[value="favorites"] {
   cursor: not-allowed;
   pointer-events: none;
   border-color: #ccc;
+}
+@media (max-width: 768px) {
+  .fighter-card {
+    flex: 1 1 100%; /* Let it take full width */
+    max-width: 95%;
+    height: auto;
+  }
+
+  .fighter-image img {
+    width: 100%;
+    height: auto;
+  }
+
+  .search-container {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .advanced-search-box {
+    width: 95%;
+    height: auto;
+    padding: 10px;
+  }
+
+  .weight-class-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .male-divisions, .female-divisions, .other-divisions {
+    width: 90%;
+  }
+
+  input {
+    max-width: 90%;
+  }
+
+  .search-input-wrapper {
+    margin-right: 0;
+    width: 100%;
+  }
+
+  .clear-search {
+    right: 10px;
+  }
+
+  .visit-profile-btn, .favorites-button, .advanced-search-button {
+    width: 90%;
+    font-size: 14px;
+  }
+}
+@media (max-width: 1024px) {
+  .fighter-card {
+    flex: 1 1 45%;
+    max-width: 95%;
+  }
+
+  .fighter-list {
+    justify-content: center;
+  }
+
+  .advanced-search-box {
+    width: 95%;
+    padding: 15px;
+  }
+
+  .male-divisions, .female-divisions, .other-divisions {
+    max-width: 100%;
+  }
+
+  .fighter-card h2,
+  .fighter-stats {
+    font-size: 16px;
+  }
+
+  button,
+  .visit-profile-btn,
+  .advanced-search-button {
+    font-size: 14px;
+    padding: 8px 12px;
+  }
 }
