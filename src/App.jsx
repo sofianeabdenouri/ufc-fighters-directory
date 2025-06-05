@@ -35,23 +35,6 @@ const sanitizeNameForImage = (firstName = '', lastName = '', nickname = '', isDu
     return fullName;
 };
 
-
-function ScrollRestoration() {
-    const location = useLocation();
-
-    useEffect(() => {
-        const scrollingElement = document.querySelector(".app");
-        const savedScrollPosition = sessionStorage.getItem("scrollPosition");
-
-        if (location.pathname === "/" && savedScrollPosition) {
-            scrollingElement?.scrollTo(0, parseInt(savedScrollPosition, 10));
-        }
-    }, [location]);
-
-    return null;
-}
-
-
 // Utility function to remove accents from strings
 const removeAccents = (str) => {
     return str.normalize('NFD').replace(/[\u0300-\u036f]/g, ''); // Removes accents from characters
@@ -186,20 +169,6 @@ const getPaginationNumbers = () => {
     }
     return pages;
 };
-useEffect(() => {
-    const scrollingElement = document.querySelector(".app"); // Target the scrollable element
-
-    const restoreScrollPosition = () => {
-        const savedScrollPosition = sessionStorage.getItem("scrollPosition");
-        if (savedScrollPosition && location.pathname === "/") {
-            const scrollPosition = parseInt(savedScrollPosition, 10);
-            scrollingElement?.scrollTo(0, scrollPosition); // Restore scroll position
-            console.log("Scroll position restored:", scrollPosition); // Debug log
-        }
-    };
-
-    restoreScrollPosition();
-}, [location]);
 
 
     
@@ -214,40 +183,11 @@ useEffect(() => {
     window.addEventListener('resize', setFixedGrid);
     return () => window.removeEventListener('resize', setFixedGrid);
 }, []);
-
-
-
-useEffect(() => {
-    const scrollingElement = document.querySelector(".app"); // Target the scrollable element
-
-    const handleScroll = () => {
-        const scrollPosition = scrollingElement?.scrollTop || 0;
-        console.log("Current scroll position:", scrollPosition); // Debug log
-
-        // Show/Hide Scroll-to-Top Button
-        if (scrollPosition > 300) {
-            setShowScrollButton(true);
-        } else {
-            setShowScrollButton(false);
-        }
-
-        // Save scroll position for Page 1
-        if (location.pathname === "/") {
-            sessionStorage.setItem("scrollPosition", scrollPosition);
-        }
-    };
-
-    scrollingElement?.addEventListener("scroll", handleScroll);
-    return () => scrollingElement?.removeEventListener("scroll", handleScroll);
-}, [location]);
-
     
-const handleScrollToTop = () => {
-    const scrollingElement = document.querySelector(".app"); // Target the scrollable element
-    if (scrollingElement) {
-        scrollingElement.scrollTo({ top: 0, behavior: "smooth" });
-    }
-};
+<button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} className="scroll-to-top">
+  ↑
+</button>
+
 
 
     const handleAdvancedSearch = () => {
