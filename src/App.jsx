@@ -449,12 +449,12 @@ useEffect(() => {
 
     return (
         <Router>
+           <ScrollRestoration />
             <Routes>
                 <Route
                     path="/"
                     element={
                         <div className="app">
-                            <ScrollRestoration />
                             <Header scrollToFighters={scrollToFighters} />
 
                             <h1 className="font-h1">UFC Records</h1>
