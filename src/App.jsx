@@ -35,6 +35,20 @@ const sanitizeNameForImage = (firstName = '', lastName = '', nickname = '', isDu
 };
 
 
+function ScrollRestoration() {
+    const location = useLocation();
+
+    useEffect(() => {
+        const scrollingElement = document.querySelector(".app");
+        const savedScrollPosition = sessionStorage.getItem("scrollPosition");
+
+        if (location.pathname === "/" && savedScrollPosition) {
+            scrollingElement?.scrollTo(0, parseInt(savedScrollPosition, 10));
+        }
+    }, [location]);
+
+    return null;
+}
 
 
 // Utility function to remove accents from strings
@@ -499,6 +513,7 @@ const handleScrollToTop = () => {
                     path="/"
                     element={
                         <div className="app">
+                            <ScrollRestoration />
                             <Header scrollToFighters={scrollToFighters} />
 
                             <h1 className="font-h1">UFC Records</h1>
