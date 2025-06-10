@@ -9,7 +9,10 @@ const ScrollRestorer = () => {
     const savedScrollPosition = sessionStorage.getItem("scrollPosition");
 
     if (scrollingElement && location.pathname === "/") {
-      scrollingElement.scrollTo(0, parseInt(savedScrollPosition || "0", 10));
+      requestAnimationFrame(() => {
+        scrollingElement.scrollTo(0, parseInt(savedScrollPosition || "0", 10));
+        console.log("Scroll restored to:", savedScrollPosition);
+      });
     }
   }, [location]);
 
