@@ -75,8 +75,8 @@ const FighterCard = ({ fighter, isFavorite, toggleFavorite }) => {
 
     const handleNavigate = () => {
         // Save the current scroll position
-const appElement = document.querySelector('.app');
-const scrollPos = appElement?.scrollTop ?? 0;
+const scrollPos = window.scrollY;
+
 sessionStorage.setItem('scrollPosition', scrollPos.toString());
 console.log("Back button clicked, scroll position saved:", scrollPos);
 

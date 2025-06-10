@@ -1,20 +1,30 @@
 import { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigationType } from 'react-router-dom';
 
 const ScrollRestorer = () => {
   const location = useLocation();
+  const navigationType = useNavigationType();
 
   useEffect(() => {
-    const scrollingElement = document.querySelector(".app");
-    const savedScrollPosition = sessionStorage.getItem("scrollPosition");
-
-    if (scrollingElement && location.pathname === "/") {
-      requestAnimationFrame(() => {
-        scrollingElement.scrollTo(0, parseInt(savedScrollPosition || "0", 10));
-        console.log("Scroll restored to:", savedScrollPosition);
-      });
+    if (navigationType === 'POP') {
+      const savedScrollPosition = sessionStorage.getItem('scrollPosition');
+      if (savedScrollPosition !== null) {
+        window.scrollTo(0, parseInt(savedScrollPosition, 10));
+        console.log('Scroll restored to:', savedScrollPosition);
+      }
+    } else {
+      window.scrollTo(0, 0);
+      console.log('Navigated via', navigationType, '- scroll to top');
     }
-  }, [location]);
+  }, [location, navigationType]);
+
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      sessionStorage.setItem('scrollPosition', window.scrollY.toString());
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, []);
 
   return null;
 };
