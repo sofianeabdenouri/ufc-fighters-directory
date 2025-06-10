@@ -99,7 +99,7 @@ app.get('/api/fighters/:id', async (req, res) => {
 
 // Default route
 app.get('/', (req, res) => {
-    res.status(200).send('Welcome to the UFC Fighters Directory API!');
+    res.status(200).send('Welcome to MMA Fighters Directory API!');
 });
 
 // Local server setup

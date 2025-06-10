@@ -6,25 +6,20 @@ const ScrollRestorer = () => {
   const navigationType = useNavigationType();
 
   useEffect(() => {
-    if (navigationType === 'POP') {
+    const scrollElement = document.scrollingElement || document.documentElement;
+    const isGoingBack = navigationType === 'POP';
+
+    if (isGoingBack && location.pathname === '/') {
       const savedScrollPosition = sessionStorage.getItem('scrollPosition');
       if (savedScrollPosition !== null) {
-        window.scrollTo(0, parseInt(savedScrollPosition, 10));
-        console.log('Scroll restored to:', savedScrollPosition);
+        const scrollY = parseInt(savedScrollPosition, 10);
+        console.log('Restoring scroll to:', scrollY);
+        scrollElement.scrollTo({ top: scrollY, behavior: 'instant' });
       }
     } else {
-      window.scrollTo(0, 0);
-      console.log('Navigated via', navigationType, '- scroll to top');
+      scrollElement.scrollTo({ top: 0, behavior: 'instant' });
     }
   }, [location, navigationType]);
-
-  useEffect(() => {
-    const handleBeforeUnload = () => {
-      sessionStorage.setItem('scrollPosition', window.scrollY.toString());
-    };
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, []);
 
   return null;
 };

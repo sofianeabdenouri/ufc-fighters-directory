@@ -456,7 +456,7 @@ const handleScrollToTop = () => {
                             <ScrollRestorer /> 
                             <Header scrollToFighters={scrollToFighters} />
 
-                            <h1 className="font-h1">UFC Records</h1>
+                            <h1 className="font-h1">MMArec</h1>
                             <h5 className="description">Live up-to-date records for every fighter</h5>
                             <div className="search-container">
     <div className="search-input-wrapper">
@@ -700,7 +700,7 @@ const handleScrollToTop = () => {
                             {/* Footer for fan project */}
                             <footer className="footer">
                                 <p>
-                                    This is a fan-made project and is in no way affiliated with, authorized, or endorsed by the Ultimate Fighting Championship (UFC) or any of its partners, subsidiaries, or associated organizations.<br/> All UFC-related trademarks, names, and logos are the property of their respective owners. <br/> The information presented on this site is for entertainment and informational purposes only, and while every effort is made to ensure accuracy, it is not official or guaranteed to be up-to-date.
+This is a fan-made project and is in no way affiliated with, authorized, or endorsed by any mixed martial arts (MMA) organization or promotion, including but not limited to the UFC, Bellator, ONE Championship, PFL, or any of their partners, subsidiaries, or affiliates.<br/> All trademarks, names, and logos associated with MMA organizations are the property of their respective owners.<br/> The information presented on this site is for entertainment and informational purposes only. While efforts are made to ensure accuracy, it is not official or guaranteed to be up-to-date.
                                 </p>
                             </footer>
                         </div>

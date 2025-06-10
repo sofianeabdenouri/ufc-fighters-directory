@@ -1,6 +1,6 @@
 # UFC Fighters Directory
 
-A sleek and responsive web app for browsing and managing UFC fighter data.
+A sleek and responsive web app for browsing and managing MMA fighter data.
 
 ## 🔍 Features
 - View fighter profiles with images and stats

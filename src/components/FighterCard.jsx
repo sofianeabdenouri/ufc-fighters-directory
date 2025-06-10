@@ -74,13 +74,7 @@ const FighterCard = ({ fighter, isFavorite, toggleFavorite }) => {
     const imageUrl = `/assets/images/${getImageName()}`;
 
     const handleNavigate = () => {
-        // Save the current scroll position
-const scrollPos = window.scrollY;
-
-sessionStorage.setItem('scrollPosition', scrollPos.toString());
-console.log("Back button clicked, scroll position saved:", scrollPos);
-
-        // Navigate to FighterProfile
+      // Navigate to FighterProfile
         navigate(`/fighter/${FighterId}`, { state: { fighter } });
     };
 

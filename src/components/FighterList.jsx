@@ -1,3 +1,4 @@
+import useSaveScrollOnUnmount from './components/useSaveScrollOnUnmount';
 // Utility function to sanitize names (removes accents, special characters)
 const sanitizeName = (firstName = '', lastName = '') => {
     const fullName = [firstName, lastName]
@@ -16,6 +17,7 @@ const sanitizeName = (firstName = '', lastName = '') => {
 
 
 function FighterList() {
+    useSaveScrollOnUnmount();
     const [fighters, setFighters] = useState([]);
     const [filteredFighters, setFilteredFighters] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
