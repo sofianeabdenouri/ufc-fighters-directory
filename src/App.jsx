@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { useLocation } from 'react-router-dom';
 import FighterCard from './components/FighterCard';
 import FighterProfile from './pages/fighter-profile/FighterProfile';
 import Header from './header/Header';
 import './App.css';
-
+import ScrollRestorer from './ScrollRestorer'; 
 // Utility function to sanitize fighter names for use in image paths
 const sanitizeNameForImage = (firstName = '', lastName = '', nickname = '', isDuplicate = false) => {
     const fullName = [firstName, lastName]
@@ -145,8 +144,6 @@ const goToPage = (side) => {
         setErrorMessage('Invalid page number');
     }
 };
-
-    
     
 const getPaginationNumbers = () => {
     const pages = [];
@@ -171,23 +168,7 @@ const getPaginationNumbers = () => {
     }
     return pages;
 };
-useEffect(() => {
-    const scrollingElement = document.querySelector(".app"); // Target the scrollable element
-
-    const restoreScrollPosition = () => {
-        const savedScrollPosition = sessionStorage.getItem("scrollPosition");
-        if (savedScrollPosition && location.pathname === "/") {
-            const scrollPosition = parseInt(savedScrollPosition, 10);
-            scrollingElement?.scrollTo(0, scrollPosition); // Restore scroll position
-            console.log("Scroll position restored:", scrollPosition); // Debug log
-        }
-    };
-
-    restoreScrollPosition();
-}, [location]);
-
-
-    
+ 
 // Dynamically set fighters per page to 5 fighters per row and 3 rows
 useEffect(() => {
     const setFixedGrid = () => {
@@ -199,33 +180,6 @@ useEffect(() => {
     window.addEventListener('resize', setFixedGrid);
     return () => window.removeEventListener('resize', setFixedGrid);
 }, []);
-
-
-
-useEffect(() => {
-    const scrollingElement = document.querySelector(".app"); // Target the scrollable element
-
-    const handleScroll = () => {
-        const scrollPosition = scrollingElement?.scrollTop || 0;
-        console.log("Current scroll position:", scrollPosition); // Debug log
-
-        // Show/Hide Scroll-to-Top Button
-        if (scrollPosition > 300) {
-            setShowScrollButton(true);
-        } else {
-            setShowScrollButton(false);
-        }
-
-        // Save scroll position for Page 1
-        if (location.pathname === "/") {
-            sessionStorage.setItem("scrollPosition", scrollPosition);
-        }
-    };
-
-    scrollingElement?.addEventListener("scroll", handleScroll);
-    return () => scrollingElement?.removeEventListener("scroll", handleScroll);
-}, [location]);
-
     
 const handleScrollToTop = () => {
     const scrollingElement = document.querySelector(".app"); // Target the scrollable element
