@@ -75,7 +75,10 @@ const FighterCard = ({ fighter, isFavorite, toggleFavorite }) => {
 
     const handleNavigate = () => {
         // Save the current scroll position
-        sessionStorage.setItem('scrollPosition', window.scrollY);
+const appElement = document.querySelector('.app');
+const scrollPos = appElement?.scrollTop ?? 0;
+sessionStorage.setItem('scrollPosition', scrollPos.toString());
+console.log("Back button clicked, scroll position saved:", scrollPos);
 
         // Navigate to FighterProfile
         navigate(`/fighter/${FighterId}`, { state: { fighter } });

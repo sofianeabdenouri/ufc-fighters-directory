@@ -29,7 +29,7 @@ const Header: React.FC<HeaderProps> = ({ scrollToFighters, conditionalRender = t
 
       <div className={classes.Content}>
         <div className={classes.SubContent}>
-          <h1>Welcome to the Mixed Marial Arts</h1>
+          <h1>Welcome to Mixed Marial Arts</h1>
           <p>The World of New Age Gladiators</p>
           <button type="button" onClick={scrollToFighters}>
             View MMA fighters
