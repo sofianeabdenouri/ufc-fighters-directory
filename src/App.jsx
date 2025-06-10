@@ -43,6 +43,7 @@ const removeAccents = (str) => {
 };
 
 function App() {
+    const location = useLocation();
     const [fighters, setFighters] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [sortBy, setSortBy] = useState('');
