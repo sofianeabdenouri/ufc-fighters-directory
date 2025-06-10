@@ -43,7 +43,6 @@ const removeAccents = (str) => {
 };
 
 function App() {
-    const location = useLocation();
     const [fighters, setFighters] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [sortBy, setSortBy] = useState('');
@@ -500,6 +499,7 @@ const handleScrollToTop = () => {
                     path="/"
                     element={
                         <div className="app">
+                            <ScrollRestorer /> 
                             <Header scrollToFighters={scrollToFighters} />
 
                             <h1 className="font-h1">UFC Records</h1>
