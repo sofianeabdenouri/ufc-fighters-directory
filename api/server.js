@@ -11,7 +11,7 @@ const app = express();
 // Allowed origins for CORS
 const allowedOrigins = [
     'http://localhost:5173', // Local frontend
-    'https://ufcrec.vercel.app', // Deployed frontend
+    'https://mmarec.vercel.app', // Deployed frontend
 ];
 
 // CORS configuration
