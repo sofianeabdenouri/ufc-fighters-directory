@@ -3,7 +3,7 @@ import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import './FighterProfile.css';
 import NotFound from '../not-found/NotFound';
 import { motion } from "framer-motion";
-import StarIcon from '../components/StarIcon.jsx'; 
+import StarIcon from '../../components/StarIcon.jsx'; 
 
 const FighterProfile = ({ favorites, toggleFavorite }) => {
     const location = useLocation();
