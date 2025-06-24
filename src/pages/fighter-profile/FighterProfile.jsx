@@ -203,13 +203,24 @@ const FighterProfile = ({ favorites, toggleFavorite }) => {
                 />
             </div>
 
-            <button onClick={() => toggleFavorite(fighter.FighterId)} className="profile-star-button">
-                <img
-                    src={isFavorite ? '/assets/images/star.png' : '/assets/images/star_gray.png'}
-                    alt={isFavorite ? 'Favorited' : 'Not Favorited'}
-                    className="profile-star-icon"
-                />
-            </button>
+            <button
+    onClick={() => toggleFavorite(fighter.FighterId)}
+    className="profile-star-button"
+    aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+    style={{ marginTop: 16, marginBottom: 16 }}
+>
+    <motion.span
+        animate={
+            isFavorite
+                ? { scale: [1, 1.3, 1], rotate: [0, -16, 0] }
+                : { scale: 1, rotate: 0 }
+        }
+        transition={{ duration: 0.35, type: "spring", stiffness: 400, damping: 20 }}
+        style={{ display: "inline-block" }}
+    >
+        <StarIcon filled={isFavorite} />
+    </motion.span>
+</button>
         </div>
     );
 };

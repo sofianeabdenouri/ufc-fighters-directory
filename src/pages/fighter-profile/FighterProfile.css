@@ -118,6 +118,18 @@
     width: 80px; /* Adjust size */
     height: 80px;
 }
+/* Star icon inside profile favorite button */
+.profile-star-button svg {
+    width: 80px;
+    height: 80px;
+    display: block;
+    transition: filter 0.2s;
+}
+
+/* Burst/glow when favorited */
+.profile-star-button.filled svg {
+    filter: drop-shadow(0 0 12px #ffc006bb);
+}
 
 @media (max-width: 768px) {
     .fighter-profile-container {
