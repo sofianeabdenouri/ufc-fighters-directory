@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from "framer-motion";
-import StarIcon from './StarIcon'; 
+import StarIcon from './StarIcon.jsx'; 
 
 // Function to sanitize and format names to match image filenames
 const sanitizeNameForImage = (firstName = '', lastName = '', nickname = '', isDuplicate = false) => {
