@@ -1,5 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from "framer-motion";
+import StarIcon from './StarIcon'; 
 
 // Function to sanitize and format names to match image filenames
 const sanitizeNameForImage = (firstName = '', lastName = '', nickname = '', isDuplicate = false) => {
@@ -80,21 +82,32 @@ const FighterCard = ({ fighter, isFavorite, toggleFavorite }) => {
 
     return (
         <div className="fighter-card">
-            <div className="nickname-wrapper">
-                {Nickname ? (
-                    <p className="nickname">"{Nickname}"</p>
-                ) : (
-                    <p className="nickname">&nbsp;</p> // Placeholder if no nickname
-                )}
-                {/* Favorite Star Icon */}
-                <button onClick={() => toggleFavorite(FighterId)} className="star-button">
-                    <img
-                        src={isFavorite ? '/assets/images/star.png' : '/assets/images/star_gray.png'}
-                        alt={isFavorite ? 'Favorited' : 'Not Favorited'}
-                        className="star-icon"
-                    />
-                </button>
-            </div>
+       <div className="nickname-wrapper">
+  {Nickname ? (
+    <p className="nickname">"{Nickname}"</p>
+  ) : (
+    <p className="nickname">&nbsp;</p>
+  )}
+  <button
+    onClick={() => toggleFavorite(FighterId)}
+    className="star-button"
+    aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+    style={{ marginLeft: 8 }}
+  >
+    <motion.span
+      animate={
+        isFavorite
+          ? { scale: [1, 1.6, 1.2, 1], rotate: [0, -24, 8, 0] }
+          : { scale: 1, rotate: 0 }
+      }
+      transition={{ duration: 0.4, type: "spring", stiffness: 500, damping: 15 }}
+      style={{ display: "inline-block", verticalAlign: "middle" }}
+    >
+      <StarIcon filled={isFavorite} />
+    </motion.span>
+  </button>
+</div>
+
 
             <h2>{FirstName || 'Unknown'} {LastName || ''}</h2>
             <p>{WeightClass || 'Unknown'}</p>

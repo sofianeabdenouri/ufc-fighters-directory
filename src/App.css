@@ -30,15 +30,17 @@ h1 {
 /* Adjust gap between search bar and dropdown filters */
 .search-container {
   display: flex;
+  flex-direction: row;
   justify-content: center;
   align-items: center;
   width: 100%;
   margin: 0;
   padding: 10px;
-  gap: 2px; /* Add gap between elements */
+  gap: 14px; /* Set a reasonable gap for all elements */
   background-color: #242424;
   transition: border-bottom 0.3s ease;
 }
+
 
 /* Only apply the border-bottom when scrolled */
 .search-container.scrolled {
@@ -409,17 +411,29 @@ button:hover {
   background: none;
   border: none;
   cursor: pointer;
-  padding: 0; /* Remove any padding so the star itself is clickable */
-  position: absolute; /* Position the star next to the nickname */
-  right: 0; /* Align the star to the right */
+  padding: 0;
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
 }
 
-/* Star icon */
+/* Star icon (for SVG) */
 .star-icon {
-  width: 24px;
-  height: 24px;
-  display: inline-block;
+  width: 28px;
+  height: 28px;
+  display: block;
+  pointer-events: none; /* So only the button handles clicks */
+  transition: filter 0.2s;
 }
+
+/* Add a little glow when favorited */
+.star-button.filled .star-icon {
+  filter: drop-shadow(0 0 5px #ffc006aa);
+}
+
 /* Custom styles for the select dropdown */
 .select-favorites {
   background-color: #FFC006; /* Yellow background for the dropdown */
@@ -580,7 +594,6 @@ option[value="favorites"] {
   text-align: center;
 }
 .search-container select {
-  margin-right: 10px; /* Adds space between the dropdown and the search button */
 }
 .favorites-button {
   background-color: #FFC006; /* Yellow background like the dropdown */
@@ -589,7 +602,6 @@ option[value="favorites"] {
   cursor: pointer;
   border: 1px solid #ccc;
   transition: background-color 0.3s ease;
-  margin-left: 15px; /* Space between search button and favorites button */
 }
 
 .favorites-button:hover {
@@ -645,7 +657,6 @@ option[value="favorites"] {
   }
 
   .search-input-wrapper {
-    margin-right: 0;
     width: 100%;
   }
 

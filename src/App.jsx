@@ -4,6 +4,7 @@ import FighterCard from './components/FighterCard';
 import FighterProfile from './pages/fighter-profile/FighterProfile';
 import Header from './header/Header';
 import './App.css';
+
 import ScrollRestorer from './ScrollRestorer'; 
 // Utility function to sanitize fighter names for use in image paths
 const sanitizeNameForImage = (firstName = '', lastName = '', nickname = '', isDuplicate = false) => {
@@ -493,7 +494,7 @@ const handleScrollToTop = () => {
         Favorites
     </button>
 
-    <button onClick={toggleAdvancedSearch} style={{ marginLeft: '10px' }}>
+    <button onClick={toggleAdvancedSearch}>
         {showAdvancedSearch ? 'Hide Advanced Filters' : 'Advanced Filters'}
     </button>
 </div>
