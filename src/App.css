@@ -593,8 +593,7 @@ option[value="favorites"] {
   margin-top: 5px;
   text-align: center;
 }
-.search-container select {
-}
+
 .favorites-button {
   background-color: #FFC006; /* Yellow background like the dropdown */
   color: black; /* Black text for contrast */
