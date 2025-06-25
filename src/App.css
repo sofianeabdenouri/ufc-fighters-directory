@@ -274,15 +274,15 @@ input {
   display: flex;
   justify-content: center;
   align-items: stretch;
-  gap: 24px;
+  gap: 28px;
   flex-wrap: wrap;
 }
 
 .male-divisions, .female-divisions, .other-divisions {
   flex: 1 1 200px;
   background: #232323;
-  border-radius: 10px;
-  padding: 18px 14px 14px 14px;
+  border-radius: 12px;
+  padding: 24px 28px 20px 28px;
   margin: 0;
   min-width: 180px;
   max-width: 250px;
@@ -293,26 +293,27 @@ input {
 }
 
 .male-divisions h3, .female-divisions h3, .other-divisions h3 {
-  margin: 0 0 12px 0;
+  margin: 0 0 16px 0;
   color: #ffc006;
   font-size: 1.12rem;
   font-weight: bold;
   letter-spacing: 0.01em;
 }
 
-/* Label styling for checkbox row: text left, box right */
 .male-divisions label,
 .female-divisions label,
 .other-divisions label {
   display: flex;
-  justify-content: space-between;
+  flex-direction: row;
   align-items: center;
+  justify-content: space-between;
   width: 100%;
-  font-size: 0.97rem;
+  font-size: 1rem;
   color: #eee;
-  margin-bottom: 9px;
+  margin-bottom: 12px;
+  padding: 0;
   cursor: pointer;
-  padding: 0 2px;
+  gap: 10px;
 }
 
 .male-divisions label:last-child,
@@ -324,11 +325,12 @@ input {
 .male-divisions input[type="checkbox"],
 .female-divisions input[type="checkbox"],
 .other-divisions input[type="checkbox"] {
-  margin-left: 18px;
-  transform: scale(1.15);
+  margin: 0 0 0 10px;
   accent-color: #ffc006;
+  transform: scale(1.12);
   cursor: pointer;
 }
+
 
 /* Responsive, mobile-first: Stack the columns, shrink padding */
 @media (max-width: 1024px) {
