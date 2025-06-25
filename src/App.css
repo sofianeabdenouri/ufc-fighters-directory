@@ -279,13 +279,13 @@ input {
 }
 
 .male-divisions, .female-divisions, .other-divisions {
-  flex: 1 1 200px;
+  flex: 1 1 270px;
   background: #232323;
   border-radius: 12px;
   padding: 24px 28px 20px 28px;
   margin: 0;
-  min-width: 180px;
-  max-width: 250px;
+  min-width: 270px;
+  max-width: 340px;
   box-shadow: 0 1px 6px rgba(0,0,0,0.11);
   display: flex;
   flex-direction: column;
@@ -314,6 +314,7 @@ input {
   padding: 0;
   cursor: pointer;
   gap: 10px;
+  white-space: nowrap;        /* NEVER WRAP TEXT */
 }
 
 .male-divisions label:last-child,
@@ -330,6 +331,7 @@ input {
   transform: scale(1.12);
   cursor: pointer;
 }
+
 
 
 /* Responsive, mobile-first: Stack the columns, shrink padding */
