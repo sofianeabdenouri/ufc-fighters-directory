@@ -509,12 +509,14 @@ const handleScrollToTop = () => {
                                             {maleWeightClasses.slice(0, 8).map(wc => (
                                                 <div key={wc}>
                                                     <label>
-                                                        <input
-                                                            type="checkbox"
-                                                            onChange={() => toggleWeightClass(wc)}
-                                                            disabled={isWeightClassDisabled(wc)}
-                                                        /> {wc}
-                                                    </label>
+  {wc}
+  <input
+    type="checkbox"
+    onChange={() => toggleWeightClass(wc)}
+    disabled={isWeightClassDisabled(wc)}
+  />
+</label>
+
                                                 </div>
                                             ))}
                                         </div>
@@ -524,12 +526,14 @@ const handleScrollToTop = () => {
                                             {femaleWeightClasses.map(wc => (
                                                 <div key={wc}>
                                                     <label>
-                                                        <input
-                                                            type="checkbox"
-                                                            onChange={() => toggleWeightClass(wc)}
-                                                            disabled={isWeightClassDisabled(wc)}
-                                                        /> {wc}
-                                                    </label>
+  {wc}
+  <input
+    type="checkbox"
+    onChange={() => toggleWeightClass(wc)}
+    disabled={isWeightClassDisabled(wc)}
+  />
+</label>
+
                                                 </div>
                                             ))}
                                         </div>
@@ -539,12 +543,14 @@ const handleScrollToTop = () => {
                                             {maleWeightClasses.slice(8).map(wc => (
                                                 <div key={wc}>
                                                     <label>
-                                                        <input
-                                                            type="checkbox"
-                                                            onChange={() => toggleWeightClass(wc)}
-                                                            disabled={isWeightClassDisabled(wc)}
-                                                        /> {wc}
-                                                    </label>
+  {wc}
+  <input
+    type="checkbox"
+    onChange={() => toggleWeightClass(wc)}
+    disabled={isWeightClassDisabled(wc)}
+  />
+</label>
+
                                                 </div>
                                             ))}
                                         </div>
