@@ -366,25 +366,25 @@ input {
 }
 
 
-/* Label styling to center-align text and checkbox */
+/* Label styling to center-align text and checkbox 
 label {
   display: flex;
-  flex-direction: row-reverse; /* Checkbox on the right */
-  justify-content: flex-start; /* Keep text aligned to the left */
-  align-items: center; /* Center-align text and checkbox vertically */
-  font-size: 0.9rem; /* Adjust font size */
+  flex-direction: row-reverse; /* Checkbox on the right 
+  justify-content: flex-start;  Keep text aligned to the left 
+  align-items: center; /* Center-align text and checkbox vertically 
+  font-size: 0.9rem; /* Adjust font size 
   color: white;
   width: 100%;
   margin-bottom: 5px;
 }
 
 
-/* Position the checkbox exactly where needed */
+/* Position the checkbox exactly where needed 
 label input[type="checkbox"] {
   margin-right: 50px; 
-  text-align: right;
+  text-align: right; 
 }
-
+*/
 .result-count {
   color: #8b0000; /* Main text color (deep red) */
   text-shadow: 
