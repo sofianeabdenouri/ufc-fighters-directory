@@ -286,7 +286,10 @@ const handleScrollToTop = () => {
                     .catch((error) => console.error('Error fetching data:', error));
             }, []);
             
-    
+   useEffect(() => {
+  handleSearch();
+}, [searchTerm]);
+ 
     const handleSort = (results) => {
         let sortedFighters = [...results];
 
