@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import useSaveScrollOnUnmount from './components/useSaveScrollOnUnmount';
-import FighterCard from './FighterCard'; // Assure-toi que l'import est correct
+import FighterCard from './FighterCard';
 import Loading from './components/Loading';
 
 // Utility function to sanitize names
@@ -51,7 +51,8 @@ function FighterList() {
       .finally(() => setLoading(false));
   }, []);
 
-  const handleSearch = () => {
+  // Real-time filtering
+  useEffect(() => {
     const sanitizedTerm = sanitizeName(searchTerm);
 
     const filtered = fighters.filter((fighter) => {
@@ -60,13 +61,13 @@ function FighterList() {
     });
 
     setFilteredFighters(filtered);
-  };
+  }, [searchTerm, fighters]);
 
   const handleSort = (e) => {
     const sortType = e.target.value;
     setSortBy(sortType);
 
-    let sortedFighters = [...fighters];
+    let sortedFighters = [...filteredFighters]; // Sort the filtered list
     switch (sortType) {
       case 'alphabetical':
         sortedFighters.sort((a, b) => a.LastName.localeCompare(b.LastName));
@@ -85,18 +86,27 @@ function FighterList() {
   };
 
   if (loading) {
-  return <Loading />;
-}
+    return <Loading />;
+  }
 
   return (
     <div>
-      <input
-        type="text"
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        placeholder="Search fighters"
-      />
-      <button onClick={handleSearch}>Search</button>
+      <div className="search-input-wrapper">
+        <input
+          type="text"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder="Search fighters"
+        />
+        {searchTerm && (
+          <button
+            className="clear-search"
+            onClick={() => setSearchTerm('')}
+          >
+            &times;
+          </button>
+        )}
+      </div>
 
       <select value={sortBy} onChange={handleSort}>
         <option value="">Sort by</option>
