@@ -1,13 +1,12 @@
-import React from 'react';
-import classes from './Loading.module.css';
+import { motion } from "framer-motion";
+import styles from "./Loading.module.css";
 
-const  Loading: React.FC = () => {
-    return (
-        <div className={classes.Loading}>
-            <div className={classes.Loader} />
-            <p>Loading Fighters</p>
-        </div>
-    )
+export default function LoadingSpinner() {
+  return (
+    <motion.div
+      animate={{ rotate: 360 }}
+      transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+      className={styles.spinner}
+    />
+  );
 }
-
-export default Loading

@@ -4,6 +4,8 @@ import FighterCard from './components/FighterCard';
 import Header from './header/Header';
 import './App.css';
 import ScrollRestorer from './ScrollRestorer';
+import Loading from './components/Loading';
+
 
 const FighterProfile = React.lazy(() => import('./pages/fighter-profile/FighterProfile'));
 
@@ -719,13 +721,13 @@ This is a fan-made project and is in no way affiliated with, authorized, or endo
                 <Route
                     path="/fighter/:id"
                     element={
-                            <Suspense fallback={<div>Loading...</div>}>
+                            <Suspense fallback={<Loading />}>
+  <FighterProfile
+    favorites={favorites}
+    toggleFavorite={toggleFavorite}
+  />
+</Suspense>
 
-                        <FighterProfile 
-                            favorites={favorites}
-                            toggleFavorite={toggleFavorite}
-                        />
-                            </Suspense>
 
                     }
                 />

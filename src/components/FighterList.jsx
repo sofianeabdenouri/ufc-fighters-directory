@@ -1,113 +1,117 @@
+import React, { useState, useEffect } from 'react';
 import useSaveScrollOnUnmount from './components/useSaveScrollOnUnmount';
-// Utility function to sanitize names (removes accents, special characters)
+import FighterCard from './FighterCard'; // Assure-toi que l'import est correct
+import Loading from './components/Loading';
+
+// Utility function to sanitize names
 const sanitizeName = (firstName = '', lastName = '') => {
-    const fullName = [firstName, lastName]
-        .filter(Boolean)               // Remove empty or undefined names
-        .join(' ')                     // Join with space if both names are present
-        .normalize('NFD')              // Normalize to decompose accented characters
-        .replace(/[\u0300-\u036f]/g, '') // Remove accents
-        .toLowerCase()                 // Convert to lowercase
-        .replace(/['-]/g, '')          // Remove apostrophes and hyphens
-        .replace(/[^a-z0-9\s]/g, '')   // Remove non-alphanumeric characters
-        .replace(/\s+/g, '_')          // Replace spaces with underscores
-        .trim();                       // Remove leading/trailing spaces
-    
-    return fullName;
+  const fullName = [firstName, lastName]
+    .filter(Boolean)
+    .join(' ')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/['-]/g, '')
+    .replace(/[^a-z0-9\s]/g, '')
+    .replace(/\s+/g, '_')
+    .trim();
+  return fullName;
 };
 
-
 function FighterList() {
-    useSaveScrollOnUnmount();
-    const [fighters, setFighters] = useState([]);
-    const [filteredFighters, setFilteredFighters] = useState([]);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [sortBy, setSortBy] = useState('');
+  useSaveScrollOnUnmount();
+  const [fighters, setFighters] = useState([]);
+  const [filteredFighters, setFilteredFighters] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortBy, setSortBy] = useState('');
+  const [loading, setLoading] = useState(true);
 
-    const apiKey = VITE_API_KEY; // Replace with your API key
-    const apiUrl = `${import.meta.env.VITE_API_URL.trim().replace(/\/+$/, '')}/fighters`;
+  const apiUrl = `${import.meta.env.VITE_API_URL.trim().replace(/\/+$/, '')}/fighters`;
 
-    // Fetch fighters data
-    useEffect(() => {
-        fetch(apiUrl)
-            .then((response) => response.json())
-            .then((data) => {
-                const uniqueFighters = [];
-                const namesSet = new Set();
+  useEffect(() => {
+    setLoading(true);
+    fetch(apiUrl)
+      .then((response) => response.json())
+      .then((data) => {
+        const uniqueFighters = [];
+        const namesSet = new Set();
 
-                data.forEach((fighter) => {
-                    const fullName = `${fighter.FirstName} ${fighter.LastName}`;
-                    if (!namesSet.has(fullName)) {
-                        namesSet.add(fullName);
-                        uniqueFighters.push(fighter);
-                    }
-                });
-
-                setFighters(uniqueFighters);
-                setFilteredFighters(uniqueFighters);
-            })
-            .catch((error) => console.error('Error fetching data:', error));
-    }, []);
-
-    // Handle search input
-    const handleSearch = () => {
-        const sanitizedTerm = sanitizeName(searchTerm);
-    
-        const filtered = fighters.filter((fighter) => {
-            const fullName = sanitizeName(fighter.FirstName, fighter.LastName);
-            return fullName.includes(sanitizedTerm);
+        data.forEach((fighter) => {
+          const fullName = `${fighter.FirstName} ${fighter.LastName}`;
+          if (!namesSet.has(fullName)) {
+            namesSet.add(fullName);
+            uniqueFighters.push(fighter);
+          }
         });
-    
-        setFilteredFighters(filtered);
-    };
-    
 
-    // Handle sorting logic
-    const handleSort = (e) => {
-        const sortType = e.target.value;
-        setSortBy(sortType);
+        setFighters(uniqueFighters);
+        setFilteredFighters(uniqueFighters);
+      })
+      .catch((error) => console.error('Error fetching data:', error))
+      .finally(() => setLoading(false));
+  }, []);
 
-        let sortedFighters = [...fighters];
-        switch (sortType) {
-            case 'alphabetical':
-                sortedFighters.sort((a, b) => a.LastName.localeCompare(b.LastName));
-                break;
-            case 'mostWins':
-                sortedFighters.sort((a, b) => b.Wins - a.Wins);
-                break;
-            case 'mostLosses':
-                sortedFighters.sort((a, b) => b.Losses - a.Losses);
-                break;
-            default:
-                break;
-        }
+  const handleSearch = () => {
+    const sanitizedTerm = sanitizeName(searchTerm);
 
-        setFilteredFighters(sortedFighters);
-    };
+    const filtered = fighters.filter((fighter) => {
+      const fullName = sanitizeName(fighter.FirstName, fighter.LastName);
+      return fullName.includes(sanitizedTerm);
+    });
 
-    return (
-        <div>
-            <input
-                type="text"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search fighters"
-            />
-            <button onClick={handleSearch}>Search</button>
+    setFilteredFighters(filtered);
+  };
 
-            <select value={sortBy} onChange={handleSort}>
-                <option value="">Sort by</option>
-                <option value="alphabetical">Alphabetical</option>
-                <option value="mostWins">Most Wins</option>
-                <option value="mostLosses">Most Losses</option>
-            </select>
+  const handleSort = (e) => {
+    const sortType = e.target.value;
+    setSortBy(sortType);
 
-            <div className="fighter-list">
-                {filteredFighters.map((fighter) => (
-                    <FighterCard key={fighter.FighterId} fighter={fighter} />
-                ))}
-            </div>
-        </div>
-    );
+    let sortedFighters = [...fighters];
+    switch (sortType) {
+      case 'alphabetical':
+        sortedFighters.sort((a, b) => a.LastName.localeCompare(b.LastName));
+        break;
+      case 'mostWins':
+        sortedFighters.sort((a, b) => b.Wins - a.Wins);
+        break;
+      case 'mostLosses':
+        sortedFighters.sort((a, b) => b.Losses - a.Losses);
+        break;
+      default:
+        break;
+    }
+
+    setFilteredFighters(sortedFighters);
+  };
+
+  if (loading) {
+  return <Loading />;
+}
+
+  return (
+    <div>
+      <input
+        type="text"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        placeholder="Search fighters"
+      />
+      <button onClick={handleSearch}>Search</button>
+
+      <select value={sortBy} onChange={handleSort}>
+        <option value="">Sort by</option>
+        <option value="alphabetical">Alphabetical</option>
+        <option value="mostWins">Most Wins</option>
+        <option value="mostLosses">Most Losses</option>
+      </select>
+
+      <div className="fighter-list">
+        {filteredFighters.map((fighter) => (
+          <FighterCard key={fighter.FighterId} fighter={fighter} />
+        ))}
+      </div>
+    </div>
+  );
 }
 
 export default FighterList;

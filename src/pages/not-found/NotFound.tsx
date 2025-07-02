@@ -11,7 +11,7 @@ const NotFound: React.FC = () => {
             </h1>
 
 <div>
-                <img src={gif} alt='gif' />
+<img src={gif} alt="gif" className={classes.Image} />
             </div>
 
 
