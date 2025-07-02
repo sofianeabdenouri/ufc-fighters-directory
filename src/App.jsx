@@ -1,11 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import FighterCard from './components/FighterCard';
-import FighterProfile from './pages/fighter-profile/FighterProfile';
 import Header from './header/Header';
 import './App.css';
+import ScrollRestorer from './ScrollRestorer';
 
-import ScrollRestorer from './ScrollRestorer'; 
+const FighterProfile = React.lazy(() => import('./pages/fighter-profile/FighterProfile'));
+
 // Utility function to sanitize fighter names for use in image paths
 const sanitizeNameForImage = (firstName = '', lastName = '', nickname = '', isDuplicate = false) => {
     const fullName = [firstName, lastName]
@@ -718,10 +719,14 @@ This is a fan-made project and is in no way affiliated with, authorized, or endo
                 <Route
                     path="/fighter/:id"
                     element={
+                            <Suspense fallback={<div>Loading...</div>}>
+
                         <FighterProfile 
                             favorites={favorites}
                             toggleFavorite={toggleFavorite}
                         />
+                            </Suspense>
+
                     }
                 />
             </Routes>
