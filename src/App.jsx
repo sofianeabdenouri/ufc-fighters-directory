@@ -4,7 +4,7 @@ import FighterCard from './components/FighterCard';
 import Header from './header/Header';
 import './App.css';
 import ScrollRestorer from './ScrollRestorer';
-import Loading from './components/Loading';
+import Loading from "./common/loading/Loading";
 
 
 const FighterProfile = React.lazy(() => import('./pages/fighter-profile/FighterProfile'));
