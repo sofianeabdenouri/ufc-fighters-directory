@@ -4,7 +4,7 @@ import './FighterProfile.css';
 import NotFound from '../not-found/NotFound';
 import { motion } from "framer-motion";
 import StarIcon from '../../components/StarIcon.jsx'; 
-import LoadingSpinner from "../../loading/Loading";
+import Loading from "../../common/loading/Loading";
 
 const FighterProfile = ({ favorites, toggleFavorite }) => {
     const location = useLocation();
@@ -40,7 +40,7 @@ const FighterProfile = ({ favorites, toggleFavorite }) => {
 
 if (loading) return (
   <div className="fighter-profile-container">
-    <LoadingSpinner />
+    <Loading />
   </div>
 );
 
