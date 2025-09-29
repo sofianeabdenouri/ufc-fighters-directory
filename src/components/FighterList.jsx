@@ -26,7 +26,7 @@ function FighterList() {
   const [sortBy, setSortBy] = useState('');
   const [loading, setLoading] = useState(true);
 
-  const apiUrl = `${import.meta.env.VITE_API_URL.trim().replace(/\/+$/, '')}/fighters`;
+const apiUrl = '/api/fighters';
 
   useEffect(() => {
     setLoading(true);

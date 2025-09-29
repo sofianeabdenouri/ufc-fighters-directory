@@ -214,7 +214,8 @@ const handleScrollToTop = () => {
         fighterListRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
     useEffect(() => {
-        const apiUrl = `${import.meta.env.VITE_API_URL.trim().replace(/\/+$/, '')}/fighters`;
+       const apiUrl = '/api/fighters';
+
         fetch(apiUrl)
             .then((response) => {
                 if (!response.ok) {

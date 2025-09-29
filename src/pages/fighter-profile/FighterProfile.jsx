@@ -20,7 +20,7 @@ const FighterProfile = ({ favorites, toggleFavorite }) => {
         if (!fighter) {
             console.log('Fetching fighter data for Fighter ID:', id);
             setLoading(true);
-            const apiUrl = `${import.meta.env.VITE_API_URL.replace(/\/+$/, '')}/fighters/${id}`;
+fetch(`/api/fighters/${id}`)
             fetch(apiUrl)
                 .then((response) => {
                     if (!response.ok) throw new Error('Failed to fetch fighter data');
