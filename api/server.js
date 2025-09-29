@@ -1,129 +1,116 @@
+// api/server.js
 import dotenv from 'dotenv';
-dotenv.config(); // Load environment variables from .env file
+dotenv.config();
 
 import express from 'express';
-import { MongoClient } from 'mongodb';
-import fetch from 'node-fetch';
 import cors from 'cors';
+import { MongoClient } from 'mongodb';
+// On Node 20/22, global fetch exists. If you prefer node-fetch, keep your import.
+// import fetch from 'node-fetch';
 
 const app = express();
 
-// Allowed origins for CORS
-const allowedOrigins = [
-    'http://localhost:5173', // Local frontend
-    'https://mmarec.vercel.app', // Deployed frontend
-];
-
-// CORS configuration
+// ---------- CORS (allow localhost + any *.vercel.app) ----------
 const corsOptions = {
-    origin: (origin, callback) => {
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-    optionsSuccessStatus: 200, // Handle legacy browsers
+  origin: (origin, cb) => {
+    if (!origin) return cb(null, true); // same-origin / curl
+    if (origin === 'http://localhost:5173') return cb(null, true);
+    if (origin.endsWith('.vercel.app')) return cb(null, true);
+    return cb(new Error('Not allowed by CORS'));
+  },
+  optionsSuccessStatus: 200,
 };
+app.options('*', cors(corsOptions));
+app.use(cors(corsOptions));
+app.use(express.json());
 
-app.options('*', cors(corsOptions)); // Preflight requests
-app.use(cors(corsOptions)); // Enable CORS
-
-// MongoDB connection variables
+// ---------- Mongo (only if you need it on some routes) ----------
 const uri = process.env.MONGODB_URI;
 const dbName = process.env.MONGODB_NAME;
-
-let cachedDb = null; // Cache the database connection
+let cachedDb = null;
 
 async function connectToDB() {
-    if (cachedDb) {
-        console.log('Using cached database instance');
-        return cachedDb;
-    }
-
-    console.log('Connecting to MongoDB...');
-    try {
-        const client = new MongoClient(uri); // Modern MongoDB driver
-        await client.connect();
-        console.log('Connected to MongoDB');
-        cachedDb = client.db(dbName); // Cache the database connection
-        return cachedDb;
-    } catch (error) {
-        console.error('Error connecting to MongoDB:', error.message);
-        throw error;
-    }
+  if (cachedDb) return cachedDb;
+  const client = new MongoClient(uri);
+  await client.connect();
+  cachedDb = client.db(dbName);
+  return cachedDb;
 }
 
-// Log all requests
-app.use((req, res, next) => {
-    console.log(`${req.method} ${req.url}`);
-    next();
+// ---------- Small helper: fetch with timeout ----------
+async function fetchWithTimeout(url, ms = 12000) {
+  const controller = new AbortController();
+  const t = setTimeout(() => controller.abort(), ms);
+  try {
+    const res = await fetch(url, { signal: controller.signal });
+    return res;
+  } finally {
+    clearTimeout(t);
+  }
+}
+
+// ---------- Logging ----------
+app.use((req, _res, next) => {
+  console.log(`${req.method} ${req.url}`);
+  next();
 });
 
-// API route to fetch fighters from SportsData API
-app.get('/api/fighters', async (req, res) => {
-    try {
-        console.log('Fetching fighters...');
-        const response = await fetch(
-            `https://api.sportsdata.io/v3/mma/scores/json/FightersBasic?key=${process.env.VITE_API_KEY}`
-        );
-        if (!response.ok) {
-            throw new Error(`Failed to fetch fighters: ${response.statusText}`);
-        }
-        const fighters = await response.json();
-        res.status(200).json(fighters);
-    } catch (error) {
-        console.error('Error fetching fighters:', error.message);
-        res.status(500).json({ error: 'Failed to fetch fighters', details: error.message });
+// ---------- Routes ----------
+app.get('/api/fighters', async (_req, res) => {
+  try {
+    const url = `https://api.sportsdata.io/v3/mma/scores/json/FightersBasic?key=${process.env.VITE_API_KEY}`;
+    const response = await fetchWithTimeout(url);
+    if (!response.ok) {
+      const body = await response.text();
+      throw new Error(`SportsData: ${response.status} ${response.statusText} ${body}`);
     }
+    const fighters = await response.json();
+    res.status(200).json(fighters);
+  } catch (err) {
+    console.error('GET /api/fighters', err.message);
+    res.status(500).json({ error: 'Failed to fetch fighters' });
+  }
 });
 
-// API route to fetch a specific fighter by ID
 app.get('/api/fighters/:id', async (req, res) => {
-    const { id } = req.params;
-    try {
-        console.log(`Fetching fighter with ID: ${id}`);
-        const response = await fetch(
-            `https://api.sportsdata.io/v3/mma/scores/json/Fighter/${id}?key=${process.env.VITE_API_KEY}`
-        );
-        if (!response.ok) {
-            throw new Error(`Failed to fetch fighter: ${response.statusText}`);
-        }
-        const fighter = await response.json();
-        res.status(200).json(fighter);
-    } catch (error) {
-        console.error(`Error fetching fighter with ID ${id}:`, error.message);
-        res.status(500).json({ error: `Failed to fetch fighter with ID ${id}`, details: error.message });
+  try {
+    const url = `https://api.sportsdata.io/v3/mma/scores/json/Fighter/${req.params.id}?key=${process.env.VITE_API_KEY}`;
+    const response = await fetchWithTimeout(url);
+    if (!response.ok) {
+      const body = await response.text();
+      throw new Error(`SportsData: ${response.status} ${response.statusText} ${body}`);
     }
+    const fighter = await response.json();
+    res.status(200).json(fighter);
+  } catch (err) {
+    console.error(`GET /api/fighters/${req.params.id}`, err.message);
+    res.status(500).json({ error: `Failed to fetch fighter ${req.params.id}` });
+  }
 });
 
-// Default route
-app.get('/', (req, res) => {
-    res.status(200).send('Welcome to MMA Fighters Directory API!');
+// Root
+app.get('/', (_req, res) => {
+  res.status(200).send('Welcome to MMA Fighters Directory API!');
 });
 
-// Local server setup
+// ---------- Local dev server ----------
 if (process.env.NODE_ENV !== 'production') {
-    const port = process.env.PORT || 5001;
-    app.listen(port, async () => {
-        console.log(`Server running on http://localhost:${port}`);
-        await connectToDB(); // Ensure DB connection is tested on startup
-    });
+  const port = process.env.PORT || 5001;
+  app.listen(port, async () => {
+    console.log(`Server running on http://localhost:${port}`);
+    // Only connect locally to verify credentials if you actually need DB
+    try { await connectToDB(); console.log('Mongo connected (local)'); } catch {}
+  });
 }
 
-// Export handler for Vercel
+// ---------- Vercel serverless handler ----------
 export default async (req, res) => {
-    console.log('Starting MongoDB connection...');
-    try {
-        const db = await connectToDB(); // Ensure DB connection for serverless deployment
-        console.log('MongoDB connection established successfully.');
-        req.db = db; // Attach DB instance to the request
-        app(req, res); // Pass the request to Express
-    } catch (error) {
-        console.error('Error establishing MongoDB connection:', error.message);
-        return res.status(500).json({
-            error: 'Failed to connect to the database',
-            details: error.message,
-        });
-    } 
+  try {
+    // IMPORTANT: do NOT connect to Mongo here unless a route needs it.
+    // If later you add a DB-backed route, call `await connectToDB()` inside that route.
+    app(req, res);
+  } catch (err) {
+    console.error('Handler error', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 };
