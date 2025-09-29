@@ -59,34 +59,60 @@ app.use((req, _res, next) => {
 app.get('/api/fighters', async (_req, res) => {
   try {
     const url = `https://api.sportsdata.io/v3/mma/scores/json/FightersBasic?key=${process.env.VITE_API_KEY}`;
-    const response = await fetchWithTimeout(url);
+    const response = await fetch(url);
+    const body = await response.text(); // read once so we can forward exact error
+
     if (!response.ok) {
-      const body = await response.text();
-      throw new Error(`SportsData: ${response.status} ${response.statusText} ${body}`);
+      console.error('SportsData error:', response.status, response.statusText, body.slice(0,300));
+      return res.status(response.status).json({
+        error: 'sportsdata_failed',
+        status: response.status,
+        statusText: response.statusText,
+        body
+      });
     }
-    const fighters = await response.json();
-    res.status(200).json(fighters);
+
+    res.setHeader('Content-Type', 'application/json');
+    res.status(200).send(body); // send raw JSON string
   } catch (err) {
-    console.error('GET /api/fighters', err.message);
-    res.status(500).json({ error: 'Failed to fetch fighters' });
+    console.error('GET /api/fighters', err);
+    res.status(500).json({ error: 'server_failed', detail: String(err) });
   }
 });
 
+
 app.get('/api/fighters/:id', async (req, res) => {
   try {
-    const url = `https://api.sportsdata.io/v3/mma/scores/json/Fighter/${req.params.id}?key=${process.env.VITE_API_KEY}`;
-    const response = await fetchWithTimeout(url);
+    const url = `https://api.sportsdata.io/v3/mma/scores/json/Fighter/${encodeURIComponent(
+      req.params.id
+    )}?key=${process.env.VITE_API_KEY}`;
+
+    const response = await fetchWithTimeout(url); // use your helper
+    const body = await response.text();           // read once
+
     if (!response.ok) {
-      const body = await response.text();
-      throw new Error(`SportsData: ${response.status} ${response.statusText} ${body}`);
+      console.error(
+        'SportsData error (/id):',
+        response.status,
+        response.statusText,
+        body.slice(0, 300)
+      );
+      return res.status(response.status).json({
+        error: 'sportsdata_failed',
+        status: response.status,
+        statusText: response.statusText,
+        body
+      });
     }
-    const fighter = await response.json();
-    res.status(200).json(fighter);
+
+    res.setHeader('Content-Type', 'application/json');
+    res.status(200).send(body); // forward raw JSON
   } catch (err) {
-    console.error(`GET /api/fighters/${req.params.id}`, err.message);
-    res.status(500).json({ error: `Failed to fetch fighter ${req.params.id}` });
+    console.error(`GET /api/fighters/${req.params.id}`, err);
+    res.status(500).json({ error: 'server_failed', detail: String(err) });
   }
 });
+
 
 // Root
 app.get('/', (_req, res) => {
