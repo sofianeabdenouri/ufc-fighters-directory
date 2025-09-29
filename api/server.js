@@ -125,5 +125,5 @@ export default async (req, res) => {
             error: 'Failed to connect to the database',
             details: error.message,
         });
-    }
+    } 
 };
